@@ -8,75 +8,76 @@
     :root {
       --bg: #09070f; --panel: #130f22; --card: #1a152e; --border: #2c224d;
       --text: #f1edf7; --muted: #9c94b0; --accent: #9d4edd; --accent2: #f72585;
-      --danger: #ff5252; --success: #2ecc71; --star: #ffbe0b;
+      --star: #ffbe0b;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
     .wrap { max-width: 900px; margin: 0 auto; }
-    .site-title { text-align: center; font-size: 2.6rem; font-weight: 800; margin-bottom: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
+    .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    /* Кнопка настроек */
+    .btn-settings { background: none; border: none; cursor: pointer; font-size: 1.5rem; position: absolute; right: 0; }
+
+    /* Панель токена */
     .token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; }
-    .add-panel { background: #130f22; border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; }
     .hidden { display: none !important; }
+    
     .grid { display: flex; flex-direction: column; gap: 18px; }
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; gap: 18px; }
     .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; }
-    .card-body { flex: 1; }
-    .btn-action { padding: 7px 14px; border: none; border-radius: 8px; cursor: pointer; margin-top: 5px; }
-    .loading { text-align: center; padding: 40px; color: var(--muted); }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1 class="site-title">🍿 Киношке</h1>
-  <div id="tokenPanel" class="token-panel">
-    <input type="text" id="tokenInput" placeholder="Токен GitHub (ghp_...)">
-    <button onclick="saveTokenBtn()">Сохранить</button>
-    <div id="statusMsg"></div>
+  <div class="header-zone">
+    <h1 class="site-title">🍿 Киношке</h1>
+    <button class="btn-settings" onclick="toggleTokenPanel()">⚙️</button>
   </div>
-  <section class="add-panel">
-    <input id="searchInput" type="text" placeholder="Поиск фильма..." oninput="onSearchInput()">
-    <div id="dropdown" class="hidden"></div>
-  </section>
+
+  <div id="tokenPanel" class="token-panel hidden">
+    <h3>🔑 Настройка токена GitHub</h3>
+    <input type="text" id="tokenInput" placeholder="Вставьте сюда ghp_...">
+    <button onclick="saveTokenBtn()">Сохранить ключ</button>
+  </div>
+
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
 </div>
 
 <script>
-  const TMDB_KEY = 'af2e801d23d9fad3c709a796331ac8f7';
   const GH_USER = '057bodyaga'; 
   const GH_REPO = '057cinema';
-  let db = [], fileSha = null;
+
+  // Функция переключения видимости панели
+  function toggleTokenPanel() {
+    document.getElementById('tokenPanel').classList.toggle('hidden');
+  }
+
+  function saveTokenBtn() {
+    const val = document.getElementById('tokenInput').value.trim();
+    localStorage.setItem('gh_token', val);
+    alert('Токен сохранен!');
+    toggleTokenPanel(); // Скрываем панель после сохранения
+  }
 
   async function apiGet() { 
     try {
       const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`);
       const data = await res.json();
-      // Правильная расшифровка Base64 для кириллицы
       const raw = atob(data.content.replace(/\s/g, ''));
       const json = decodeURIComponent(Array.from(raw).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
-      db = JSON.parse(json);
-      fileSha = data.sha;
-      render();
-    } catch(e) { document.getElementById('grid').innerHTML = "Ошибка загрузки."; }
-  }
-
-  function render() {
-    const grid = document.getElementById('grid');
-    grid.innerHTML = db.map(m => `
-      <div class="card">
-        <img class="card-poster" src="${m.poster}">
-        <div class="card-body">
-          <h3>${m.title}</h3>
-          <p>${m.year}</p>
+      const db = JSON.parse(json);
+      
+      document.getElementById('grid').innerHTML = db.map(m => `
+        <div class="card">
+          <img class="card-poster" src="${m.poster}">
+          <div><h3>${m.title}</h3><p>${m.year}</p></div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+    } catch(e) { document.getElementById('grid').innerHTML = "Ошибка загрузки базы."; }
   }
 
-  function saveTokenBtn() {
-    localStorage.setItem('gh_token', document.getElementById('tokenInput').value);
-    apiGet();
-  }
-
+  // Загружаем токен в инпут при старте
+  document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
   apiGet();
 </script>
 </body>
