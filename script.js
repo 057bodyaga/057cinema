@@ -14,6 +14,14 @@ let textStates = {}; // Храним состояние кнопок (разве
 // Заполняем инпут токена из памяти браузера
 document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
 
+// Функция для шестерёнки: показать/скрыть панель настроек токена
+function toggleTokenPanel() {
+  const panel = document.getElementById('tokenPanel');
+  if (panel) {
+    panel.classList.toggle('hidden');
+  }
+}
+
 function saveTokenBtn() {
   const val = document.getElementById('tokenInput').value.trim();
   if(val) {
@@ -70,7 +78,7 @@ async function apiGet() {
 
 async function commitToGitHub(msg) {
   const token = localStorage.getItem('gh_token');
-  if(!token) { alert("Нельзя сохранить! Сначала введите рабочий токен вверху страницы."); return; }
+  if(!token) { alert("Нельзя сохранить! Сначала введите рабочий токен."); return; }
   
   const base64 = btoa(encodeURIComponent(JSON.stringify(db, null, 2)).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
   
@@ -84,7 +92,7 @@ async function commitToGitHub(msg) {
       fileSha = (await res.json()).content.sha; 
       render(); 
     } else { 
-      alert("GitHub отклонил сохранение. Проверьте права токена (должна быть включена галочка 'repo' или 'contents: write')!"); 
+      alert("GitHub отклонил сохранение. Проверьте права токена!"); 
     }
   } catch {
     alert("Ошибка сети при отправке данных на GitHub.");
@@ -124,22 +132,24 @@ function saveMovie() {
     year: pending.release_date?.substring(0,4) || pending.year || '—', status, category: cat,
     scoreBoy: (status === 'watched' && cat !== 'girl') ? parseInt(document.getElementById('sliBoy').value) : null,
     scoreGirl: (status === 'watched' && cat !== 'boy') ? parseInt(document.getElementById('sliGirl').value) : null,
-    timestamp: Date.now() // Метка времени для боковой панели
+    timestamp: Date.now()
   });
   document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
 }
 
-// Починенная функция переключения текста «Читать дальше»
+// Полноценно исправленный обработчик раскрытия описания
 function toggleDesc(id) {
   textStates[id] = !textStates[id];
   const el = document.getElementById(`desc-${id}`);
   const btn = document.getElementById(`btn-more-${id}`);
-  if(textStates[id]) { 
-    el.classList.remove('truncated'); 
-    btn.textContent = "Свернуть описание"; 
-  } else { 
-    el.classList.add('truncated'); 
-    btn.textContent = "Развернуть полностью"; 
+  if (el && btn) {
+    if(textStates[id]) { 
+      el.classList.remove('truncated'); 
+      btn.textContent = "Свернуть описание"; 
+    } else { 
+      el.classList.add('truncated'); 
+      btn.textContent = "Развернуть полностью"; 
+    }
   }
 }
 
@@ -147,9 +157,10 @@ function editRatings(id) {
   const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year };
   document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; if(m.status === 'watched') document.getElementById('selCategory').value = m.category;
   document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
-function markWatched(id) { const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year }; document.getElementById('selStatus').value = 'watched'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange(); }
+function markWatched(id) { const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year }; document.getElementById('selStatus').value = 'watched'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
 function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
@@ -165,14 +176,14 @@ function renderSidebar() {
     return;
   }
   
-  sideList.innerHTML = watchedList.slice(0, 4).map(m => {
+  sideList.innerHTML = watchedList.slice(0, 5).map(m => {
     let scoresHTML = '';
     if(m.scoreBoy) scoresHTML += `<span class="mini-score">👨 ${m.scoreBoy}</span>`;
     if(m.scoreGirl) scoresHTML += `<span class="mini-score">👩 ${m.scoreGirl}</span>`;
     
     return `
       <div class="recent-item">
-        <img src="${m.poster}">
+        <img src="${esc(m.poster)}">
         <div class="recent-info">
           <div class="recent-title" title="${esc(m.title)}">${esc(m.title)}</div>
           <div class="recent-scores">${scoresHTML}</div>
@@ -192,7 +203,6 @@ function render() {
     const tags = m.status === 'watched' ? `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}/10</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}/10</span>`:''}` : '';
     const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Оценки</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
     
-    // Оригинальные инлайновые оценки в строке названия
     let inlineScores = '';
     if (m.status === 'watched') {
       if (m.scoreBoy) inlineScores += ` 🍿 ${m.scoreBoy}/10`;
