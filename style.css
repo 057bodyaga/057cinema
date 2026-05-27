@@ -16,7 +16,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; overflow-x: hidden; }
 
-/* Боковая панель: намертво уперта влево */
+/* Боковая панель: уперта влево */
 .sidebar { 
   position: fixed; left: 0; top: 0; bottom: 0; 
   width: 260px; background: var(--panel); 
@@ -36,11 +36,19 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 .recent-scores { display: flex; gap: 4px; flex-wrap: wrap; }
 .mini-score { font-size: 0.7rem; color: var(--star); background: rgba(255,190,11,0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,190,11,0.2); font-weight: 600; }
 
-/* Основной контент: сдвинут из-за панели */
-.wrap { flex: 1; margin-left: 260px; max-width: 940px; padding: 40px 24px 80px; }
-
-/* Твой оригинальный дизайн элементов */
+/* Основной контент: возвращаем оригинальный wrap шириной 900px */
+.wrap { flex: 1; margin-left: 260px; max-width: 900px; padding: 40px 16px 80px; }
 .site-title { text-align: center; font-size: 2.6rem; font-weight: 800; margin-bottom: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* Твой оригинальный дизайн панелей и карточек */
+.token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; }
+.token-panel h3 { margin-bottom: 8px; font-size: 1.1rem; }
+.token-panel p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
+.token-flex { display: flex; gap: 10px; max-width: 500px; margin: 0 auto; }
+.token-flex input { flex: 1; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
+.token-flex input:focus { border-color: var(--accent); }
+.btn-save-token { padding: 10px 20px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
+.status-msg { margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
 
 .add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
 .search-wrap { position: relative; }
@@ -78,41 +86,49 @@ input[type="range"] { flex: 1; accent-color: var(--accent); }
 .sub-tab.active { border-color: var(--accent); color: var(--accent); }
 
 .grid { display: flex; flex-direction: column; gap: 18px; }
-.card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; position: relative; }
+.card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; }
 .card:hover { border-color: rgba(157,78,221,.4); }
 .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
 .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.card-title-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.card-title-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
 .card-title { font-size: 1.25rem; font-weight: 700; }
+.card-scores-inline { display: flex; gap: 10px; font-size: 0.88rem; color: var(--star); font-weight: 600; }
 .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 8px; }
-.card-desc  { color: var(--muted); font-size: .9rem; line-height: 1.45; margin-bottom: 6px; }
+
+/* Исправленное описание и кнопка разворачивания */
+.card-desc { color: var(--muted); font-size: .9rem; line-height: 1.45; margin-bottom: 8px; transition: all 0.25s; }
 .card-desc.truncated { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 
-/* Красивая кнопка Развернуть/Свернуть */
-.btn-more { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.85rem; font-weight: 600; text-align: left; margin-bottom: 12px; width: fit-content; outline: none; }
-.btn-more:hover { color: var(--accent2); }
+/* Стилизация кнопки Развернуть/Свернуть, чтобы она не была дефолтной белой плашкой */
+.btn-more-trigger {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  margin-bottom: 12px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-more-trigger:hover {
+  background: var(--card);
+  border-color: var(--accent);
+}
 
 .card-tags  { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
-.tag { padding: 3px 10px; border-radius: 6px; font-size: .82rem; font-weight: 600; }
-.tag-viewer { background: rgba(255,255,255,.06); color: var(--text); }
+.tag { padding: 3px 10px; border-radius: 6px; font-size: .82rem; }
+.tag-viewer { background: rgba(255,255,255,.06); }
 .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
 
-.card-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: center; }
-.btn-action { padding: 8px 16px; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
+.card-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: flex-start; }
+.btn-action { padding: 7px 14px; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
 .btn-action:hover { opacity: .82; }
 .btn-watched  { background: var(--success); color: #fff; }
 .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); }
 .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); }
-
-/* Модалка для токена (аккуратная плашка вместо старого разворота на пол-экрана) */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal-card { background: var(--panel); padding: 25px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
-
-.header-zone { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-.controls-group { display: flex; align-items: center; gap: 15px; }
-.status-icon { cursor: pointer; font-size: 1.3rem; }
-.btn-settings { background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
-.btn-settings:hover { opacity: 1; }
 
 .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
 .loading { text-align: center; padding: 40px; color: var(--muted); }
