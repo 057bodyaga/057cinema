@@ -14,7 +14,16 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+/* 1. ГАРАНТИРУЕМ ФЛЕКС ДЛЯ ВСЕЙ СТРАНИЦЫ */
+body { 
+  background: var(--bg); 
+  color: var(--text); 
+  font-family: 'Segoe UI', sans-serif; 
+  min-height: 100vh; 
+  overflow-x: hidden;
+  display: flex; /* Сайдбар и контейнер встанут в ряд */
+}
 
 /* Боковая панель (фиксированная слева) */
 .sidebar { 
@@ -36,19 +45,22 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 .recent-scores { display: flex; gap: 4px; flex-wrap: wrap; }
 .mini-score { font-size: 0.7rem; color: var(--star); background: rgba(255,190,11,0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,190,11,0.2); font-weight: 600; }
 
-/* Главный контейнер (занимает всё пространство справа от панели) */
+/* 2. ЖЕСТКО ЗАСТАВЛЯЕМ КОНТЕЙНЕР ЗАНЯТЬ ВСЁ ОСТАВШЕЕСЯ МЕСТО И ЦЕНТРИРОВАТЬ */
 .main-container {
-  padding-left: 260px;
+  padding-left: 260px;   /* Отступаем, чтобы не заезжать под сайдбар */
+  flex: 1;               /* Занимает абсолютно всё свободное место справа */
   width: 100%;
+  display: flex;
+  justify-content: center; /* Центрирует внутренний .wrap по горизонтали */
 }
 
-/* Оболочка контента — теперь ИДЕАЛЬНО центрирует всё содержимое внутри себя */
+/* 3. САМ БЛОК КОНТЕНТА ТЕПЕРЬ СТРОГО ПО ЦЕНТРУ */
 .wrap { 
+  width: 100%;
   max-width: 900px; 
-  margin: 0 auto; /* Центрирует сам блок на большой рабочей области */
   padding: 40px 24px 80px; 
   display: flex;
-  flex-direction: column; /* Выстраивает все элементы строго друг под другом */
+  flex-direction: column;
 }
 
 /* Зона заголовка */
@@ -80,7 +92,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 }
 .btn-settings:hover { opacity: 1; transform: translateY(-50%) rotate(45deg); }
 
-/* Панели, инпуты и вкладки теперь растягиваются одинаково */
+/* Элементы интерфейса */
 .token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; width: 100%; }
 .token-panel h3 { margin-bottom: 8px; font-size: 1.1rem; }
 .token-panel p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
@@ -117,7 +129,6 @@ input[type="range"] { flex: 1; accent-color: var(--accent); }
 .btn-primary:hover { opacity: .88; }
 .btn-primary:disabled { opacity: .45; cursor: default; }
 
-/* Вкладки */
 .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; width: 100%; }
 .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
 .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
@@ -126,7 +137,6 @@ input[type="range"] { flex: 1; accent-color: var(--accent); }
 .sub-tab { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 7px 15px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: border-color .2s, color .2s; }
 .sub-tab.active { border-color: var(--accent); color: var(--accent); }
 
-/* Сетка карточек */
 .grid { display: flex; flex-direction: column; gap: 18px; width: 100%; }
 .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; width: 100%; }
 .card:hover { border-color: rgba(157,78,221,.4); }
@@ -160,6 +170,7 @@ input[type="range"] { flex: 1; accent-color: var(--accent); }
 .hidden { display: none !important; }
 
 @media(max-width: 900px) {
+  body { flex-direction: column; }
   .sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
   .main-container { padding-left: 0; }
   .wrap { padding: 20px; }
