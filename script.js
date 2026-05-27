@@ -1,33 +1,30 @@
-async function apiGet() { 
-  const token = localStorage.getItem('gh_token');
-  if(!token) {
-    setMsg("⚠️ Вы не ввели токен! Добавление работать не будет.", "var(--danger)");
-  } else {
-    setMsg("✅ Токен установлен. Проверяем связь...", "var(--star)");
-  }
-  
-  try {
-    document.getElementById('grid').innerHTML = '<div class="loading">Синхронизация с GitHub...</div>';
-    
-    const headers = { "Accept": "application/vnd.github.v3+json" };
-    if(token) headers["Authorization"] = `token ${token}`;
+const GH_USER = '057bodyaga'; 
+const GH_REPO = '057cinema';
+let db = [];
 
-    const response = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`, { headers });
-    
-    if (!response.ok) {
-      if(response.status === 401 || response.status === 403) {
-        setMsg("❌ Ошибка: Неверный токен или лимит запросов истек!", "var(--danger)");
-      }
-      throw new Error();
-    }
-    
-    const data = await response.json(); 
-    fileSha = data.sha;
-    db = JSON.parse(decodeURIComponent(atob(data.content.replace(/\s/g, '')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-    
-    if(token) setMsg("✅ Подключение успешно! База синхронизирована.", "var(--success)");
+async function apiGet() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '<div class="loading">Синхронизация...</div>';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`);
+    const data = await res.json();
+    db = JSON.parse(decodeURIComponent(atob(data.content.replace(/\s/g, ''))));
     render();
   } catch (e) {
-    document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить movies.json. Либо файла нет, либо токен не даёт доступ.</div>';
+    grid.innerHTML = '<div class="loading">Ошибка: проверьте сеть или файл.</div>';
   }
 }
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = db.map(m => `
+    <div class="card">
+      <img src="${m.poster}" width="80">
+      <div><h3>${m.title}</h3><p>${m.year}</p></div>
+    </div>
+  `).join('');
+}
+
+function toggleTokenPanel() { document.getElementById('tokenPanel').classList.toggle('hidden'); }
+
+apiGet();
