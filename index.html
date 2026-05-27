@@ -6,309 +6,77 @@
   <title>Киношке</title>
   <style>
     :root {
-      --bg:         #09070f;
-      --panel:      #130f22;
-      --card:       #1a152e;
-      --border:     #2c224d;
-      --text:       #f1edf7;
-      --muted:      #9c94b0;
-      --accent:     #9d4edd;
-      --accent-glow:rgba(157, 78, 221, 0.35);
-      --accent2:    #f72585;
-      --danger:     #ff5252;
-      --success:    #2ecc71;
-      --star:       #ffbe0b;
+      --bg: #09070f; --panel: #130f22; --card: #1a152e; --border: #2c224d;
+      --text: #f1edf7; --muted: #9c94b0; --accent: #9d4edd; --accent2: #f72585;
+      --danger: #ff5252; --success: #2ecc71; --star: #ffbe0b;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
+    .wrap { max-width: 900px; margin: 0 auto; }
     .site-title { text-align: center; font-size: 2.6rem; font-weight: 800; margin-bottom: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    
-    /* Панель токена */
     .token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; }
-    .token-panel h3 { margin-bottom: 8px; font-size: 1.1rem; }
-    .token-panel p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
-    .token-flex { display: flex; gap: 10px; max-width: 500px; margin: 0 auto; }
-    .token-flex input { flex: 1; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
-    .token-flex input:focus { border-color: var(--accent); }
-    .btn-save-token { padding: 10px 20px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
-    .status-msg { margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
-
-    .add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
-    .search-wrap { position: relative; }
-    input[type="text"] { width: 100%; padding: 14px 18px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; }
-    input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
-    
-    .dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; max-height: 320px; overflow-y: auto; z-index: 200; box-shadow: 0 16px 40px rgba(0,0,0,0.65); }
-    .dropdown-item { display: flex; gap: 14px; padding: 11px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s; }
-    .dropdown-item:last-child { border-bottom: none; }
-    .dropdown-item:hover { background: rgba(157,78,221,.12); }
-    .dropdown-item img { width: 42px; height: 62px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
-    .dropdown-item h4 { font-size: .95rem; margin-bottom: 4px; }
-    .dropdown-item p  { font-size: .82rem; color: var(--muted); }
-    
-    .config-form { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; }
-    .config-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
-    .row { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
-    .field { flex: 1; min-width: 190px; }
-    .field label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 7px; }
-    select { width: 100%; padding: 11px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); outline: none; cursor: pointer; }
-    .slider-row { display: flex; align-items: center; gap: 10px; }
-    input[type="range"] { flex: 1; accent-color: var(--accent); }
-    .score-val { font-weight: 700; color: var(--star); min-width: 32px; }
-    
-    .btn-primary { width: 100%; padding: 13px; background: linear-gradient(45deg, var(--accent), var(--accent2)); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity .2s; margin-top: 4px; }
-    .btn-primary:hover { opacity: .88; }
-    .btn-primary:disabled { opacity: .45; cursor: default; }
-    
-    .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
-    .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
-    .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
-    
-    .sub-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
-    .sub-tab { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 7px 15px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: border-color .2s, color .2s; }
-    .sub-tab.active { border-color: var(--accent); color: var(--accent); }
-    
-    .grid { display: flex; flex-direction: column; gap: 18px; }
-    .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; }
-    .card:hover { border-color: rgba(157,78,221,.4); }
-    .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
-    .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-    .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
-    .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 8px; }
-    .card-desc  { color: var(--muted); font-size: .9rem; line-height: 1.45; margin-bottom: 12px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
-    .card-tags  { display: flex; gap: 8px; flex-wrap: wrap; }
-    .tag { padding: 3px 10px; border-radius: 6px; font-size: .82rem; }
-    .tag-viewer { background: rgba(255,255,255,.06); }
-    .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
-    
-    .card-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: flex-start; }
-    .btn-action { padding: 7px 14px; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
-    .btn-action:hover { opacity: .82; }
-    .btn-watched  { background: var(--success); color: #fff; }
-    .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); }
-    .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); }
-    
-    .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
-    .loading { text-align: center; padding: 40px; color: var(--muted); }
+    .add-panel { background: #130f22; border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; }
     .hidden { display: none !important; }
+    .grid { display: flex; flex-direction: column; gap: 18px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; gap: 18px; }
+    .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; }
+    .card-body { flex: 1; }
+    .btn-action { padding: 7px 14px; border: none; border-radius: 8px; cursor: pointer; margin-top: 5px; }
+    .loading { text-align: center; padding: 40px; color: var(--muted); }
   </style>
 </head>
 <body>
 <div class="wrap">
   <h1 class="site-title">🍿 Киношке</h1>
-
-  <div class="token-panel">
-    <h3>🔑 Настройка токена GitHub</h3>
-    <p>Вставьте ваш токен (ghp_...), чтобы сайт мог сохранять фильмы в ваш movies.json.</p>
-    <div class="token-flex">
-      <input type="text" id="tokenInput" placeholder="Вставьте сюда ghp_...">
-      <button class="btn-save-token" onclick="saveTokenBtn()">Сохранить ключ</button>
-    </div>
-    <div id="statusMsg" class="status-msg"></div>
+  <div id="tokenPanel" class="token-panel">
+    <input type="text" id="tokenInput" placeholder="Токен GitHub (ghp_...)">
+    <button onclick="saveTokenBtn()">Сохранить</button>
+    <div id="statusMsg"></div>
   </div>
-
   <section class="add-panel">
-    <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Как называется фильм?" autocomplete="off" oninput="onSearchInput()">
-      <div id="dropdown" class="dropdown hidden"></div>
-    </div>
-    <div id="configForm" class="config-form hidden">
-      <div id="configTitle" class="config-title"></div>
-      <div class="row">
-        <div class="field">
-          <label>Куда добавить?</label>
-          <select id="selStatus" onchange="onStatusChange()">
-            <option value="watchlist">Хочу посмотреть</option>
-            <option value="watched">Уже посмотрели</option>
-          </select>
-        </div>
-        <div class="field watched-only hidden">
-          <label>Кто смотрел?</label>
-          <select id="selCategory" onchange="onCategoryChange()">
-            <option value="joint">🍿 Наши</option>
-            <option value="boy">👨 Бодяга</option>
-            <option value="girl">👩 Каракумикуи</option>
-          </select>
-        </div>
-      </div>
-      <div class="row watched-only hidden">
-        <div class="field" id="boyField">
-          <label>Моя оценка: <span id="valBoy" class="score-val">5</span>/10</label>
-          <div class="slider-row"><input type="range" id="sliBoy" min="1" max="10" value="5" oninput="document.getElementById('valBoy').textContent=this.value"></div>
-        </div>
-        <div class="field" id="girlField">
-          <label>Оценка девушки: <span id="valGirl" class="score-val">5</span>/10</label>
-          <div class="slider-row"><input type="range" id="sliGirl" min="1" max="10" value="5" oninput="document.getElementById('valGirl').textContent=this.value"></div>
-        </div>
-      </div>
-      <button class="btn-primary" id="btnSave" onclick="saveMovie()">Добавить в коллекцию</button>
-    </div>
+    <input id="searchInput" type="text" placeholder="Поиск фильма..." oninput="onSearchInput()">
+    <div id="dropdown" class="hidden"></div>
   </section>
-  
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab(this,'watchlist')">Хочу посмотреть</button>
-    <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
-  </div>
-  <div id="subTabs" class="sub-tabs hidden">
-    <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
-    <button class="sub-tab"        onclick="switchSub(this,'joint')">🍿 Наши</button>
-    <button class="sub-tab"        onclick="switchSub(this,'boy')">👨 Бодяга</button>
-    <button class="sub-tab"        onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
-  </div>
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
 </div>
 
 <script>
   const TMDB_KEY = 'af2e801d23d9fad3c709a796331ac8f7';
-  const LABELS   = { joint: '🍿 Наши', boy: '👨 Бодяга', girl: '👩 Каракумикуи' };
-  const GH_USER  = '057bodyaga'; 
-  const GH_REPO  = '057cinema';
-
-  let db= []; activeTab='watchlist'; activeSub='all'; pending= null; searchTimer= null; fileSha= null;
-
-  // Показываем текущий сохраненный токен в инпуте, если он есть
-  document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
-
-  function saveTokenBtn() {
-    const val = document.getElementById('tokenInput').value.trim();
-    if(val) {
-      localStorage.setItem('gh_token', val);
-      setMsg("Ключ сохранен в браузере! Переподключение...", "var(--success)");
-      apiGet();
-    } else {
-      localStorage.removeItem('gh_token');
-      setMsg("Токен удален. Работа в режиме чтения.", "var(--danger)");
-    }
-  }
-
-  function setMsg(txt, color) {
-    const el = document.getElementById('statusMsg');
-    el.textContent = txt;
-    el.style.color = color;
-  }
+  const GH_USER = '057bodyaga'; 
+  const GH_REPO = '057cinema';
+  let db = [], fileSha = null;
 
   async function apiGet() { 
-    const token = localStorage.getItem('gh_token');
-    if(!token) {
-      setMsg("⚠️ Вы не ввели токен! Добавление работать не будет.", "var(--danger)");
-    } else {
-      setMsg("✅ Токен установлен. Проверяем связь...", "var(--star)");
-    }
-    
     try {
-      document.getElementById('grid').innerHTML = '<div class="loading">Синхронизация с GitHub...</div>';
-      
-      // Настраиваем заголовки. Если токена нет — пробуем публичный запрос без него
-      const headers = { "Accept": "application/vnd.github.v3+json" };
-      if(token) headers["Authorization"] = `token ${token}`;
-
-      const response = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`, { headers });
-      
-      if (!response.ok) {
-        if(response.status === 401 || response.status === 403) {
-          setMsg("❌ Ошибка: Неверный токен или лимит запросов истек!", "var(--danger)");
-        }
-        throw new Error();
-      }
-      
-      const data = await response.json(); 
+      const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`);
+      const data = await res.json();
+      // Правильная расшифровка Base64 для кириллицы
+      const raw = atob(data.content.replace(/\s/g, ''));
+      const json = decodeURIComponent(Array.from(raw).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
+      db = JSON.parse(json);
       fileSha = data.sha;
-      db = JSON.parse(decodeURIComponent(atob(data.content.replace(/\s/g, '')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-      
-      if(token) setMsg("✅ Подключение успешно! База синхронизирована.", "var(--success)");
       render();
-    } catch (e) {
-      document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить movies.json. Либо файла нет, либо токен не даёт доступ.</div>';
-    }
+    } catch(e) { document.getElementById('grid').innerHTML = "Ошибка загрузки."; }
   }
-
-  async function commitToGitHub(msg) {
-    const token = localStorage.getItem('gh_token');
-    if(!token) { alert("Нельзя сохранить! Сначала введите рабочий токен вверху страницы."); return; }
-    
-    const base64 = btoa(encodeURIComponent(JSON.stringify(db, null, 2)).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
-    
-    try {
-      const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`, {
-        method: 'PUT',
-        headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg, content: base64, sha: fileSha })
-      });
-      if (res.ok) { 
-        fileSha = (await res.json()).content.sha; 
-        render(); 
-      } else { 
-        alert("GitHub отклонил сохранение. Проверьте права токена (должна быть включена галочка 'repo' или 'contents: write')!"); 
-      }
-    } catch {
-      alert("Ошибка сети при отправке данных на GitHub.");
-    }
-  }
-
-  async function apiSave(m) { db = db.filter(x => x.id !== m.id); db.push(m); await commitToGitHub("Обновление фильма"); }
-  async function apiDelete(id) { db = db.filter(x => x.id !== id); await commitToGitHub("Удаление фильма"); }
-
-  function onSearchInput() { clearTimeout(searchTimer); const q = document.getElementById('searchInput').value.trim(); if (q.length < 2) { hideDropdown(); return; } searchTimer = setTimeout(() => fetchMovies(q), 350); }
-  async function fetchMovies(q) { try { const data = await (await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=ru-RU`)).json(); showDropdown(data.results?.slice(0, 6) ?? []); } catch { hideDropdown(); } }
-
-  function showDropdown(res) {
-    const dd = document.getElementById('dropdown'); dd.innerHTML = ''; if (!res.length) { hideDropdown(); return; }
-    res.forEach(m => {
-      const item = document.createElement('div'); item.className = 'dropdown-item';
-      item.innerHTML = `<img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w92'+m.poster_path : 'https://placehold.co/42x62'}"><div><h4>${esc(m.title)}</h4><p>${m.release_date?.substring(0,4) ?? '—'}</p></div>`;
-      item.onclick = () => pickMovie(m); dd.appendChild(item);
-    });
-    dd.classList.remove('hidden');
-  }
-  function hideDropdown() { document.getElementById('dropdown').classList.add('hidden'); }
-
-  function pickMovie(m) {
-    pending = m; hideDropdown(); document.getElementById('searchInput').value = m.title; document.getElementById('configTitle').textContent = `Настройка: "${m.title}"`;
-    document.getElementById('selStatus').value = 'watchlist'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
-  }
-  function onStatusChange() { const isW = document.getElementById('selStatus').value === 'watched'; document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); if (isW) onCategoryChange(); }
-  function onCategoryChange() { const c = document.getElementById('selCategory').value; document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); }
-
-  function saveMovie() {
-    if (!pending) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
-    const status = document.getElementById('selStatus').value; const cat = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
-    apiSave({
-      id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
-      poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
-      year: pending.release_date?.substring(0,4) || pending.year || '—', status, category: cat,
-      scoreBoy: (status === 'watched' && cat !== 'girl') ? parseInt(document.getElementById('sliBoy').value) : null,
-      scoreGirl: (status === 'watched' && cat !== 'boy') ? parseInt(document.getElementById('sliGirl').value) : null
-    });
-    document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
-  }
-
-  function editRatings(id) {
-    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year };
-    document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; if(m.status === 'watched') document.getElementById('selCategory').value = m.category;
-    document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
-  }
-  function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
-  function markWatched(id) { const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year }; document.getElementById('selStatus').value = 'watched'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange(); }
-  
-  function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
-  function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
 
   function render() {
-    const grid = document.getElementById('grid'); let list = db.filter(x => x.status === activeTab);
-    if (activeTab === 'watched' && activeSub !== 'all') list = list.filter(x => x.category === activeSub);
-    if (!list.length) { grid.innerHTML = '<div class="empty">Здесь пока пусто 🎬</div>'; return; }
-    grid.innerHTML = list.map(m => {
-      const tags = m.status === 'watched' ? `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}/10</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}/10</span>`:''}` : '';
-      const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Оценки</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
-      return `<article class="card"><img class="card-poster" src="${esc(m.poster)}"><div class="card-body"><div class="card-title">${esc(m.title)}</div><div class="card-year">${esc(m.year)}</div><div class="card-desc">${esc(m.overview)}</div><div class="card-tags">${tags}</div></div><div class="card-actions">${acts}</div></article>`;
-    }).join('');
+    const grid = document.getElementById('grid');
+    grid.innerHTML = db.map(m => `
+      <div class="card">
+        <img class="card-poster" src="${m.poster}">
+        <div class="card-body">
+          <h3>${m.title}</h3>
+          <p>${m.year}</p>
+        </div>
+      </div>
+    `).join('');
   }
 
-  function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) hideDropdown(); });
-  
+  function saveTokenBtn() {
+    localStorage.setItem('gh_token', document.getElementById('tokenInput').value);
+    apiGet();
+  }
+
   apiGet();
 </script>
 </body>
