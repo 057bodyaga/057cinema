@@ -13,23 +13,30 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
     .wrap { max-width: 900px; margin: 0 auto; }
-    .site-title { text-align: center; font-size: 2.6rem; font-weight: 800; margin-bottom: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
+    /* Шапка сайта с кнопкой настроек */
+    .header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
+    .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn-settings { background: none; border: none; cursor: pointer; font-size: 1.5rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+
+    /* Панель токена */
     .token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; }
     .token-panel input { padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); outline: none; width: 250px; }
     .token-panel button { padding: 8px 16px; background: var(--accent); border: none; border-radius: 6px; color: var(--text); cursor: pointer; font-weight: bold; margin-left: 8px; }
     #statusMsg { margin-top: 10px; font-size: 0.9rem; }
 
+    /* Панель поиска */
     .add-panel { background: #130f22; border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; position: relative; }
     #searchInput { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; outline: none; }
     #searchInput:focus { border-color: var(--accent); }
     
-    /* Стили для выпадающего списка поиска */
-    #dropdown { position: absolute; top: 70px; left: 24px; right: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    /* Выпадающий список */
+    #dropdown { position: absolute; top: 75px; left: 24px; right: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     .dropdown-item { padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); transition: background 0.2s; }
     .dropdown-item:hover { background: var(--card); }
     .dropdown-item span { color: var(--muted); font-size: 0.9rem; }
 
+    /* Сетка и карточки */
     .grid { display: flex; flex-direction: column; gap: 18px; }
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; gap: 18px; transition: transform 0.2s, border-color 0.2s; }
     .card:hover { transform: translateY(-2px); border-color: var(--accent); }
@@ -44,9 +51,13 @@
 </head>
 <body>
 <div class="wrap">
-  <h1 class="site-title">🍿 Киношке</h1>
   
-  <div id="tokenPanel" class="token-panel">
+  <div class="header-zone">
+    <h1 class="site-title">🍿 Киношке</h1>
+    <button class="btn-settings" onclick="toggleTokenPanel()">⚙️</button>
+  </div>
+  
+  <div id="tokenPanel" class="token-panel hidden">
     <input type="text" id="tokenInput" placeholder="Токен GitHub (ghp_...)">
     <button onclick="saveTokenBtn()">Сохранить</button>
     <div id="statusMsg"></div>
@@ -66,6 +77,11 @@
   const GH_REPO = '057cinema';
   let db = [], fileSha = null;
 
+  // Функция переключения видимости панели токена
+  function toggleTokenPanel() {
+    document.getElementById('tokenPanel').classList.toggle('hidden');
+  }
+
   // 1. Получение базы фильмов с GitHub
   async function apiGet() { 
     try {
@@ -78,7 +94,7 @@
       const json = new TextDecoder('utf-8').decode(bytes);
       
       db = JSON.parse(json);
-      fileSha = data.sha; // Запоминаем SHA файла для будущих обновлений
+      fileSha = data.sha; 
       render();
     } catch(e) { 
       document.getElementById('grid').innerHTML = "Ошибка загрузки базы."; 
@@ -119,11 +135,9 @@
       const data = await res.json();
       
       if (data.results && data.results.length > 0) {
-        // Берем первые 5 результатов
         dropdown.innerHTML = data.results.slice(0, 5).map(m => {
           const year = m.release_date ? m.release_date.split('-')[0] : '----';
           const posterUrl = m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/95x142?text=No+Poster';
-          // Экранируем кавычки в названии, чтобы не ломать HTML-атрибут onclick
           const safeTitle = m.title.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
           
           return `
@@ -148,27 +162,29 @@
     const statusMsg = document.getElementById('statusMsg');
     
     if (!token) {
-      alert('Сначала введите и сохраните ваш GitHub Токен!');
+      alert('Сначала нажмите на ⚙️, введите и сохраните ваш GitHub Токен!');
+      toggleTokenPanel(); // Автоматически открываем панель, если забыли токен
       return;
     }
 
-    // Прячем дропдаун и очищаем строку поиска
     document.getElementById('dropdown').classList.add('hidden');
     document.getElementById('searchInput').value = '';
 
-    // Проверка на дубликаты
     if (db.some(m => m.title === title && m.year === year)) {
       alert('Этот фильм уже есть в твоем списке!');
       return;
     }
 
-    // Добавляем фильм наверх списка и сразу рендерим локально
     db.unshift({ title, year, poster });
     render();
 
+    // Показываем статус загрузки в панели токена, если она открыта, либо алертом
+    if (document.getElementById('tokenPanel').classList.contains('hidden')) {
+      // Если панель скрыта, временно покажем её, чтобы юзер видел статус сохранения
+      toggleTokenPanel();
+    }
     statusMsg.innerHTML = '<span style="color:var(--muted)">Сохранение на GitHub...</span>';
 
-    // Кодируем обновленный массив в UTF-8, а затем в Base64
     const jsonStr = JSON.stringify(db, null, 2);
     const bytes = new TextEncoder().encode(jsonStr);
     const base64Content = btoa(String.fromCharCode(...bytes));
@@ -183,22 +199,25 @@
         body: JSON.stringify({
           message: `Добавлен фильм: ${title}`,
           content: base64Content,
-          sha: fileSha // Обязательно передаем старый SHA для перезаписи файла
+          sha: fileSha
         })
       });
 
       if (res.ok) {
         const resData = await res.json();
-        fileSha = resData.content.sha; // Обновляем текущий SHA для следующей записи
+        fileSha = resData.content.sha; 
         statusMsg.innerHTML = '<span style="color:var(--success)">Сохранено в репозиторий!</span>';
-        setTimeout(() => statusMsg.innerHTML = '', 3000);
+        setTimeout(() => {
+          statusMsg.innerHTML = '';
+          toggleTokenPanel(); // Прячем панель обратно через 2 секунды
+        }, 2000);
       } else {
         throw new Error('Не удалось обновить файл на GitHub');
       }
     } catch (e) {
       statusMsg.innerHTML = '<span style="color:var(--danger)">Ошибка сохранения. Проверьте токен!</span>';
       console.error(e);
-      apiGet(); // Перезагружаем базу с сервера, чтобы откатить неудачное локальное добавление
+      apiGet(); 
     }
   }
 
@@ -206,9 +225,12 @@
   function saveTokenBtn() {
     const tokenVal = document.getElementById('tokenInput').value.trim();
     localStorage.setItem('gh_token', tokenVal);
-    document.getElementById('statusMsg').innerHTML = '<span style="color:var(--success)">Токен сохранен локально!</span>';
-    setTimeout(() => document.getElementById('statusMsg').innerHTML = '', 2000);
-    apiGet(); // Перезапускаем загрузку, теперь запросы пойдут быстрее (с авторизацией)
+    document.getElementById('statusMsg').innerHTML = '<span style="color:var(--success)">Токен сохранен!</span>';
+    setTimeout(() => {
+      document.getElementById('statusMsg').innerHTML = '';
+      toggleTokenPanel();
+    }, 1500);
+    apiGet(); 
   }
 
   // Инициализация при старте страницы
