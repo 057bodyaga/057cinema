@@ -1,53 +1,21 @@
 :root {
-  --bg: #09070f;
-  --panel: #130f22;
-  --card: #1a152e;
-  --border: #2c224d;
-  --text: #f1edf7;
-  --accent: #9d4edd;
-  --accent2: #f72585;
+  --bg: #09070f; --panel: #130f22; --card: #1a152e; --border: #2c224d;
+  --text: #f1edf7; --accent: #9d4edd; --accent2: #f72585; --muted: #9c94b0;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+body { background: var(--bg); color: var(--text); font-family: sans-serif; min-height: 100vh; }
 
-.sidebar { 
-  position: fixed; left: 0; top: 0; bottom: 0; width: 260px; 
-  background: var(--panel); border-right: 1px solid var(--border); 
-  padding: 24px 16px; z-index: 100;
-}
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; }
 
-/* Основной контейнер — фиксированный отступ слева, чтобы не перекрывать сайдбар */
-.main-container {
-  margin-left: 260px;
-  width: calc(100% - 260px);
-  padding: 40px 20px;
-  display: flex;
-  justify-content: center; /* Центрируем внутренний wrap */
-}
+.main-container { margin-left: 260px; width: calc(100% - 260px); display: flex; justify-content: center; padding: 40px 20px; }
+.wrap { width: 100%; max-width: 900px; }
 
-/* Оболочка контента */
-.wrap { 
-  width: 100%;
-  max-width: 900px; 
-}
+.header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 20px; }
+.btn-settings { background: none; border: none; cursor: pointer; font-size: 1.5rem; position: absolute; right: 0; }
 
-.header-zone { 
-  display: flex; justify-content: center; align-items: center; 
-  position: relative; margin-bottom: 30px; width: 100%;
-}
-.site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-/* Кнопка настройки */
-.btn-settings { 
-  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-  background: none; border: none; font-size: 1.8rem; cursor: pointer;
-  z-index: 200; padding: 10px; opacity: 0.7;
-}
-.btn-settings:hover { opacity: 1; }
-
+.token-panel, .config-form { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
 .hidden { display: none !important; }
 
-/* Исправление для списков и карточек */
-.grid { display: flex; flex-direction: column; gap: 18px; width: 100%; }
-.loading { text-align: center; color: var(--text); padding: 40px; }
+.grid { display: flex; flex-direction: column; gap: 15px; }
+.card { background: var(--panel); border: 1px solid var(--border); padding: 15px; border-radius: 12px; display: flex; gap: 15px; }
+.loading { color: var(--muted); text-align: center; margin-top: 50px; }
