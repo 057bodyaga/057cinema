@@ -14,9 +14,9 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-/* Боковая панель */
+/* Боковая панель: намертво слева */
 .sidebar { 
   position: fixed; left: 0; top: 0; bottom: 0; 
   width: 260px; background: var(--panel); 
@@ -36,13 +36,48 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 .recent-scores { display: flex; gap: 4px; flex-wrap: wrap; }
 .mini-score { font-size: 0.7rem; color: var(--star); background: rgba(255,190,11,0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,190,11,0.2); font-weight: 600; }
 
-/* Контентный блок */
-.wrap { flex: 1; margin-left: 260px; max-width: 900px; padding: 40px 16px 80px; position: relative; }
+/* Центрирование основного контента: отступаем справа от сайдбара и центрируем wrap */
+.main-container {
+  padding-left: 260px; /* Отступ на ширину боковой панели */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.wrap { 
+  width: 100%;
+  max-width: 900px; 
+  padding: 40px 24px 80px; 
+  position: relative; 
+}
 
 /* Зона заголовка с шестерёнкой */
-.header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
+.header-zone { 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  position: relative; 
+  margin-bottom: 30px; 
+  width: 100%;
+}
 .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.btn-settings { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.6rem; cursor: pointer; transition: opacity 0.2s, transform 0.2s; opacity: 0.7; }
+
+/* Починенная кнопка-шестерёнка */
+.btn-settings { 
+  position: absolute; 
+  right: 0; 
+  top: 50%; 
+  transform: translateY(-50%); 
+  background: transparent; 
+  border: none; 
+  font-size: 1.8rem; 
+  line-height: 1;
+  cursor: pointer; 
+  transition: opacity 0.2s, transform 0.2s; 
+  opacity: 0.75; 
+  z-index: 50; /* Гарантирует, что кнопка будет поверх других элементов */
+  padding: 10px; /* Увеличиваем область клика */
+}
 .btn-settings:hover { opacity: 1; transform: translateY(-50%) rotate(45deg); }
 
 /* Панель токена */
@@ -55,7 +90,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 .btn-save-token { padding: 10px 20px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
 .status-msg { margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
 
-/* Остальной интерфейс добавления */
+/* Панель добавления и поиска */
 .add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
 .search-wrap { position: relative; }
 input[type="text"] { width: 100%; padding: 14px 18px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; }
@@ -124,7 +159,7 @@ input[type="range"] { flex: 1; accent-color: var(--accent); }
 .hidden { display: none !important; }
 
 @media(max-width: 900px) {
-  body { flex-direction: column; }
   .sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-  .wrap { margin-left: 0; padding: 20px; }
+  .main-container { padding-left: 0; }
+  .wrap { padding: 20px; }
 }
