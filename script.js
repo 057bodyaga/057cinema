@@ -9,9 +9,9 @@ let activeSub = 'all';
 let pending = null; 
 let searchTimer = null; 
 let fileSha = null;
-let textStates = {}; // Для хранения состояний развернутых описаний
+let textStates = {}; // Храним состояние кнопок (развернуто/свернуто)
 
-// Показываем текущий сохраненный токен в инпуте, если он есть
+// Заполняем инпут токена из памяти браузера
 document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
 
 function saveTokenBtn() {
@@ -70,7 +70,7 @@ async function apiGet() {
 
 async function commitToGitHub(msg) {
   const token = localStorage.getItem('gh_token');
-  if(!token) { alert("Нельзя保存! Сначала введите рабочий токен вверху страницы."); return; }
+  if(!token) { alert("Нельзя сохранить! Сначала введите рабочий токен вверху страницы."); return; }
   
   const base64 = btoa(encodeURIComponent(JSON.stringify(db, null, 2)).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
   
@@ -129,12 +129,18 @@ function saveMovie() {
   document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
 }
 
+// Починенная функция переключения текста «Читать дальше»
 function toggleDesc(id) {
   textStates[id] = !textStates[id];
   const el = document.getElementById(`desc-${id}`);
   const btn = document.getElementById(`btn-more-${id}`);
-  if(textStates[id]) { el.classList.remove('truncated'); btn.textContent = "Свернуть"; } 
-  else { el.classList.add('truncated'); btn.textContent = "Развернуть полностью"; }
+  if(textStates[id]) { 
+    el.classList.remove('truncated'); 
+    btn.textContent = "Свернуть описание"; 
+  } else { 
+    el.classList.add('truncated'); 
+    btn.textContent = "Развернуть полностью"; 
+  }
 }
 
 function editRatings(id) {
@@ -166,7 +172,7 @@ function renderSidebar() {
     
     return `
       <div class="recent-item">
-        <img src="${esc(m.poster)}">
+        <img src="${m.poster}">
         <div class="recent-info">
           <div class="recent-title" title="${esc(m.title)}">${esc(m.title)}</div>
           <div class="recent-scores">${scoresHTML}</div>
@@ -186,6 +192,13 @@ function render() {
     const tags = m.status === 'watched' ? `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}/10</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}/10</span>`:''}` : '';
     const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Оценки</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
     
+    // Оригинальные инлайновые оценки в строке названия
+    let inlineScores = '';
+    if (m.status === 'watched') {
+      if (m.scoreBoy) inlineScores += ` 🍿 ${m.scoreBoy}/10`;
+      if (m.scoreGirl) inlineScores += ` 🍿 ${m.scoreGirl}/10`;
+    }
+
     const isTruncated = !textStates[m.id];
     const needsButton = m.overview && m.overview.length > 200;
 
@@ -194,11 +207,11 @@ function render() {
         <img class="card-poster" src="${esc(m.poster)}">
         <div class="card-body">
           <div class="card-title-wrap">
-            <div class="card-title">${esc(m.title)}</div>
+            <div class="card-title">${esc(m.title)} <span class="card-scores-inline">${inlineScores}</span></div>
           </div>
           <div class="card-year">${esc(m.year)}</div>
           <div id="desc-${m.id}" class="card-desc ${needsButton && isTruncated ? 'truncated' : ''}">${esc(m.overview)}</div>
-          ${needsButton ? `<button id="btn-more-${m.id}" class="btn-more" onclick="toggleDesc(${m.id})">${isTruncated ? 'Развернуть полностью' : 'Свернуть'}</button>` : ''}
+          ${needsButton ? `<button id="btn-more-${m.id}" class="btn-more-trigger" onclick="toggleDesc(${m.id})">${isTruncated ? 'Развернуть полностью' : 'Свернуть описание'}</button>` : ''}
           <div class="card-tags">${tags}</div>
         </div>
         <div class="card-actions">${acts}</div>
