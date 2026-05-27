@@ -3,63 +3,74 @@ const LABELS   = { joint: '🍿 Наши', boy: '👨 Бодяга', girl: '👩
 const GH_USER  = '057bodyaga'; 
 const GH_REPO  = '057cinema';
 
-let db = []; activeTab = 'watchlist'; activeSub = 'all'; pending = null; searchTimer = null; fileSha = null;
-let textStates = {};
+let db = []; 
+let activeTab = 'watchlist'; 
+let activeSub = 'all'; 
+let pending = null; 
+let searchTimer = null; 
+let fileSha = null;
+let textStates = {}; // Для хранения состояний развернутых описаний
 
+// Показываем текущий сохраненный токен в инпуте, если он есть
 document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
-
-function openTokenModal() { document.getElementById('tokenModal').classList.remove('hidden'); }
-function closeTokenModal() { document.getElementById('tokenModal').classList.add('hidden'); }
 
 function saveTokenBtn() {
   const val = document.getElementById('tokenInput').value.trim();
   if(val) {
     localStorage.setItem('gh_token', val);
-    closeTokenModal();
+    setMsg("Ключ сохранен в браузере! Переподключение...", "var(--success)");
     apiGet();
   } else {
     localStorage.removeItem('gh_token');
-    updateStatusIndicator(false);
+    setMsg("Токен удален. Работа в режиме чтения.", "var(--danger)");
   }
 }
 
-function updateStatusIndicator(isSuccess) {
-  const icon = document.getElementById('statusIcon');
-  if(isSuccess) {
-    icon.textContent = "✅";
-    icon.style.color = "var(--success)";
-  } else {
-    icon.textContent = "❌";
-    icon.style.color = "var(--danger)";
+function setMsg(txt, color) {
+  const el = document.getElementById('statusMsg');
+  if (el) {
+    el.textContent = txt;
+    el.style.color = color;
   }
 }
 
 async function apiGet() { 
   const token = localStorage.getItem('gh_token');
-  updateStatusIndicator(!!token);
+  if(!token) {
+    setMsg("⚠️ Вы не ввели токен! Добавление работать не будет.", "var(--danger)");
+  } else {
+    setMsg("✅ Токен установлен. Проверяем связь...", "var(--star)");
+  }
   
   try {
-    document.getElementById('grid').innerHTML = '<div style="text-align:center;color:var(--muted)">Загрузка...</div>';
+    document.getElementById('grid').innerHTML = '<div class="loading">Синхронизация с GitHub...</div>';
+    
     const headers = { "Accept": "application/vnd.github.v3+json" };
     if(token) headers["Authorization"] = `token ${token}`;
 
     const response = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`, { headers });
-    if (!response.ok) throw new Error();
+    
+    if (!response.ok) {
+      if(response.status === 401 || response.status === 403) {
+        setMsg("❌ Ошибка: Неверный токен или лимит запросов истек!", "var(--danger)");
+      }
+      throw new Error();
+    }
     
     const data = await response.json(); 
     fileSha = data.sha;
     db = JSON.parse(decodeURIComponent(atob(data.content.replace(/\s/g, '')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     
-    if(token) updateStatusIndicator(true);
+    if(token) setMsg("✅ Подключение успешно! База синхронизирована.", "var(--success)");
     render();
   } catch (e) {
-    document.getElementById('grid').innerHTML = '<div style="text-align:center;color:var(--danger)">Ошибка синхронизации. Проверьте токен в ⚙️</div>';
+    document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить movies.json. Либо файла нет, либо токен не даёт доступ.</div>';
   }
 }
 
 async function commitToGitHub(msg) {
   const token = localStorage.getItem('gh_token');
-  if(!token) { alert("Введите токен через ⚙️!"); return; }
+  if(!token) { alert("Нельзя保存! Сначала введите рабочий токен вверху страницы."); return; }
   
   const base64 = btoa(encodeURIComponent(JSON.stringify(db, null, 2)).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
   
@@ -72,8 +83,12 @@ async function commitToGitHub(msg) {
     if (res.ok) { 
       fileSha = (await res.json()).content.sha; 
       render(); 
-    } else { alert("GitHub отклонил запись."); }
-  } catch { alert("Ошибка сети."); }
+    } else { 
+      alert("GitHub отклонил сохранение. Проверьте права токена (должна быть включена галочка 'repo' или 'contents: write')!"); 
+    }
+  } catch {
+    alert("Ошибка сети при отправке данных на GitHub.");
+  }
 }
 
 async function apiSave(m) { db = db.filter(x => x.id !== m.id); db.push(m); await commitToGitHub("Обновление фильма"); }
@@ -85,8 +100,8 @@ async function fetchMovies(q) { try { const data = await (await fetch(`https://a
 function showDropdown(res) {
   const dd = document.getElementById('dropdown'); dd.innerHTML = ''; if (!res.length) { hideDropdown(); return; }
   res.forEach(m => {
-    const item = document.createElement('div'); item.style.cssText = "display:flex;gap:10px;padding:8px;cursor:pointer;border-bottom:1px solid #2c224d";
-    item.innerHTML = `<img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w92'+m.poster_path : 'https://placehold.co/42x62'}" style="width:30px;height:45px;object-fit:cover;border-radius:4px"><div><div style="font-size:0.9rem">${m.title}</div><div style="font-size:0.8rem;color:var(--muted)">${m.release_date?.substring(0,4) ?? '—'}</div></div>`;
+    const item = document.createElement('div'); item.className = 'dropdown-item';
+    item.innerHTML = `<img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w92'+m.poster_path : 'https://placehold.co/42x62'}"><div><h4>${esc(m.title)}</h4><p>${m.release_date?.substring(0,4) ?? '—'}</p></div>`;
     item.onclick = () => pickMovie(m); dd.appendChild(item);
   });
   dd.classList.remove('hidden');
@@ -97,21 +112,21 @@ function pickMovie(m) {
   pending = m; hideDropdown(); document.getElementById('searchInput').value = m.title; document.getElementById('configTitle').textContent = `Настройка: "${m.title}"`;
   document.getElementById('selStatus').value = 'watchlist'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
 }
-function onStatusChange() { const isW = document.getElementById('selStatus').value === 'watched'; document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); }
+function onStatusChange() { const isW = document.getElementById('selStatus').value === 'watched'; document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); if (isW) onCategoryChange(); }
+function onCategoryChange() { const c = document.getElementById('selCategory').value; document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); }
 
 function saveMovie() {
-  if (!pending) return;
-  const status = document.getElementById('selStatus').value; 
-  const cat = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
+  if (!pending) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
+  const status = document.getElementById('selStatus').value; const cat = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
   apiSave({
     id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
     poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
     year: pending.release_date?.substring(0,4) || pending.year || '—', status, category: cat,
-    scoreBoy: status === 'watched' ? parseInt(document.getElementById('sliBoy').value) : null,
-    scoreGirl: status === 'watched' ? parseInt(document.getElementById('sliGirl').value) : null,
-    timestamp: Date.now()
+    scoreBoy: (status === 'watched' && cat !== 'girl') ? parseInt(document.getElementById('sliBoy').value) : null,
+    scoreGirl: (status === 'watched' && cat !== 'boy') ? parseInt(document.getElementById('sliGirl').value) : null,
+    timestamp: Date.now() // Метка времени для боковой панели
   });
-  document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null;
+  document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
 }
 
 function toggleDesc(id) {
@@ -127,18 +142,20 @@ function editRatings(id) {
   document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; if(m.status === 'watched') document.getElementById('selCategory').value = m.category;
   document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
 }
-function deleteMovie(id) { if(confirm("Удалить фильм?")) apiDelete(id); }
+function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
 function markWatched(id) { const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year }; document.getElementById('selStatus').value = 'watched'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange(); }
 
-function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
-function switchSub(b, s) { activeSub = s; render(); }
+function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
+function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
 
 function renderSidebar() {
   const sideList = document.getElementById('recentList');
+  if (!sideList) return;
+  
   let watchedList = db.filter(x => x.status === 'watched').sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
   
   if(!watchedList.length) {
-    sideList.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);text-align:center">Нет просмотров</div>';
+    sideList.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);text-align:center;margin-top:20px">Нет просмотров</div>';
     return;
   }
   
@@ -149,9 +166,9 @@ function renderSidebar() {
     
     return `
       <div class="recent-item">
-        <img src="${m.poster}">
+        <img src="${esc(m.poster)}">
         <div class="recent-info">
-          <div class="recent-title" title="${m.title}">${m.title}</div>
+          <div class="recent-title" title="${esc(m.title)}">${esc(m.title)}</div>
           <div class="recent-scores">${scoresHTML}</div>
         </div>
       </div>
@@ -161,31 +178,36 @@ function renderSidebar() {
 
 function render() {
   renderSidebar();
-  const grid = document.getElementById('grid'); 
-  let list = db.filter(x => x.status === activeTab);
-  if (!list.length) { grid.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)">Пусто 🎬</div>'; return; }
+  const grid = document.getElementById('grid'); let list = db.filter(x => x.status === activeTab);
+  if (activeTab === 'watched' && activeSub !== 'all') list = list.filter(x => x.category === activeSub);
+  if (!list.length) { grid.innerHTML = '<div class="empty">Здесь пока пусто 🎬</div>'; return; }
   
   grid.innerHTML = list.map(m => {
-    const tags = m.status === 'watched' ? `<span style="background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:4px;font-size:0.8rem">${LABELS[m.category] || ''}</span>` : '';
-    const scores = m.status === 'watched' ? `${m.scoreBoy ? `<span style="color:var(--star);font-size:0.8rem;margin-left:10px">👨 ${m.scoreBoy}/10</span>`:''} ${m.scoreGirl ? `<span style="color:var(--star);font-size:0.8rem;margin-left:10px">👩 ${m.scoreGirl}/10</span>`:''}` : '';
-    const acts = m.status === 'watchlist' ? `<button onclick="markWatched(${m.id})" style="padding:6px 12px;background:var(--success);border:none;color:#fff;border-radius:6px;cursor:pointer">Посмотрели!</button> <button onclick="deleteMovie(${m.id})" style="padding:6px 12px;background:none;border:1px solid var(--danger);color:var(--danger);border-radius:6px;cursor:pointer">Удалить</button>` : `<button onclick="editRatings(${m.id})" style="padding:6px 12px;background:none;border:1px solid var(--accent);color:var(--accent);border-radius:6px;cursor:pointer">Оценки</button> <button onclick="deleteMovie(${m.id})" style="padding:6px 12px;background:none;border:1px solid var(--danger);color:var(--danger);border-radius:6px;cursor:pointer">Удалить</button>`;
+    const tags = m.status === 'watched' ? `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}/10</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}/10</span>`:''}` : '';
+    const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Оценки</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
     
     const isTruncated = !textStates[m.id];
+    const needsButton = m.overview && m.overview.length > 200;
+
     return `
       <article class="card">
-        <img class="card-poster" src="${m.poster}">
+        <img class="card-poster" src="${esc(m.poster)}">
         <div class="card-body">
-          <div style="display:flex;justify-content:between;align-items:center"><h2 class="card-title">${m.title}</h2>${scores}</div>
-          <div class="card-year" style="margin-bottom:8px">${m.year}</div>
-          <div id="desc-${m.id}" class="card-desc ${isTruncated ? 'truncated' : ''}">${m.overview}</div>
-          ${m.overview && m.overview.length > 140 ? `<button id="btn-more-${m.id}" class="btn-more" onclick="toggleDesc(${m.id})">${isTruncated ? 'Развернуть полностью' : 'Свернуть'}</button>` : ''}
-          <div class="card-tags" style="margin-top:10px">${tags}</div>
+          <div class="card-title-wrap">
+            <div class="card-title">${esc(m.title)}</div>
+          </div>
+          <div class="card-year">${esc(m.year)}</div>
+          <div id="desc-${m.id}" class="card-desc ${needsButton && isTruncated ? 'truncated' : ''}">${esc(m.overview)}</div>
+          ${needsButton ? `<button id="btn-more-${m.id}" class="btn-more" onclick="toggleDesc(${m.id})">${isTruncated ? 'Развернуть полностью' : 'Свернуть'}</button>` : ''}
+          <div class="card-tags">${tags}</div>
         </div>
-        <div class="card-actions" style="display:flex;flex-direction:column;gap:5px;justify-content:center">${acts}</div>
+        <div class="card-actions">${acts}</div>
       </article>
     `;
   }).join('');
 }
 
-document.addEventListener('click', e => { if (!e.target.closest('#searchInput')) hideDropdown(); });
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) hideDropdown(); });
+
 apiGet();
