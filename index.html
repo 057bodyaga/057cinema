@@ -290,7 +290,6 @@
     <div class="loading">Загрузка...</div>
   </div>
 </div>
-
 <script>
   const TMDB_KEY = 'af2e801d23d9fad3c709a796331ac8f7';
   const LABELS   = { joint: '🍿 Наши', boy: '👨 Бодяга', girl: '👩 Каракумикуи' };
@@ -320,7 +319,7 @@
       db = JSON.parse(b64DecodeUnicode(data.content));
       render();
     } catch (e) {
-      document.getElementById('grid').innerHTML = '<div class="empty">Ошибка! Проверь логин GitHub в строке 160 кода.</div>';
+      document.getElementById('grid').innerHTML = '<div class="empty">Ошибка! Проверь логин GitHub в коде.</div>';
     }
   }
 
@@ -487,7 +486,6 @@
     render();
   }
 
-  /* Исправление бага клика по подвкладкам в Просмотрено */
   function switchSub(btn, sub) {
     activeSub = sub;
     document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
