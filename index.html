@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Киношке</title>
+  <style>
+    :root {
+      --bg:         #09070f;
+      --panel:      #130f22;
+      --card:       #1a152e;
+      --border:     #2c224d;
+      --text:       #f1edf7;
+      --muted:      #9c94b0;
+      --accent:     #9d4edd;
+      --accent-glow:rgba(157, 78, 221, 0.35);
+      --accent2:    #f72585;
+      --danger:     #ff5252;
+      --success:    #2ecc71;
+      --star:       #ffbe0b;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 16px 80px;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    .site-title {
+      text-align: center;
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+    }
+
+    /* ── Search / Add panel ──────────────────────────── */
+    .add-panel {
+      background: linear-gradient(135deg, var(--panel), #17122b);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      position: relative;
+    }
+
+    .search-wrap { position: relative; }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    /* ── Dropdown results ────────────────────────────── */
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-height: 320px;
+      overflow-y: auto;
+      z-index: 200;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.65);
+    }
+    .dropdown-item {
+      display: flex;
+      gap: 14px;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: rgba(157,78,221,.12); }
+    .dropdown-item img { width: 42px; height: 62px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+    .dropdown-item h4 { font-size: .95rem; margin-bottom: 4px; }
+    .dropdown-item p  { font-size: .82rem; color: var(--muted); }
+
+    /* ── Config form (shown after selecting a movie) ─── */
+    .config-form {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .config-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+
+    .row { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
+    .field { flex: 1; min-width: 190px; }
+    .field label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 7px; }
+
+    select {
+      width: 100%;
+      padding: 11px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    input[type="range"] { flex: 1; accent-color: var(--accent); }
+    .score-val { font-weight: 700; color: var(--star); min-width: 32px; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(45deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s;
+      margin-top: 4px;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-primary:disabled { opacity: .45; cursor: default; }
+
+    /* ── Tabs ────────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 9px 22px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      transition: color .2s;
+    }
+    .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
+
+    .sub-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .sub-tab {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .9rem;
+      transition: border-color .2s, color .2s;
+    }
+    .sub-tab.active { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Movie cards ─────────────────────────────────── */
+    .grid { display: flex; flex-direction: column; gap: 18px; }
+
+    .card {
+      display: flex;
+      gap: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: rgba(157,78,221,.4); }
+
+    .card-poster {
+      width: 95px;
+      height: 142px;
+      object-fit: cover;
+      border-radius: 9px;
+      flex-shrink: 0;
+    }
+
+    .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
+    .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 8px; }
+    .card-desc  { color: var(--muted); font-size: .9rem; line-height: 1.45; margin-bottom: 12px;
+                  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+
+    .card-tags  { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: .82rem;
+    }
+    .tag-viewer { background: rgba(255,255,255,.06); }
+    .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
+
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+      justify-content: flex-start;
+    }
+    .btn-action {
+      padding: 7px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .2s;
+    }
+    .btn-action:hover { opacity: .82; }
+    .btn-watched  { background: var(--success); color: #fff; }
+    .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); }
+    .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); }
+
+    /* ── Empty state ─────────────────────────────────── */
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── Loading spinner ─────────────────────────────── */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="site-title">🍿 Киношке</h1>
+
+  <!-- ── Search & Add ── -->
+  <section class="add-panel">
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Как называется фильм?" autocomplete="off" oninput="onSearchInput()">
+      <div id="dropdown" class="dropdown hidden"></div>
+    </div>
+
+    <div id="configForm" class="config-form hidden">
+      <div id="configTitle" class="config-title"></div>
+
+      <div class="row">
+        <div class="field">
+          <label>Куда добавить?</label>
+          <select id="selStatus" onchange="onStatusChange()">
+            <option value="watchlist">Хочу посмотреть</option>
+            <option value="watched">Уже посмотрели</option>
+          </select>
+        </div>
+        <div class="field watched-only hidden">
+          <label>Кто смотрел?</label>
+          <select id="selCategory" onchange="onCategoryChange()">
+            <option value="joint">🍿 Наши</option>
+            <option value="boy">👨 Бодяга</option>
+            <option value="girl">👩 Каракумикуи</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row watched-only hidden">
+        <div class="field" id="boyField">
+          <label>Моя оценка: <span id="valBoy" class="score-val">5</span>/10</label>
+          <div class="slider-row">
+            <input type="range" id="sliBoy" min="1" max="10" value="5" oninput="document.getElementById('valBoy').textContent=this.value">
+          </div>
+        </div>
+        <div class="field" id="girlField">
+          <label>Оценка девушки: <span id="valGirl" class="score-val">5</span>/10</label>
+          <div class="slider-row">
+            <input type="range" id="sliGirl" min="1" max="10" value="5" oninput="document.getElementById('valGirl').textContent=this.value">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btnSave" onclick="saveMovie()">Добавить в коллекцию</button>
+    </div>
+  </section>
+
+  <!-- ── Tabs ── -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'watchlist')">Хочу посмотреть</button>
+    <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
+  </div>
+
+  <div id="subTabs" class="sub-tabs hidden">
+    <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
+    <button class="sub-tab"        onclick="switchSub(this,'joint')">🍿 Наши</button>
+    <button class="sub-tab"        onclick="switchSub(this,'boy')">👨 Бодяга</button>
+    <button class="sub-tab"        onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
+  </div>
+
+  <div id="grid" class="grid">
+    <div class="loading">Загрузка...</div>
+  </div>
+</div>
+
+<script>
+  const TMDB_KEY = 'af2e801d23d9fad3c709a796331ac8f7';
+  const LABELS   = { joint: '🍿 Наши', boy: '👨 Бодяга', girl: '👩 Каракумикуи' };
+
+  let db          = [];   // local mirror of server data
+  let activeTab   = 'watchlist';
+  let activeSub   = 'all';
+  let pending     = null; // movie being configured
+  let searchTimer = null;
+
+  /* ─── API helpers ──────────────────────────────────────── */
+  async function apiGet()       { const r = await fetch('/api/movies'); return r.json(); }
+  async function apiSave(m)     { await fetch('/api/movies', { method:'POST',  headers:{'Content-Type':'application/json'}, body:JSON.stringify(m) }); }
+  async function apiDelete(id)  { await fetch(`/api/movies?id=${id}`, { method:'DELETE' }); }
+
+  /* ─── Boot ─────────────────────────────────────────────── */
+  async function boot() {
+    db = await apiGet();
+    render();
+  }
+  boot();
+
+  /* ─── Search ───────────────────────────────────────────── */
+  function onSearchInput() {
+    clearTimeout(searchTimer);
+    const q = document.getElementById('searchInput').value.trim();
+    if (q.length < 2) { hideDropdown(); return; }
+    searchTimer = setTimeout(() => fetchMovies(q), 350);
+  }
+
+  async function fetchMovies(q) {
+    try {
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=ru-RU`;
+      const data = await (await fetch(url)).json();
+      showDropdown(data.results?.slice(0, 6) ?? []);
+    } catch { hideDropdown(); }
+  }
+
+  function showDropdown(results) {
+    const dd = document.getElementById('dropdown');
+    if (!results.length) { hideDropdown(); return; }
+    dd.innerHTML = results.map(m => {
+      const poster = m.poster_path ? `https://image.tmdb.org/t/p/w92${m.poster_path}` : 'https://placehold.co/42x62/1a152e/9c94b0?text=?';
+      const year   = m.release_date?.substring(0,4) ?? '—';
+      return `<div class="dropdown-item" onclick='pickMovie(${JSON.stringify(m).replace(/'/g,"&apos;")})'>
+        <img src="${poster}" alt="">
+        <div><h4>${esc(m.title)}</h4><p>${year}</p></div>
+      </div>`;
+    }).join('');
+    dd.classList.remove('hidden');
+  }
+
+  function hideDropdown() {
+    document.getElementById('dropdown').classList.add('hidden');
+  }
+
+  /* ─── Pick a movie from results ────────────────────────── */
+  function pickMovie(movie) {
+    pending = movie;
+    hideDropdown();
+    document.getElementById('searchInput').value = movie.title;
+    document.getElementById('configTitle').textContent = `Настройка: "${movie.title}"`;
+    document.getElementById('selStatus').value   = 'watchlist';
+    document.getElementById('sliBoy').value      = 5;
+    document.getElementById('sliGirl').value     = 5;
+    document.getElementById('valBoy').textContent  = '5';
+    document.getElementById('valGirl').textContent = '5';
+    document.getElementById('btnSave').textContent = 'Добавить в коллекцию';
+    document.getElementById('configForm').classList.remove('hidden');
+    onStatusChange();
+  }
+
+  /* ─── Form visibility helpers ───────────────────────────── */
+  function onStatusChange()   { syncWatchedFields(); }
+  function onCategoryChange() { syncScoreFields(); }
+
+  function syncWatchedFields() {
+    const isWatched = document.getElementById('selStatus').value === 'watched';
+    document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isWatched));
+    if (isWatched) syncScoreFields();
+  }
+
+  function syncScoreFields() {
+    const cat = document.getElementById('selCategory').value;
+    document.getElementById('boyField').classList.toggle('hidden',  cat === 'girl');
+    document.getElementById('girlField').classList.toggle('hidden', cat === 'boy');
+  }
+
+  /* ─── Save (add or update) ──────────────────────────────── */
+  async function saveMovie() {
+    if (!pending) return;
+    const btn    = document.getElementById('btnSave');
+    btn.disabled = true;
+
+    const status   = document.getElementById('selStatus').value;
+    const category = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
+
+    const movie = {
+      id:        pending.id,
+      title:     pending.title,
+      overview:  pending.overview ?? 'Описание отсутствует.',
+      poster:    pending._poster ?? (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142/1a152e/9c94b0?text=?'),
+      year:      pending.release_date?.substring(0,4) ?? '—',
+      status,
+      category,
+      scoreBoy:  (status === 'watched' && category !== 'girl') ? parseInt(document.getElementById('sliBoy').value)  : null,
+      scoreGirl: (status === 'watched' && category !== 'boy')  ? parseInt(document.getElementById('sliGirl').value) : null,
+    };
+
+    await apiSave(movie);
+    db = db.filter(m => m.id !== movie.id);
+    db.push(movie);
+
+    document.getElementById('configForm').classList.add('hidden');
+    document.getElementById('searchInput').value = '';
+    pending  = null;
+    btn.disabled = false;
+    render();
+  }
+
+  /* ─── Edit ratings ──────────────────────────────────────── */
+  function editRatings(id) {
+    const movie = db.find(m => m.id === id);
+    if (!movie) return;
+
+    // Reuse the same config form, pre-filled with existing data
+    pending = {
+      id:          movie.id,
+      title:       movie.title,
+      overview:    movie.overview,
+      poster_path: null,
+      _poster:     movie.poster,
+      release_date: movie.year ? movie.year + '-01-01' : null,
+    };
+
+    document.getElementById('searchInput').value    = movie.title;
+    document.getElementById('configTitle').textContent = `Изменить оценки: "${movie.title}"`;
+    document.getElementById('selStatus').value      = movie.status;
+    document.getElementById('selCategory').value    = movie.category;
+    document.getElementById('sliBoy').value         = movie.scoreBoy  ?? 5;
+    document.getElementById('sliGirl').value        = movie.scoreGirl ?? 5;
+    document.getElementById('valBoy').textContent   = movie.scoreBoy  ?? 5;
+    document.getElementById('valGirl').textContent  = movie.scoreGirl ?? 5;
+    document.getElementById('btnSave').textContent  = 'Сохранить изменения';
+    document.getElementById('configForm').classList.remove('hidden');
+    onStatusChange();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ─── Delete ────────────────────────────────────────────── */
+  async function deleteMovie(id) {
+    await apiDelete(id);
+    db = db.filter(m => m.id !== id);
+    render();
+  }
+
+  /* ─── Mark watchlist → watched ─────────────────────────── */
+  function markWatched(id) {
+    const movie = db.find(m => m.id === id);
+    if (!movie) return;
+    pending = {
+      id:          movie.id,
+      title:       movie.title,
+      overview:    movie.overview,
+      poster_path: null,
+      _poster:     movie.poster,
+      release_date: movie.year ? movie.year + '-01-01' : null,
+    };
+    document.getElementById('searchInput').value    = movie.title;
+    document.getElementById('configTitle').textContent = `Посмотрели! "${movie.title}"`;
+    document.getElementById('selStatus').value      = 'watched';
+    document.getElementById('sliBoy').value         = 5;
+    document.getElementById('sliGirl').value        = 5;
+    document.getElementById('valBoy').textContent   = '5';
+    document.getElementById('valGirl').textContent  = '5';
+    document.getElementById('btnSave').textContent  = 'Добавить в просмотрено';
+    document.getElementById('configForm').classList.remove('hidden');
+    onStatusChange();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ─── Tab switching ─────────────────────────────────────── */
+  function switchTab(btn, tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('subTabs').classList.toggle('hidden', tab !== 'watched');
+    render();
+  }
+
+  function switchSub(btn, sub) {
+    activeSub = sub;
+    document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  /* ─── Render ────────────────────────────────────────────── */
+  function render() {
+    const grid = document.getElementById('grid');
+    let list = db.filter(m => m.status === activeTab);
+
+    if (activeTab === 'watched' && activeSub !== 'all') {
+      list = list.filter(m => m.category === activeSub);
+    }
+
+    if (!list.length) {
+      grid.innerHTML = '<div class="empty">Здесь пока пусто — добавь что-нибудь! 🎬</div>';
+      return;
+    }
+
+    grid.innerHTML = list.map(movie => {
+      const tags = movie.status === 'watched' ? `
+        <span class="tag tag-viewer">${LABELS[movie.category] ?? movie.category}</span>
+        ${movie.scoreBoy  != null ? `<span class="tag tag-score">👨 ${movie.scoreBoy}/10</span>`  : ''}
+        ${movie.scoreGirl != null ? `<span class="tag tag-score">👩 ${movie.scoreGirl}/10</span>` : ''}
+      ` : '';
+
+      const actions = movie.status === 'watchlist'
+        ? `<button class="btn-action btn-watched" onclick="markWatched(${movie.id})">Посмотрели!</button>
+           <button class="btn-action btn-delete"  onclick="deleteMovie(${movie.id})">Удалить</button>`
+        : `<button class="btn-action btn-edit"   onclick="editRatings(${movie.id})">Оценки</button>
+           <button class="btn-action btn-delete"  onclick="deleteMovie(${movie.id})">Удалить</button>`;
+
+      return `
+        <article class="card">
+          <img class="card-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}">
+          <div class="card-body">
+            <div class="card-title">${esc(movie.title)}</div>
+            <div class="card-year">${esc(movie.year)}</div>
+            <div class="card-desc">${esc(movie.overview)}</div>
+            <div class="card-tags">${tags}</div>
+          </div>
+          <div class="card-actions">${actions}</div>
+        </article>`;
+    }).join('');
+  }
+
+  /* ─── Utils ─────────────────────────────────────────────── */
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.search-wrap')) hideDropdown();
+  });
+</script>
+</body>
+</html>
