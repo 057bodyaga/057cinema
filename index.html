@@ -14,9 +14,13 @@
   </aside>
 
   <div class="wrap">
-    <h1 class="site-title">🍿 Киношке</h1>
+    
+    <div class="header-zone">
+      <h1 class="site-title">🍿 Киношке</h1>
+      <button class="btn-settings" onclick="toggleTokenPanel()" title="Настройки токена">⚙️</button>
+    </div>
 
-    <div class="token-panel">
+    <div id="tokenPanel" class="token-panel hidden">
       <h3>🔑 Настройка токена GitHub</h3>
       <p>Вставьте ваш токен (ghp_...), чтобы сайт мог сохранять фильмы в ваш movies.json.</p>
       <div class="token-flex">
@@ -76,4 +80,17 @@
     </div>
     
     <div id="subTabs" class="sub-tabs hidden">
-      <button class="sub-tab active" onclick="switch
+      <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
+      <button class="sub-tab" onclick="switchSub(this,'joint')">🍿 Наши</button>
+      <button class="sub-tab" onclick="switchSub(this,'boy')">👨 Бодяга</button>
+      <button class="sub-tab" onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
+    </div>
+
+    <div id="grid" class="grid">
+      <div class="loading">Загрузка...</div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
