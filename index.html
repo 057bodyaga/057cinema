@@ -1,18 +1,78 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="style.css"></head>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Киношке</title>
+    <style>
+        body { font-family: sans-serif; background: #09070f; color: #fff; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; }
+        .movie-card { background: #1a152e; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; gap: 15px; }
+        .movie-card img { width: 60px; }
+        .hidden { display: none; }
+        /* Твои базовые стили, которые точно не ломали JS */
+    </style>
+</head>
 <body>
-  <aside class="sidebar"><h3>Недавно</h3><div id="recentList"></div></aside>
-  <div class="main-container">
-    <div class="wrap">
-      <div class="header-zone">
-        <h1>Киношке</h1>
-        <button class="btn-settings" onclick="toggleTokenPanel()">⚙️</button>
-      </div>
-      <div id="tokenPanel" class="token-panel hidden">...форма токена...</div>
-      <div id="grid" class="grid"></div>
+
+<div class="container">
+    <h1>Киношке</h1>
+    
+    <div id="controls">
+        <input type="text" id="searchInput" placeholder="Поиск фильма...">
+        <button onclick="toggleTokenPanel()">⚙️ Настройки</button>
     </div>
-  </div>
-  <script src="script.js"></script>
+
+    <div id="tokenPanel" class="hidden">
+        <input type="text" id="tokenInput" placeholder="Токен GitHub">
+        <button onclick="saveToken()">Сохранить</button>
+    </div>
+
+    <div id="grid"></div>
+</div>
+
+<script>
+    const GH_USER = '057bodyaga';
+    const GH_REPO = '057cinema';
+    let db = [];
+
+    // Базовая функция загрузки
+    async function init() {
+        try {
+            const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`);
+            const data = await res.json();
+            db = JSON.parse(decodeURIComponent(atob(data.content.replace(/\s/g, ''))));
+            render();
+        } catch (e) {
+            document.getElementById('grid').innerHTML = "Ошибка загрузки базы.";
+        }
+    }
+
+    function render() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = db.map(m => `
+            <div class="movie-card">
+                <img src="${m.poster}">
+                <div>
+                    <h3>${m.title}</h3>
+                    <p>${m.year}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleTokenPanel() {
+        document.getElementById('tokenPanel').classList.toggle('hidden');
+    }
+
+    function saveToken() {
+        localStorage.setItem('gh_token', document.getElementById('tokenInput').value);
+        alert('Токен сохранен!');
+    }
+
+    // Запуск
+    init();
+</script>
+
 </body>
 </html>
