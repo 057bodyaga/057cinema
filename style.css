@@ -16,7 +16,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-/* Боковая панель: намертво слева */
+/* Боковая панель (фиксированная слева) */
 .sidebar { 
   position: fixed; left: 0; top: 0; bottom: 0; 
   width: 260px; background: var(--panel); 
@@ -36,22 +36,22 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 .recent-scores { display: flex; gap: 4px; flex-wrap: wrap; }
 .mini-score { font-size: 0.7rem; color: var(--star); background: rgba(255,190,11,0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,190,11,0.2); font-weight: 600; }
 
-/* Центрирование основного контента: отступаем справа от сайдбара и центрируем wrap */
+/* Главный контейнер (занимает всё пространство справа от панели) */
 .main-container {
-  padding-left: 260px; /* Отступ на ширину боковой панели */
+  padding-left: 260px;
   width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
+/* Оболочка контента — теперь ИДЕАЛЬНО центрирует всё содержимое внутри себя */
 .wrap { 
-  width: 100%;
   max-width: 900px; 
+  margin: 0 auto; /* Центрирует сам блок на большой рабочей области */
   padding: 40px 24px 80px; 
-  position: relative; 
+  display: flex;
+  flex-direction: column; /* Выстраивает все элементы строго друг под другом */
 }
 
-/* Зона заголовка с шестерёнкой */
+/* Зона заголовка */
 .header-zone { 
   display: flex; 
   justify-content: center; 
@@ -62,7 +62,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 }
 .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-/* Починенная кнопка-шестерёнка */
+/* Кнопка-шестерёнка */
 .btn-settings { 
   position: absolute; 
   right: 0; 
@@ -75,13 +75,13 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
   cursor: pointer; 
   transition: opacity 0.2s, transform 0.2s; 
   opacity: 0.75; 
-  z-index: 50; /* Гарантирует, что кнопка будет поверх других элементов */
-  padding: 10px; /* Увеличиваем область клика */
+  z-index: 150;
+  padding: 10px;
 }
 .btn-settings:hover { opacity: 1; transform: translateY(-50%) rotate(45deg); }
 
-/* Панель токена */
-.token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; }
+/* Панели, инпуты и вкладки теперь растягиваются одинаково */
+.token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; width: 100%; }
 .token-panel h3 { margin-bottom: 8px; font-size: 1.1rem; }
 .token-panel p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
 .token-flex { display: flex; gap: 10px; max-width: 500px; margin: 0 auto; }
@@ -90,9 +90,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-
 .btn-save-token { padding: 10px 20px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
 .status-msg { margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
 
-/* Панель добавления и поиска */
-.add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
-.search-wrap { position: relative; }
+.add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); width: 100%; }
+.search-wrap { position: relative; width: 100%; }
 input[type="text"] { width: 100%; padding: 14px 18px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; }
 input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
 
@@ -118,16 +117,18 @@ input[type="range"] { flex: 1; accent-color: var(--accent); }
 .btn-primary:hover { opacity: .88; }
 .btn-primary:disabled { opacity: .45; cursor: default; }
 
-.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
+/* Вкладки */
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; width: 100%; }
 .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
 .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
 
-.sub-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+.sub-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; width: 100%; }
 .sub-tab { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 7px 15px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: border-color .2s, color .2s; }
 .sub-tab.active { border-color: var(--accent); color: var(--accent); }
 
-.grid { display: flex; flex-direction: column; gap: 18px; }
-.card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; }
+/* Сетка карточек */
+.grid { display: flex; flex-direction: column; gap: 18px; width: 100%; }
+.card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; width: 100%; }
 .card:hover { border-color: rgba(157,78,221,.4); }
 .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
 .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -154,8 +155,8 @@ input[type="range"] { flex: 1; accent-color: var(--accent); }
 .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); }
 .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); }
 
-.empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
-.loading { text-align: center; padding: 40px; color: var(--muted); }
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; width: 100%; }
+.loading { text-align: center; padding: 40px; color: var(--muted); width: 100%; }
 .hidden { display: none !important; }
 
 @media(max-width: 900px) {
