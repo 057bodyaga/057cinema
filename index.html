@@ -13,61 +13,30 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
     .wrap { max-width: 900px; margin: 0 auto; }
-    
-    /* Шапка сайта с кнопкой настроек */
-    .header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
-    .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .btn-settings { background: none; border: none; cursor: pointer; font-size: 1.5rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
-
-    /* Панель токена */
+    .site-title { text-align: center; font-size: 2.6rem; font-weight: 800; margin-bottom: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; }
-    .token-panel input { padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); outline: none; width: 250px; }
-    .token-panel button { padding: 8px 16px; background: var(--accent); border: none; border-radius: 6px; color: var(--text); cursor: pointer; font-weight: bold; margin-left: 8px; }
-    #statusMsg { margin-top: 10px; font-size: 0.9rem; }
-
-    /* Панель поиска */
-    .add-panel { background: #130f22; border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; position: relative; }
-    #searchInput { width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; outline: none; }
-    #searchInput:focus { border-color: var(--accent); }
-    
-    /* Выпадающий список */
-    #dropdown { position: absolute; top: 75px; left: 24px; right: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .dropdown-item { padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); transition: background 0.2s; }
-    .dropdown-item:hover { background: var(--card); }
-    .dropdown-item span { color: var(--muted); font-size: 0.9rem; }
-
-    /* Сетка и карточки */
-    .grid { display: flex; flex-direction: column; gap: 18px; }
-    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; gap: 18px; transition: transform 0.2s, border-color 0.2s; }
-    .card:hover { transform: translateY(-2px); border-color: var(--accent); }
-    .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; }
-    .card-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    .card-body h3 { font-size: 1.3rem; margin-bottom: 5px; }
-    .card-body p { color: var(--muted); }
-    
+    .add-panel { background: #130f22; border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; }
     .hidden { display: none !important; }
+    .grid { display: flex; flex-direction: column; gap: 18px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; gap: 18px; }
+    .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; }
+    .card-body { flex: 1; }
+    .btn-action { padding: 7px 14px; border: none; border-radius: 8px; cursor: pointer; margin-top: 5px; }
     .loading { text-align: center; padding: 40px; color: var(--muted); }
   </style>
 </head>
 <body>
 <div class="wrap">
-  
-  <div class="header-zone">
-    <h1 class="site-title">🍿 Киношке</h1>
-    <button class="btn-settings" onclick="toggleTokenPanel()">⚙️</button>
-  </div>
-  
-  <div id="tokenPanel" class="token-panel hidden">
+  <h1 class="site-title">🍿 Киношке</h1>
+  <div id="tokenPanel" class="token-panel">
     <input type="text" id="tokenInput" placeholder="Токен GitHub (ghp_...)">
     <button onclick="saveTokenBtn()">Сохранить</button>
     <div id="statusMsg"></div>
   </div>
-
   <section class="add-panel">
-    <input id="searchInput" type="text" placeholder="Поиск фильма в TMDB..." oninput="onSearchInput()">
+    <input id="searchInput" type="text" placeholder="Поиск фильма..." oninput="onSearchInput()">
     <div id="dropdown" class="hidden"></div>
   </section>
-
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
 </div>
 
@@ -77,41 +46,24 @@
   const GH_REPO = '057cinema';
   let db = [], fileSha = null;
 
-  // Функция переключения видимости панели токена
-  function toggleTokenPanel() {
-    document.getElementById('tokenPanel').classList.toggle('hidden');
-  }
-
-  // 1. Получение базы фильмов с GitHub
   async function apiGet() { 
     try {
       const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`);
       const data = await res.json();
-      
-      // Декодируем Base64 с поддержкой кириллицы
+      // Правильная расшифровка Base64 для кириллицы
       const raw = atob(data.content.replace(/\s/g, ''));
-      const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
-      const json = new TextDecoder('utf-8').decode(bytes);
-      
+      const json = decodeURIComponent(Array.from(raw).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
       db = JSON.parse(json);
-      fileSha = data.sha; 
+      fileSha = data.sha;
       render();
-    } catch(e) { 
-      document.getElementById('grid').innerHTML = "Ошибка загрузки базы."; 
-      console.error(e);
-    }
+    } catch(e) { document.getElementById('grid').innerHTML = "Ошибка загрузки."; }
   }
 
-  // 2. Отрисовка списка фильмов на странице
   function render() {
     const grid = document.getElementById('grid');
-    if (db.length === 0) {
-      grid.innerHTML = "<div class='loading'>Список пуст. Добавьте первый фильм!</div>";
-      return;
-    }
     grid.innerHTML = db.map(m => `
       <div class="card">
-        <img class="card-poster" src="${m.poster}" alt="${m.title}">
+        <img class="card-poster" src="${m.poster}">
         <div class="card-body">
           <h3>${m.title}</h3>
           <p>${m.year}</p>
@@ -120,121 +72,11 @@
     `).join('');
   }
 
-  // 3. Живой поиск фильмов через TMDB API
-  async function onSearchInput() {
-    const query = document.getElementById('searchInput').value.trim();
-    const dropdown = document.getElementById('dropdown');
-    
-    if (query.length < 2) {
-      dropdown.classList.add('hidden');
-      return;
-    }
-
-    try {
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}&language=ru-RU`);
-      const data = await res.json();
-      
-      if (data.results && data.results.length > 0) {
-        dropdown.innerHTML = data.results.slice(0, 5).map(m => {
-          const year = m.release_date ? m.release_date.split('-')[0] : '----';
-          const posterUrl = m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/95x142?text=No+Poster';
-          const safeTitle = m.title.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-          
-          return `
-            <div class="dropdown-item" onclick="addMovie('${safeTitle}', '${year}', '${posterUrl}')">
-              <div>${m.title} <span>( ${year} )</span></div>
-            </div>
-          `;
-        }).join('');
-        dropdown.classList.remove('hidden');
-      } else {
-        dropdown.innerHTML = '<div style="padding:12px; color:var(--muted)">Ничего не найдено</div>';
-        dropdown.classList.remove('hidden');
-      }
-    } catch (e) {
-      console.error('Ошибка поиска в TMDB:', e);
-    }
-  }
-
-  // 4. Добавление фильма в массив и отправка коммита на GitHub
-  async function addMovie(title, year, poster) {
-    const token = localStorage.getItem('gh_token');
-    const statusMsg = document.getElementById('statusMsg');
-    
-    if (!token) {
-      alert('Сначала нажмите на ⚙️, введите и сохраните ваш GitHub Токен!');
-      toggleTokenPanel(); // Автоматически открываем панель, если забыли токен
-      return;
-    }
-
-    document.getElementById('dropdown').classList.add('hidden');
-    document.getElementById('searchInput').value = '';
-
-    if (db.some(m => m.title === title && m.year === year)) {
-      alert('Этот фильм уже есть в твоем списке!');
-      return;
-    }
-
-    db.unshift({ title, year, poster });
-    render();
-
-    // Показываем статус загрузки в панели токена, если она открыта, либо алертом
-    if (document.getElementById('tokenPanel').classList.contains('hidden')) {
-      // Если панель скрыта, временно покажем её, чтобы юзер видел статус сохранения
-      toggleTokenPanel();
-    }
-    statusMsg.innerHTML = '<span style="color:var(--muted)">Сохранение на GitHub...</span>';
-
-    const jsonStr = JSON.stringify(db, null, 2);
-    const bytes = new TextEncoder().encode(jsonStr);
-    const base64Content = btoa(String.fromCharCode(...bytes));
-
-    try {
-      const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: `Добавлен фильм: ${title}`,
-          content: base64Content,
-          sha: fileSha
-        })
-      });
-
-      if (res.ok) {
-        const resData = await res.json();
-        fileSha = resData.content.sha; 
-        statusMsg.innerHTML = '<span style="color:var(--success)">Сохранено в репозиторий!</span>';
-        setTimeout(() => {
-          statusMsg.innerHTML = '';
-          toggleTokenPanel(); // Прячем панель обратно через 2 секунды
-        }, 2000);
-      } else {
-        throw new Error('Не удалось обновить файл на GitHub');
-      }
-    } catch (e) {
-      statusMsg.innerHTML = '<span style="color:var(--danger)">Ошибка сохранения. Проверьте токен!</span>';
-      console.error(e);
-      apiGet(); 
-    }
-  }
-
-  // 5. Сохранение токена в LocalStorage
   function saveTokenBtn() {
-    const tokenVal = document.getElementById('tokenInput').value.trim();
-    localStorage.setItem('gh_token', tokenVal);
-    document.getElementById('statusMsg').innerHTML = '<span style="color:var(--success)">Токен сохранен!</span>';
-    setTimeout(() => {
-      document.getElementById('statusMsg').innerHTML = '';
-      toggleTokenPanel();
-    }, 1500);
-    apiGet(); 
+    localStorage.setItem('gh_token', document.getElementById('tokenInput').value);
+    apiGet();
   }
 
-  // Инициализация при старте страницы
-  document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
   apiGet();
 </script>
 </body>
