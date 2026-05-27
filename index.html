@@ -1,98 +1,18 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Киношке</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
 <body>
-
-  <aside class="sidebar">
-    <h3>🍿 Недавно смотрели</h3>
-    <div id="recentList"></div>
-  </aside>
-
+  <aside class="sidebar"><h3>Недавно</h3><div id="recentList"></div></aside>
   <div class="main-container">
     <div class="wrap">
-      
       <div class="header-zone">
-        <h1 class="site-title">🍿 Киношке</h1>
-        <button class="btn-settings" onclick="toggleTokenPanel()" title="Настройки токена">⚙️</button>
+        <h1>Киношке</h1>
+        <button class="btn-settings" onclick="toggleTokenPanel()">⚙️</button>
       </div>
-
-      <div id="tokenPanel" class="token-panel hidden">
-        <h3>🔑 Настройка токена GitHub</h3>
-        <p>Вставьте ваш токен (ghp_...), чтобы сайт мог сохранять фильмы в ваш movies.json.</p>
-        <div class="token-flex">
-          <input type="text" id="tokenInput" placeholder="Вставьте сюда ghp_...">
-          <button class="btn-save-token" onclick="saveTokenBtn()">Сохранить ключ</button>
-        </div>
-        <div id="statusMsg" class="status-msg"></div>
-      </div>
-
-      <section class="add-panel">
-        <div class="search-wrap">
-          <input id="searchInput" type="text" placeholder="Как называется фильм?" autocomplete="off" oninput="onSearchInput()">
-          <div id="dropdown" class="dropdown hidden"></div>
-        </div>
-        
-        <div id="configForm" class="config-form hidden">
-          <div id="configTitle" class="config-title"></div>
-          <div class="row">
-            <div class="field">
-              <label>Куда добавить?</label>
-              <select id="selStatus" onchange="onStatusChange()">
-                <option value="watchlist">Хочу посмотреть</option>
-                <option value="watched">Уже посмотрели</option>
-              </select>
-            </div>
-            <div class="field watched-only hidden">
-              <label>Кто смотрел?</label>
-              <select id="selCategory" onchange="onCategoryChange()">
-                <option value="joint">🍿 Наши</option>
-                <option value="boy">👨 Бодяга</option>
-                <option value="girl">👩 Каракумикуи</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="row watched-only hidden">
-            <div class="field" id="boyField">
-              <label>Моя оценка: <span id="valBoy" class="score-val">5</span>/10</label>
-              <div class="slider-row">
-                <input type="range" id="sliBoy" min="1" max="10" value="5" oninput="document.getElementById('valBoy').textContent=this.value">
-              </div>
-            </div>
-            <div class="field" id="girlField">
-              <label>Оценка девушки: <span id="valGirl" class="score-val">5</span>/10</label>
-              <div class="slider-row">
-                <input type="range" id="sliGirl" min="1" max="10" value="5" oninput="document.getElementById('valGirl').textContent=this.value">
-              </div>
-            </div>
-          </div>
-          <button class="btn-primary" id="btnSave" onclick="saveMovie()">Добавить в коллекцию</button>
-        </div>
-      </section>
-      
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab(this,'watchlist')">Хочу посмотреть</button>
-        <button class="tab" onclick="switchTab(this,'watched')">Просмотрено</button>
-      </div>
-      
-      <div id="subTabs" class="sub-tabs hidden">
-        <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
-        <button class="sub-tab" onclick="switchSub(this,'joint')">🍿 Наши</button>
-        <button class="sub-tab" onclick="switchSub(this,'boy')">👨 Бодяга</button>
-        <button class="sub-tab" onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
-      </div>
-
-      <div id="grid" class="grid">
-        <div class="loading">Загрузка...</div>
-      </div>
+      <div id="tokenPanel" class="token-panel hidden">...форма токена...</div>
+      <div id="grid" class="grid"></div>
     </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
