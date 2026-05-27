@@ -1,0 +1,58 @@
+:root {
+  --bg: #09070f; --panel: #130f22; --card: #1a152e; --border: #2c224d;
+  --text: #f1edf7; --muted: #9c94b0; --accent: #9d4edd; --accent2: #f72585;
+  --danger: #ff5252; --success: #2ecc71; --star: #ffbe0b;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+/* Боковая панель: теперь уперта в левую стенку */
+.sidebar { 
+  position: fixed; left: 0; top: 0; bottom: 0; 
+  width: 280px; background: var(--panel); 
+  border-right: 1px solid var(--border); 
+  padding: 20px; overflow-y: auto; z-index: 100;
+}
+.sidebar h3 { font-size: 1.2rem; margin-bottom: 20px; color: var(--accent2); text-align: center; }
+.recent-item { 
+  display: flex; gap: 12px; margin-bottom: 15px; 
+  background: rgba(255,255,255,0.03); padding: 8px; 
+  border-radius: 12px; border: 1px solid transparent; 
+}
+.recent-item img { width: 50px; height: 75px; object-fit: cover; border-radius: 6px; }
+.recent-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
+.recent-title { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recent-scores { display: flex; gap: 8px; flex-wrap: wrap; }
+.mini-score { font-size: 0.75rem; color: var(--star); background: rgba(255,190,11,0.1); padding: 2px 6px; border-radius: 4px; }
+
+/* Основной контент (сдвинут вправо из-за панели) */
+.content-area { margin-left: 280px; padding: 40px; max-width: 1000px; }
+
+/* Шапка и Кнопки */
+.header-zone { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.site-title { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.controls-group { display: flex; align-items: center; gap: 15px; }
+.status-icon { cursor: pointer; font-size: 1.2rem; }
+.status-icon.success { animation: pulse 2s infinite; color: var(--success); }
+.btn-settings { background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; opacity: 0.6; }
+
+/* Карточки фильмов и остальное */
+.grid { display: flex; flex-direction: column; gap: 20px; }
+.card { display: flex; gap: 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+.card-poster { width: 100px; height: 150px; object-fit: cover; border-radius: 8px; }
+.card-body { flex: 1; }
+.card-desc.truncated { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.btn-more { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.8rem; margin: 5px 0 10px; }
+
+/* Модалка и формы (оставляем твой дизайн) */
+.hidden { display: none !important; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-card { background: var(--panel); padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; }
+input, select { background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; }
+.btn-primary { background: linear-gradient(45deg, var(--accent), var(--accent2)); border: none; color: #fff; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; }
+
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+@media(max-width: 900px) {
+  .sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .content-area { margin-left: 0; padding: 20px; }
+}
