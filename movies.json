@@ -119,5 +119,16 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 8
+  },
+  {
+    "id": 911430,
+    "title": "F1",
+    "overview": "Легенду автоспорта Сонни Хейса уговаривают возглавить отстающую команду «Формулы-1» и обучить молодого одаренного гонщика, заодно получая последний шанс на искупление.",
+    "poster": "https://image.tmdb.org/t/p/w185/XDDweAK5vyUwCoX1NYbu9HlwFK.jpg",
+    "year": "2025",
+    "status": "watched",
+    "category": "joint",
+    "scoreBoy": 9,
+    "scoreGirl": 8
   }
 ]
