@@ -196,5 +196,16 @@
     "category": "joint",
     "scoreBoy": 5,
     "scoreGirl": 5
+  },
+  {
+    "id": 1400940,
+    "title": "Глиноликий",
+    "overview": "Существо меняющее форму, сделанное из волшебной глины, бродит по Готэму, превращаясь то в злодея, то в союзника Бэтмена. За прошедшие годы множество трагических личностей приняли облик Глиноликого.",
+    "poster": "https://image.tmdb.org/t/p/w185/sj71k1IkJAq3CpG35QqBJT9PBjR.jpg",
+    "year": "2026",
+    "status": "watchlist",
+    "category": "watchlist",
+    "scoreBoy": null,
+    "scoreGirl": null
   }
 ]
