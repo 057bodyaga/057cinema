@@ -229,5 +229,16 @@
     "category": "joint",
     "scoreBoy": 3,
     "scoreGirl": 5
+  },
+  {
+    "id": 297761,
+    "title": "Отряд самоубийц",
+    "overview": "Правительство решает дать команде суперзлодеев шанс на искупление. Подвох в том, что их отправляют на миссию, где они, вероятнее всего, погибнут...",
+    "poster": "https://image.tmdb.org/t/p/w185/7tJjv7vPBhG2pzcTIMgGBV1mL4w.jpg",
+    "year": "2016",
+    "status": "watched",
+    "category": "joint",
+    "scoreBoy": 9,
+    "scoreGirl": 9
   }
 ]
