@@ -350,5 +350,16 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 7
+  },
+  {
+    "id": 256591,
+    "title": "Фокус",
+    "overview": "История об опытном мошеннике, который влюбляется в девушку, делающую первые шаги на поприще нелегального отъема средств у граждан. Отношения становятся для них проблемой, когда обнаруживается, что романтика мешает их нечестному бизнесу.",
+    "poster": "https://image.tmdb.org/t/p/w185/zqgYuwxxqKWtdbljthoWejtYOR6.jpg",
+    "year": "2015",
+    "status": "watched",
+    "category": "joint",
+    "scoreBoy": 9,
+    "scoreGirl": 9
   }
 ]
