@@ -416,5 +416,16 @@
     "category": "watchlist",
     "scoreBoy": null,
     "scoreGirl": null
+  },
+  {
+    "id": 1284041,
+    "title": "Последний дом",
+    "overview": "Семья оказывается запертой в своем доме. Какая-то таинственная и зловещая сила держит всех в западне, запасов остается все меньше, и приходится бороться за выживание.",
+    "poster": "https://image.tmdb.org/t/p/w185/o31KZEt6ubk1RaaipRGKvCnLdVT.jpg",
+    "year": "2026",
+    "status": "watchlist",
+    "category": "watchlist",
+    "scoreBoy": null,
+    "scoreGirl": null
   }
 ]
