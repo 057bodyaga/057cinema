@@ -460,5 +460,16 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 9
+  },
+  {
+    "id": 1273221,
+    "title": "Очень страшное кино",
+    "overview": "На Тьюздей, младшую дочь Синди Кэмпбелл, нападает Призрачное Лицо. Старшая дочь Сара разыскивает ставшую отшельницей мать, и они пытаются остановить очередную волну убийств в Вудсвилле вместе с разросшимся семейством Бренды Микс.",
+    "poster": "https://image.tmdb.org/t/p/w185/w5rqOMj4J85Dee1tA3qNwhPuxKt.jpg",
+    "year": "2026",
+    "status": "watchlist",
+    "category": "watchlist",
+    "scoreBoy": null,
+    "scoreGirl": null
   }
 ]
