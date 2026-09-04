@@ -504,5 +504,16 @@
     "category": "watchlist",
     "scoreBoy": null,
     "scoreGirl": null
+  },
+  {
+    "id": 1516724,
+    "title": "Pour le plaisir",
+    "overview": "",
+    "poster": "https://image.tmdb.org/t/p/w185/2cWdr2n7VNrLEAer6hMPASIP7Px.jpg",
+    "year": "2026",
+    "status": "watchlist",
+    "category": "watchlist",
+    "scoreBoy": null,
+    "scoreGirl": null
   }
 ]
