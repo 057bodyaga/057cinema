@@ -482,5 +482,16 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 8
+  },
+  {
+    "id": 1477712,
+    "title": "Мороженщик",
+    "overview": "Обычный летний городок погружается в безумие, когда продавец мороженого угощает детей сладкими лакомствами, что приводит к ужасающим последствиям.",
+    "poster": "https://image.tmdb.org/t/p/w185/c987gxFjXqYOxZEZKcTkS1ONTWH.jpg",
+    "year": "2026",
+    "status": "watchlist",
+    "category": "watchlist",
+    "scoreBoy": null,
+    "scoreGirl": null
   }
 ]
