@@ -526,5 +526,16 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 7
+  },
+  {
+    "id": 1423191,
+    "title": "Обитель зла",
+    "overview": "Незадачливому курьеру поручено доставить посылку в отдалённую больницу. Вскоре он оказывается в эпицентре вспышки неизвестного вируса, где вынужден сражаться с ордами мутировавших существ, чтобы выжить.",
+    "poster": "https://image.tmdb.org/t/p/w185/vLl5tcuabARqGBefccSsYAYXdgA.jpg",
+    "year": "2026",
+    "status": "watched",
+    "category": "joint",
+    "scoreBoy": 5,
+    "scoreGirl": 5
   }
 ]
