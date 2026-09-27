@@ -122,8 +122,45 @@
     .sub-tab { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 7px 15px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: border-color .2s, color .2s; }
     .sub-tab.active { border-color: var(--accent); color: var(--accent); }
     
-    .sort-wrap { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--muted); }
-    .sort-wrap select { padding: 6px 10px; width: auto; font-size: .85rem; }
+    /* СТИЛИЗАЦИЯ СОРТИРОВКИ В ДИЗАЙН САЙТА */
+    .sort-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
+    .sort-wrap label { font-weight: 600; }
+    
+    .sort-select { 
+      padding: 8px 32px 8px 14px; 
+      width: auto; 
+      font-size: .88rem; 
+      font-weight: 600;
+      color: var(--text);
+      background-color: var(--panel);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%209c94b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    }
+
+    .sort-select:hover {
+      border-color: var(--accent);
+      background-color: var(--card);
+    }
+
+    .sort-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .sort-select option {
+      background-color: var(--card);
+      color: var(--text);
+      padding: 10px;
+    }
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
     .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; }
@@ -220,7 +257,7 @@
     </div>
     <div class="sort-wrap">
       <label for="selSort">Сортировка:</label>
-      <select id="selSort" onchange="changeSort(this.value)">
+      <select id="selSort" class="sort-select" onchange="changeSort(this.value)">
         <option value="newest">Сначала новые</option>
         <option value="oldest">Сначала старые</option>
         <option value="score">По средней оценке</option>
@@ -442,7 +479,14 @@
       if (m.status === 'watched') {
         const avg = getAvgScore(m);
         const avgTag = avg > 0 ? `<span class="tag tag-avg">⭐ ${avg.toFixed(1)}/10</span>` : '';
-        tags = `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
+        
+        // Показываем плашку категории, ТОЛЬКО ЕСЛИ стоят НЕ обе оценки одновременно
+        const hasBothScores = m.scoreBoy != null && m.scoreGirl != null;
+        const categoryTag = (!hasBothScores && LABELS[m.category]) 
+          ? `<span class="tag tag-viewer">${LABELS[m.category]}</span>` 
+          : '';
+
+        tags = `${categoryTag}${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
       }
 
       const acts = m.status === 'watchlist' 
