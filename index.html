@@ -21,6 +21,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
     .wrap { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; position: relative; }
     
@@ -328,10 +329,21 @@
       document.getElementById('valGirl').textContent = gScore;
     }
 
-    document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
+    const form = document.getElementById('configForm');
+    form.classList.remove('hidden'); 
+    onStatusChange();
+    
+    // Плавный скролл к блоку изменения/оценки
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
-  function markWatched(id) { const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange(); }
+  function markWatched(id) { 
+    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; 
+    const form = document.getElementById('configForm');
+    form.classList.remove('hidden'); 
+    onStatusChange();
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
   
   function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
   function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
@@ -354,7 +366,7 @@
 
     grid.innerHTML = list.map(m => {
       const tags = m.status === 'watched' ? `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}/10</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}/10</span>`:''}` : '';
-      const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Оценки</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+      const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
       return `<article class="card"><img class="card-poster" src="${esc(m.poster)}"><div class="card-body"><div class="card-title">${esc(m.title)}</div><div class="card-year">${esc(m.year)}</div><div class="card-desc">${esc(m.overview)}</div><div class="card-tags">${tags}</div></div><div class="card-actions">${acts}</div></article>`;
     }).join('');
   }
