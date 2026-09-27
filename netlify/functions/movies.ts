@@ -1,55 +1,66 @@
-import type { Config } from "@netlify/functions";
-import { db } from "../../db/index.js";
-import { movies } from "../../db/schema.js";
-import { eq } from "drizzle-orm";
+import { db } from '../database/index.js';
+import { movies } from '../database/schema.js';
+import { eq, desc } from 'drizzle-orm';
 
 export default async (req: Request) => {
   const url = new URL(req.url);
+  const method = req.method;
 
-  if (req.method === "GET") {
-    const all = await db.select().from(movies).orderBy(movies.addedAt);
-    return Response.json(all);
+  try {
+    // GET /api/movies — теперь сортирует по убыванию даты (новые сверху)
+    if (method === 'GET') {
+      const result = await db.select().from(movies).orderBy(desc(movies.addedAt));
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // POST /api/movies
+    if (method === 'POST') {
+      const body = await req.json();
+
+      await db.insert(movies).values({
+        id: body.id,
+        title: body.title,
+        overview: body.overview ?? "",
+        poster: body.poster ?? "",
+        year: body.year ?? "",
+        status: body.status,
+        category: body.category ?? "watchlist",
+        scoreBoy: body.scoreBoy ?? null,
+        scoreGirl: body.scoreGirl ?? null,
+        addedAt: new Date(), // обновляем timestamp при добавлении/изменении
+      }).onConflictDoUpdate({
+        target: movies.id,
+        set: {
+          title: body.title,
+          overview: body.overview ?? "",
+          poster: body.poster ?? "",
+          year: body.year ?? "",
+          status: body.status,
+          category: body.category ?? "watchlist",
+          scoreBoy: body.scoreBoy ?? null,
+          scoreGirl: body.scoreGirl ?? null,
+          // ВАЖНО: addedAt НЕ обновляем при редактировании оценок,
+          // чтобы просмотренные фильмы сохраняли свою позицию!
+        },
+      });
+
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    }
+
+    // DELETE /api/movies?id=123
+    if (method === 'DELETE') {
+      const id = url.searchParams.get('id');
+      if (!id) return new Response('Missing ID', { status: 400 });
+
+      await db.delete(movies).where(eq(movies.id, Number(id)));
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    }
+
+    return new Response('Method Not Allowed', { status: 405 });
+  } catch (err: any) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
-
-  if (req.method === "POST") {
-    const body = await req.json();
-    const row = {
-      id: body.id,
-      title: body.title,
-      overview: body.overview ?? "",
-      poster: body.poster ?? "",
-      year: body.year ?? "",
-      status: body.status,
-      category: body.category ?? "watchlist",
-      scoreBoy: body.scoreBoy ?? null,
-      scoreGirl: body.scoreGirl ?? null,
-    };
-    await db.insert(movies).values(row).onConflictDoUpdate({
-      target: movies.id,
-      set: {
-        title: row.title,
-        overview: row.overview,
-        poster: row.poster,
-        year: row.year,
-        status: row.status,
-        category: row.category,
-        scoreBoy: row.scoreBoy,
-        scoreGirl: row.scoreGirl,
-      },
-    });
-    return Response.json({ ok: true });
-  }
-
-  if (req.method === "DELETE") {
-    const id = parseInt(url.searchParams.get("id") ?? "0");
-    if (!id) return new Response("Missing id", { status: 400 });
-    await db.delete(movies).where(eq(movies.id, id));
-    return Response.json({ ok: true });
-  }
-
-  return new Response("Method not allowed", { status: 405 });
-};
-
-export const config: Config = {
-  path: "/api/movies",
 };
