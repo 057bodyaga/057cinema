@@ -6,18 +6,18 @@
   <title>Киношке</title>
   <style>
     :root {
-      --bg:         #09070f;
-      --panel:      #130f22;
-      --card:       #1a152e;
-      --border:     #2c224d;
-      --text:       #f1edf7;
-      --muted:      #9c94b0;
-      --accent:     #9d4edd;
+      --bg:          #09070f;
+      --panel:       #130f22;
+      --card:        #1a152e;
+      --border:      #2c224d;
+      --text:        #f1edf7;
+      --muted:       #9c94b0;
+      --accent:      #9d4edd;
       --accent-glow:rgba(157, 78, 221, 0.35);
-      --accent2:    #f72585;
-      --danger:     #ff5252;
-      --success:    #2ecc71;
-      --star:       #ffbe0b;
+      --accent2:     #f72585;
+      --danger:      #ff5252;
+      --success:     #2ecc71;
+      --star:        #ffbe0b;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -130,14 +130,14 @@
         <div class="field">
           <label>Куда добавить?</label>
           <select id="selStatus" onchange="onStatusChange()">
-            <option value="watchlist">Хочу посмотреть</option>
+            <option value="watchlist">Нужно посмотреть</option>
             <option value="watched">Уже посмотрели</option>
           </select>
         </div>
         <div class="field watched-only hidden">
           <label>Кто смотрел?</label>
           <select id="selCategory" onchange="onCategoryChange()">
-            <option value="joint">🍿 Наши</option>
+            <option value="joint">🍿 Совместныйи</option>
             <option value="boy">👨 Бодяга</option>
             <option value="girl">👩 Каракумикуи</option>
           </select>
@@ -145,12 +145,12 @@
       </div>
       <div class="row watched-only hidden">
         <div class="field" id="boyField">
-          <label>Моя оценка: <span id="valBoy" class="score-val">5</span>/10</label>
-          <div class="slider-row"><input type="range" id="sliBoy" min="1" max="10" value="5" oninput="document.getElementById('valBoy').textContent=this.value"></div>
+          <label>Оценка Боди: <span id="valBoy" class="score-val">5</span>/10</label>
+          <div class="slider-row"><input type="range" id="sliBoy" min="1" max="10" step="0.5" value="5" oninput="document.getElementById('valBoy').textContent=this.value"></div>
         </div>
         <div class="field" id="girlField">
-          <label>Оценка девушки: <span id="valGirl" class="score-val">5</span>/10</label>
-          <div class="slider-row"><input type="range" id="sliGirl" min="1" max="10" value="5" oninput="document.getElementById('valGirl').textContent=this.value"></div>
+          <label>Оценка Камилы: <span id="valGirl" class="score-val">5</span>/10</label>
+          <div class="slider-row"><input type="range" id="sliGirl" min="1" max="10" step="0.5" value="5" oninput="document.getElementById('valGirl').textContent=this.value"></div>
         </div>
       </div>
       <button class="btn-primary" id="btnSave" onclick="saveMovie()">Добавить в коллекцию</button>
@@ -158,12 +158,12 @@
   </section>
   
   <div class="tabs">
-    <button class="tab active" onclick="switchTab(this,'watchlist')">Хочу посмотреть</button>
+    <button class="tab active" onclick="switchTab(this,'watchlist')">Нужно посмотреть</button>
     <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
   </div>
   <div id="subTabs" class="sub-tabs hidden">
     <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
-    <button class="sub-tab"        onclick="switchSub(this,'joint')">🍿 Наши</button>
+    <button class="sub-tab"        onclick="switchSub(this,'joint')">🍿 Совместный</button>
     <button class="sub-tab"        onclick="switchSub(this,'boy')">👨 Бодяга</button>
     <button class="sub-tab"        onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
   </div>
@@ -172,7 +172,7 @@
 
 <script>
   const TMDB_KEY = 'af2e801d23d9fad3c709a796331ac8f7';
-  const LABELS   = { joint: '🍿 Наши', boy: '👨 Бодяга', girl: '👩 Каракумикуи' };
+  const LABELS   = { joint: '🍿 Совместный', boy: '👨 Бодяга', girl: '👩 Каракумикуи' };
   const GH_USER  = '057bodyaga'; 
   const GH_REPO  = '057cinema';
 
@@ -295,15 +295,26 @@
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
       poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
       year: pending.release_date?.substring(0,4) || pending.year || '—', status, category: cat,
-      scoreBoy: (status === 'watched' && cat !== 'girl') ? parseInt(document.getElementById('sliBoy').value) : null,
-      scoreGirl: (status === 'watched' && cat !== 'boy') ? parseInt(document.getElementById('sliGirl').value) : null
+      scoreBoy: (status === 'watched' && cat !== 'girl') ? parseFloat(document.getElementById('sliBoy').value) : null,
+      scoreGirl: (status === 'watched' && cat !== 'boy') ? parseFloat(document.getElementById('sliGirl').value) : null
     });
     document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
   }
 
   function editRatings(id) {
     const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year };
-    document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; if(m.status === 'watched') document.getElementById('selCategory').value = m.category;
+    document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; 
+    
+    if(m.status === 'watched') {
+      document.getElementById('selCategory').value = m.category;
+      const bScore = m.scoreBoy ?? 5;
+      const gScore = m.scoreGirl ?? 5;
+      document.getElementById('sliBoy').value = bScore;
+      document.getElementById('valBoy').textContent = bScore;
+      document.getElementById('sliGirl').value = gScore;
+      document.getElementById('valGirl').textContent = gScore;
+    }
+
     document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
   }
   function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
