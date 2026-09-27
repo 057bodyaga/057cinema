@@ -137,16 +137,13 @@
     .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
     .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
     
-    .sub-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
-    .sub-tabs-group { display: flex; gap: 8px; flex-wrap: wrap; }
-    .sub-tab { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 7px 15px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: border-color .2s, color .2s; }
-    .sub-tab.active { border-color: var(--accent); color: var(--accent); }
+    .sub-tabs { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
     
-    /* СТИЛИЗАЦИЯ СОРТИРОВКИ */
-    .sort-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
-    .sort-wrap label { font-weight: 600; }
+    /* ЕДИНЫЙ СТИЛЬ ДЛЯ ВЫПАДАЮЩИХ СПИСКОВ СОРТИРОВКИ И ФИЛЬТРАЦИИ */
+    .select-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
+    .select-wrap label { font-weight: 600; }
     
-    .sort-select { 
+    .custom-select { 
       padding: 8px 32px 8px 14px; 
       width: auto; 
       font-size: .88rem; 
@@ -166,17 +163,17 @@
       transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
     }
 
-    .sort-select:hover {
+    .custom-select:hover {
       border-color: var(--accent);
       background-color: var(--card);
     }
 
-    .sort-select:focus {
+    .custom-select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
-    .sort-select option {
+    .custom-select option {
       background-color: var(--card);
       color: var(--text);
       padding: 10px;
@@ -190,15 +187,15 @@
     .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
     .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 6px; }
 
+    /* ОПИСАНИЕ БЕЗ ФИОЛЕТОВОЙ ПОЛОСКИ СЛЕВА */
     .card-desc { 
       color: var(--muted); 
       font-size: .88rem; 
       line-height: 1.45; 
       margin-bottom: 12px; 
-      background: rgba(0,0,0,0.2); 
-      padding: 10px; 
-      border-radius: 8px; 
-      border-left: 3px solid var(--accent); 
+      padding: 0; 
+      border: none;
+      background: transparent;
     }
 
     .card-comment { 
@@ -327,22 +324,28 @@
     <button class="tab active" onclick="switchTab(this,'watchlist')">Нужно посмотреть</button>
     <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
   </div>
+
   <div id="subTabs" class="sub-tabs hidden">
-    <div class="sub-tabs-group">
-      <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
-      <button class="sub-tab"        onclick="switchSub(this,'joint')">🍿 Совместный</button>
-      <button class="sub-tab"        onclick="switchSub(this,'boy')">👨 Бодяга</button>
-      <button class="sub-tab"        onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
+    <div class="select-wrap">
+      <label for="selFilter">Фильтр:</label>
+      <select id="selFilter" class="custom-select" onchange="changeSubFilter(this.value)">
+        <option value="all">Все</option>
+        <option value="joint">🍿 Совместный</option>
+        <option value="boy">👨 Бодяга</option>
+        <option value="girl">👩 Каракумикуи</option>
+      </select>
     </div>
-    <div class="sort-wrap">
+
+    <div class="select-wrap">
       <label for="selSort">Сортировка:</label>
-      <select id="selSort" class="sort-select" onchange="changeSort(this.value)">
+      <select id="selSort" class="custom-select" onchange="changeSort(this.value)">
         <option value="newest">Сначала новые</option>
         <option value="oldest">Сначала старые</option>
         <option value="score">По средней оценке</option>
       </select>
     </div>
   </div>
+
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
 </div>
 
@@ -473,10 +476,8 @@
     if (q.length < 1) { hideDropdown(); return; } 
 
     if (activeTab === 'watched') {
-      // Искать ТОЛЬКО среди просмотренных
       searchLocalWatched(q);
     } else {
-      // Искать новые фильмы в TMDB
       if (q.length < 2) { hideDropdown(); return; }
       searchTimer = setTimeout(() => fetchMovies(q), 350); 
     }
@@ -525,14 +526,11 @@
     hideDropdown();
     document.getElementById('searchInput').value = '';
     
-    // Если стоит фильтр по подвкладке, переключаем на 'all', если фильм не виден
     if (activeSub !== 'all') {
       const m = db.find(x => x.id === id);
       if (m && m.category !== activeSub) {
         activeSub = 'all';
-        document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active'));
-        const allBtn = document.querySelector('.sub-tab');
-        if(allBtn) allBtn.classList.add('active');
+        document.getElementById('selFilter').value = 'all';
         render();
       }
     }
@@ -542,7 +540,7 @@
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         card.classList.remove('card-highlight');
-        void card.offsetWidth; // перезапуск анимации
+        void card.offsetWidth;
         card.classList.add('card-highlight');
       }
     }, 100);
@@ -616,7 +614,7 @@
     render(); 
   }
 
-  function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
+  function changeSubFilter(val) { activeSub = val; render(); }
   function changeSort(val) { activeSort = val; render(); }
 
   function toggleDesc(id) {
@@ -676,7 +674,6 @@
         tags = `${categoryTag}${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
       }
 
-      // На вкладке "Нужно посмотреть" описание отображается ВСЕГДА
       const isWatchlist = m.status === 'watchlist';
       const descHtml = isWatchlist 
         ? `<div class="card-desc">${esc(m.overview)}</div>` 
