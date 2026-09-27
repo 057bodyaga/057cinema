@@ -61,77 +61,26 @@
     input[type="text"]:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
     
     .dropdown { 
-      position: absolute; 
-      top: calc(100% + 10px); 
-      left: 0; 
-      right: 0; 
-      background: rgba(26, 21, 46, 0.95); 
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(157, 78, 221, 0.3); 
-      border-radius: 16px; 
-      max-height: 380px; 
-      overflow-y: auto; 
-      z-index: 200; 
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(157, 78, 221, 0.15); 
-      padding: 6px;
-      animation: fadeIn 0.2s ease-out;
+      position: absolute; top: calc(100% + 10px); left: 0; right: 0; 
+      background: rgba(26, 21, 46, 0.95); backdrop-filter: blur(12px);
+      border: 1px solid rgba(157, 78, 221, 0.3); border-radius: 16px; 
+      max-height: 380px; overflow-y: auto; z-index: 200; 
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8); padding: 6px;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     .dropdown::-webkit-scrollbar { width: 6px; }
     .dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-    .dropdown::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-    .dropdown-item { 
-      display: flex; 
-      gap: 14px; 
-      padding: 10px; 
-      border-radius: 10px;
-      cursor: pointer; 
-      transition: all .2s ease; 
-      align-items: center;
-    }
-    .dropdown-item:hover { 
-      background: rgba(157, 78, 221, 0.2); 
-      transform: translateX(4px);
-    }
-    .dropdown-item img { 
-      width: 44px; 
-      height: 66px; 
-      object-fit: cover; 
-      border-radius: 8px; 
-      flex-shrink: 0; 
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    }
+    .dropdown-item { display: flex; gap: 14px; padding: 10px; border-radius: 10px; cursor: pointer; transition: all .2s; align-items: center; }
+    .dropdown-item:hover { background: rgba(157, 78, 221, 0.2); transform: translateX(4px); }
+    .dropdown-item img { width: 44px; height: 66px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
     .dropdown-item h4 { font-size: 0.98rem; font-weight: 600; margin-bottom: 4px; color: #fff; }
     .dropdown-item p { font-size: 0.82rem; color: var(--muted); }
     
     .config-form { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; position: relative; }
-    
-    .btn-close-config {
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 1.5rem;
-      font-weight: bold;
-      line-height: 1;
-      cursor: pointer;
-      transition: color .2s, transform .2s;
-    }
-    .btn-close-config:hover {
-      color: var(--accent);
-      transform: scale(1.15);
-    }
+    .btn-close-config { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; }
+    .btn-close-config:hover { color: var(--accent); }
 
-    .config-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; color: var(--text); padding-right: 30px; }
+    .config-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
     .row { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
     .field { flex: 1; min-width: 190px; }
     .field label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 7px; }
@@ -140,57 +89,26 @@
     input[type="range"] { flex: 1; accent-color: var(--accent); }
     .score-val { font-weight: 700; color: var(--star); min-width: 32px; }
     
-    .btn-primary { width: 100%; padding: 13px; background: linear-gradient(45deg, var(--accent), var(--accent2)); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity .2s; margin-top: 4px; }
+    .btn-primary { width: 100%; padding: 13px; background: linear-gradient(45deg, var(--accent), var(--accent2)); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 4px; }
     .btn-primary:hover { opacity: .88; }
-    .btn-primary:disabled { opacity: .45; cursor: default; }
     
     .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
-    .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
+    .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; }
     .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
     
     .sub-tabs { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
-    
     .select-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
-    .select-wrap label { font-weight: 600; }
     
     .custom-select { 
-      padding: 8px 32px 8px 14px; 
-      width: auto; 
-      font-size: .88rem; 
-      font-weight: 600;
-      color: var(--text);
-      background-color: var(--panel);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%209c94b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      cursor: pointer;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+      padding: 8px 32px 8px 14px; font-size: .88rem; font-weight: 600; color: var(--text);
+      background-color: var(--panel); border: 1px solid var(--border); border-radius: 10px; outline: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239c94b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center; -webkit-appearance: none; appearance: none;
     }
-
-    .custom-select:hover {
-      border-color: var(--accent);
-      background-color: var(--card);
-    }
-
-    .custom-select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
-
-    .custom-select option {
-      background-color: var(--card);
-      color: var(--text);
-      padding: 10px;
-    }
+    .custom-select option { background-color: var(--card); color: var(--text); }
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
-    .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s, box-shadow .3s; }
+    .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; }
     .card:hover { border-color: rgba(157,78,221,.4); }
     .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
     .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -200,23 +118,8 @@
     .card-meta .genre { color: rgba(241, 237, 247, 0.7); }
     .card-meta .dot { font-size: 0.6rem; opacity: 0.5; }
 
-    .card-desc { 
-      color: var(--muted); 
-      font-size: .88rem; 
-      line-height: 1.45; 
-      margin-bottom: 12px; 
-      padding: 0; 
-      border: none;
-      background: transparent;
-    }
-
-    .card-comment { 
-      color: var(--text); 
-      font-size: .92rem; 
-      line-height: 1.45; 
-      margin-bottom: 12px; 
-      font-style: italic; 
-    }
+    .card-desc { color: var(--muted); font-size: .88rem; line-height: 1.45; margin-bottom: 12px; }
+    .card-comment { color: var(--text); font-size: .92rem; line-height: 1.45; margin-bottom: 12px; font-style: italic; }
     
     .card-tags  { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
     .tag { padding: 3px 10px; border-radius: 6px; font-size: .82rem; }
@@ -224,106 +127,30 @@
     .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
     .tag-avg    { background: rgba(255,190,11,.15); color: var(--star); font-weight: bold; }
     
-    .card-actions { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 10px; 
-      flex-shrink: 0; 
-      justify-content: center; 
-      width: 155px;
-    }
-    
-    .btn-action { 
-      width: 100%;
-      padding: 10px 14px; 
-      border: none; 
-      border-radius: 10px; 
-      font-size: .88rem; 
-      font-weight: 600; 
-      cursor: pointer; 
-      white-space: nowrap; 
-      transition: all .2s; 
-      text-align: center; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-action:hover { opacity: .88; transform: translateY(-1px); }
+    .card-actions { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; justify-content: center; width: 155px; }
+    .btn-action { width: 100%; padding: 10px 14px; border: none; border-radius: 10px; font-size: .88rem; font-weight: 600; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; }
+    .btn-action:hover { opacity: .88; }
     .btn-watched  { background: var(--success); color: #fff; }
     .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); border: 1px solid rgba(157,78,221,.4); }
     .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
     .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); border: 1px solid rgba(255,82,82,.2); }
     
-    .card-highlight {
-      animation: highlightPulse 2.5s ease-out;
-    }
-
+    .card-highlight { animation: highlightPulse 2.5s ease-out; }
     @keyframes highlightPulse {
-      0% { border-color: var(--accent2); box-shadow: 0 0 25px rgba(247, 37, 133, 0.6); transform: scale(1.02); }
-      50% { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
-      100% { border-color: var(--border); box-shadow: none; transform: scale(1); }
+      0% { border-color: var(--accent2); box-shadow: 0 0 25px rgba(247, 37, 133, 0.6); }
+      100% { border-color: var(--border); box-shadow: none; }
     }
 
     .btn-scroll-bottom {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: rgba(26, 21, 46, 0.7);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 1.1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.25s ease;
-      z-index: 99;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: fixed; bottom: 24px; right: 24px; width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(26, 21, 46, 0.7); backdrop-filter: blur(8px); border: 1px solid var(--border);
+      color: var(--muted); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99;
     }
-
-    .btn-scroll-bottom:hover {
-      color: var(--text);
-      border-color: var(--accent);
-      background: rgba(157, 78, 221, 0.3);
-      transform: translateY(2px);
-    }
+    .btn-scroll-bottom:hover { color: var(--text); border-color: var(--accent); }
 
     .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
     .loading { text-align: center; padding: 40px; color: var(--muted); }
     .hidden { display: none !important; }
-
-    @media (max-width: 768px) {
-      .wrap { padding: 20px 12px 80px; }
-      .site-title { font-size: 2rem; }
-      .token-flex { flex-direction: column; }
-      .add-panel { padding: 16px; border-radius: 16px; }
-      .config-form { padding: 16px 12px; }
-      .field { min-width: 100%; }
-      .row { gap: 12px; margin-bottom: 10px; }
-      input[type="range"] { height: 24px; }
-      .card { flex-direction: column; align-items: center; gap: 14px; padding: 16px; }
-      .card-poster { width: 120px; height: 180px; }
-      .card-body { width: 100%; text-align: center; }
-      .card-meta { justify-content: center; }
-      .card-tags { justify-content: center; margin-top: 8px; }
-      .card-actions { width: 100%; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
-      .btn-action { width: 100%; padding: 12px; font-size: 0.95rem; }
-      .tabs { justify-content: center; }
-      .tab { padding: 8px 14px; font-size: 0.98rem; }
-      .sub-tabs { flex-direction: column; align-items: stretch; gap: 10px; }
-      .select-wrap { justify-content: space-between; width: 100%; }
-      .custom-select { flex: 1; max-width: 200px; }
-      .dropdown { max-height: 280px; }
-      .dropdown-item { padding: 8px; }
-      .dropdown-item img { width: 38px; height: 56px; }
-      .dropdown-item h4 { font-size: 0.9rem; }
-      .btn-scroll-bottom { bottom: 16px; right: 16px; width: 46px; height: 46px; }
-    }
   </style>
 </head>
 <body>
@@ -335,11 +162,11 @@
   </div>
 
   <div id="tokenPanel" class="token-panel hidden">
-    <h3>🔑 Авторизация</h3>
-    <p>Вставьте ваш пароль, чтобы управлять списком фильмов.</p>
+    <h3>🔑 Пароль администратора</h3>
+    <p>Введите пароль, чтобы добавлять и удалять фильмы.</p>
     <div class="token-flex">
       <input type="password" id="passInput" placeholder="Введите пароль">
-      <button class="btn-save-token" onclick="savePassBtn()">Войти</button>
+      <button class="btn-save-token" onclick="savePassBtn()">Сохранить</button>
     </div>
     <div id="statusMsg" class="status-msg"></div>
 
@@ -349,13 +176,13 @@
     </div>
   </div>
 
-  <section class="add-panel" id="addPanel">
+  <section class="add-panel hidden" id="addPanel">
     <div class="search-wrap">
       <input id="searchInput" type="text" placeholder="Поиск нового фильма" autocomplete="off" oninput="onSearchInput()">
       <div id="dropdown" class="dropdown hidden"></div>
     </div>
     <div id="configForm" class="config-form hidden">
-      <button type="button" class="btn-close-config" onclick="closeConfigForm()" title="Закрыть">&times;</button>
+      <button type="button" class="btn-close-config" onclick="closeConfigForm()">&times;</button>
       <div id="configTitle" class="config-title"></div>
       <div class="row">
         <div class="field">
@@ -385,10 +212,10 @@
         </div>
       </div>
       <div class="field watched-only hidden" style="margin-bottom: 14px;">
-        <label>Ваш комментарий / впечатления:</label>
-        <textarea id="txtComment" rows="3" placeholder="Напишите кратко, как вам фильм..."></textarea>
+        <label>Комментарий:</label>
+        <textarea id="txtComment" rows="3" placeholder="Напишите впечатления..."></textarea>
       </div>
-      <button class="btn-primary" id="btnSave" onclick="saveMovie()">Добавить в коллекцию</button>
+      <button class="btn-primary" id="btnSave" onclick="saveMovie()">Сохранить</button>
     </div>
   </section>
   
@@ -421,10 +248,10 @@
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
 </div>
 
-<button class="btn-scroll-bottom" onclick="scrollToBottom()" title="В самый низ">↓</button>
+<button class="btn-scroll-bottom" onclick="scrollToBottom()" title="Вниз">↓</button>
 
 <script>
-  // 🔴 ВСТАВЬТЕ СЮДА ССЫЛКУ НА ВАШ CLOUDFLARE WORKER (вида https://cinema-proxy.xxx.workers.dev)
+  // 🔴 СЮДА ВСТАВЬТЕ ВАШ URL ВОРКЕРА CLOUDFLARE
   const WORKER_URL = 'https://057cinema.057bodyaga.workers.dev'; 
   
   const TMDB_KEY  = 'af2e801d23d9fad3c709a796331ac8f7';
@@ -456,11 +283,7 @@
 
   function updateSearchPlaceholder() {
     const input = document.getElementById('searchInput');
-    if (activeTab === 'watched') {
-      input.placeholder = 'Поиск по просмотренным фильмам...';
-    } else {
-      input.placeholder = 'Поиск нового фильма';
-    }
+    input.placeholder = (activeTab === 'watched') ? 'Поиск по просмотренным...' : 'Поиск нового фильма';
   }
 
   function toggleTokenPanel() {
@@ -471,21 +294,20 @@
     const val = document.getElementById('passInput').value.trim();
     if(val) {
       localStorage.setItem('app_password', val);
-      setMsg("Пароль сохранен! Авторизация...", "var(--success)");
-      apiGet();
+      setMsg("✅ Пароль сохранен!", "var(--success)");
     } else {
       localStorage.removeItem('app_password');
-      setMsg("Пароль удален.", "var(--danger)");
-      apiGet();
+      setMsg("ℹ️ Пароль сброшен (режим чтения).", "var(--star)");
     }
+    setTimeout(() => {
+      document.getElementById('tokenPanel').classList.add('hidden');
+      render();
+    }, 600);
   }
 
   function setMsg(txt, color) {
     const el = document.getElementById('statusMsg');
-    if(el) {
-      el.textContent = txt;
-      el.style.color = color;
-    }
+    if(el) { el.textContent = txt; el.style.color = color; }
   }
 
   function closeConfigForm() {
@@ -499,12 +321,7 @@
 
   function formatDate(d) {
     if (!d || isNaN(d.getTime())) return '—';
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, '0');
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    return `${day}.${month}.${year}, ${hours}:${minutes}`;
+    return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}, ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
   async function fetchLastCommitDate() {
@@ -512,55 +329,27 @@
       const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/commits?page=1&per_page=1&t=${Date.now()}`);
       if (res.ok) {
         const commits = await res.json();
-        if (commits && commits.length > 0) {
-          return formatDate(new Date(commits[0].commit.committer.date));
-        }
+        if (commits && commits.length > 0) return formatDate(new Date(commits[0].commit.committer.date));
       }
-    } catch (e) {
-      console.error("Ошибка получения даты коммита:", e);
-    }
+    } catch (e) {}
     return null;
   }
 
   async function updateFooterInfo() {
     let lastMovieText = '—';
     if (db.length > 0) {
-      let newestMovie = db[0];
-      for (let m of db) {
-        if ((m.addedAt || 0) > (newestMovie.addedAt || 0)) newestMovie = m;
-      }
-      const dateFormatted = newestMovie.addedAt ? formatDate(new Date(newestMovie.addedAt)) : '—';
-      lastMovieText = `${dateFormatted} (${newestMovie.title})`;
+      let newest = db[0];
+      for (let m of db) if ((m.addedAt || 0) > (newest.addedAt || 0)) newest = m;
+      lastMovieText = `${newest.addedAt ? formatDate(new Date(newest.addedAt)) : '—'} (${newest.title})`;
     }
     document.getElementById('lastAddedText').textContent = lastMovieText;
-
-    const commitDate = await fetchLastCommitDate();
-    document.getElementById('lastUpdatedText').textContent = commitDate || 'Ошибка загрузки';
+    document.getElementById('lastUpdatedText').textContent = await fetchLastCommitDate() || '—';
   }
 
   async function apiGet() { 
-    const pass = localStorage.getItem('app_password');
-
-    if(!pass) {
-      setMsg("⚠️ Режим чтения. Введите пароль для изменений.", "var(--danger)");
-    } else {
-      setMsg("✅ Пароль установлен. Синхронизация...", "var(--star)");
-    }
-    
     try {
-      document.getElementById('grid').innerHTML = '<div class="loading">Загрузка базы данных...</div>';
-      
-      const headers = {};
-      if (pass) headers["X-App-Password"] = pass;
-
-      const response = await fetch(`${WORKER_URL}?t=${Date.now()}`, { headers });
-      
-      if (!response.ok) {
-        if(response.status === 401) {
-          setMsg("❌ Ошибка: Неверный пароль!", "var(--danger)");
-        }
-        throw new Error();
-      }
+      const response = await fetch(`${WORKER_URL}?t=${Date.now()}`);
+      if (!response.ok) throw new Error();
       
       const data = await response.json(); 
       fileSha = data.sha;
@@ -569,28 +358,23 @@
       const jsonString = decodeURIComponent(Array.from(raw).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
       db = JSON.parse(jsonString);
       
-      if(pass) setMsg("✅ Успешная авторизация!", "var(--success)");
-      
       updateFooterInfo();
       render();
     } catch (e) {
-      document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить данные. Проверьте пароль или ссылку Worker.</div>';
+      document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить данные из базы.</div>';
     }
   }
 
   async function commitToGitHub(msg) {
     const pass = localStorage.getItem('app_password');
-    if(!pass) { alert("Введите пароль в настройках!"); return; }
+    if(!pass) { alert("Введите пароль администратора!"); return; }
     
     const base64 = btoa(encodeURIComponent(JSON.stringify(db, null, 2)).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
     
     try {
       const res = await fetch(WORKER_URL, {
         method: 'PUT',
-        headers: { 
-          "X-App-Password": pass, 
-          "Content-Type": "application/json" 
-        },
+        headers: { "X-App-Password": pass, "Content-Type": "application/json" },
         body: JSON.stringify({ message: msg, content: base64, sha: fileSha })
       });
       
@@ -600,10 +384,10 @@
         updateFooterInfo();
         render(); 
       } else { 
-        alert("Ошибка при сохранении. Проверьте пароль!"); 
+        alert("Неверный пароль!"); 
       }
     } catch {
-      alert("Ошибка сети при отправке данных.");
+      alert("Ошибка сети.");
     }
   }
 
@@ -616,10 +400,13 @@
       m.addedAt = Date.now();
       db.unshift(m);
     }
-    await commitToGitHub("Обновление фильма"); 
+    await commitToGitHub("Обновление"); 
   }
 
-  async function apiDelete(id) { db = db.filter(x => x.id !== id); await commitToGitHub("Удаление фильма"); }
+  async function apiDelete(id) { 
+    db = db.filter(x => x.id !== id); 
+    await commitToGitHub("Удаление"); 
+  }
 
   function onSearchInput() { 
     clearTimeout(searchTimer); 
@@ -629,10 +416,7 @@
     if (activeTab === 'watched') {
       searchLocalWatched(q);
     } else {
-      if (!hasPass()) {
-        hideDropdown();
-        return;
-      }
+      if (!hasPass()) return; // Без пароля нельзя искать новые фильмы для добавления
       if (q.length < 2) { hideDropdown(); return; }
       searchTimer = setTimeout(() => fetchMovies(q), 350); 
     }
@@ -640,47 +424,37 @@
 
   function searchLocalWatched(q) {
     const query = q.toLowerCase();
-    const results = db.filter(m => m.status === 'watched' && m.title.toLowerCase().includes(query));
-    showWatchedDropdown(results);
+    showWatchedDropdown(db.filter(m => m.status === 'watched' && m.title.toLowerCase().includes(query)));
   }
 
   async function fetchMovies(q) { 
     try { 
       const data = await (await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=ru-RU`)).json(); 
       showDropdown(data.results?.slice(0, 6) ?? []); 
-    } catch { 
-      hideDropdown(); 
-    } 
+    } catch { hideDropdown(); } 
   }
 
-  function parseGenres(genreIds) {
-    if (!genreIds || !genreIds.length) return '';
-    return genreIds.map(id => GENRES_MAP[id]).filter(Boolean).slice(0, 2).join(', ');
+  function parseGenres(ids) {
+    if (!ids || !ids.length) return '';
+    return ids.map(id => GENRES_MAP[id]).filter(Boolean).slice(0, 2).join(', ');
   }
 
   function showDropdown(res) {
     const dd = document.getElementById('dropdown'); dd.innerHTML = ''; if (!res.length) { hideDropdown(); return; }
     res.forEach(m => {
-      const genres = parseGenres(m.genre_ids);
-      const metaText = [m.release_date?.substring(0,4), genres].filter(Boolean).join(' • ');
-      
       const item = document.createElement('div'); item.className = 'dropdown-item';
-      item.innerHTML = `<img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w92'+m.poster_path : 'https://placehold.co/42x62'}"><div><h4>${esc(m.title)}</h4><p>${esc(metaText || '—')}</p></div>`;
+      item.innerHTML = `<img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w92'+m.poster_path : 'https://placehold.co/42x62'}"><div><h4>${esc(m.title)}</h4><p>${esc(m.release_date?.substring(0,4) || '')}</p></div>`;
       item.onclick = () => pickMovie(m); dd.appendChild(item);
     });
     dd.classList.remove('hidden');
   }
 
   function showWatchedDropdown(res) {
-    const dd = document.getElementById('dropdown'); dd.innerHTML = ''; 
-    if (!res.length) { hideDropdown(); return; }
+    const dd = document.getElementById('dropdown'); dd.innerHTML = ''; if (!res.length) { hideDropdown(); return; }
     res.forEach(m => {
       const item = document.createElement('div'); item.className = 'dropdown-item';
-      const avg = getAvgScore(m);
-      const scoreStr = avg > 0 ? `⭐ ${avg.toFixed(1)}/10` : '';
-      const metaText = [m.year, m.genre].filter(Boolean).join(' • ');
-      item.innerHTML = `<img src="${esc(m.poster)}"><div><h4>${esc(m.title)}</h4><p>${esc(metaText)} ${scoreStr ? '• ' + scoreStr : ''}</p></div>`;
-      item.onclick = () => scrollToWatchedMovie(m.id); 
+      item.onclick = () => scrollToWatchedMovie(m.id);
+      item.innerHTML = `<div><h4>${esc(m.title)}</h4><p>${esc(m.year)}</p></div>`;
       dd.appendChild(item);
     });
     dd.classList.remove('hidden');
@@ -689,22 +463,10 @@
   function scrollToWatchedMovie(id) {
     hideDropdown();
     document.getElementById('searchInput').value = '';
-    
-    if (activeSub !== 'all') {
-      const m = db.find(x => x.id === id);
-      if (m && m.category !== activeSub) {
-        activeSub = 'all';
-        document.getElementById('selFilter').value = 'all';
-        render();
-      }
-    }
-
     setTimeout(() => {
       const card = document.getElementById(`card-${id}`);
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.classList.remove('card-highlight');
-        void card.offsetWidth;
         card.classList.add('card-highlight');
       }
     }, 100);
@@ -715,22 +477,28 @@
   function pickMovie(m) {
     if (!hasPass()) return;
     m._genre = parseGenres(m.genre_ids);
-    pending = m; 
-    hideDropdown(); 
+    pending = m; hideDropdown(); 
     document.getElementById('searchInput').value = m.title; 
     document.getElementById('configTitle').textContent = `Настройка: "${m.title}"`;
     document.getElementById('selStatus').value = 'watchlist'; 
     document.getElementById('configForm').classList.remove('hidden'); 
-    document.getElementById('txtComment').value = '';
     onStatusChange();
   }
 
-  function onStatusChange() { const isW = document.getElementById('selStatus').value === 'watched'; document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); if (isW) onCategoryChange(); }
-  function onCategoryChange() { const c = document.getElementById('selCategory').value; document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); }
+  function onStatusChange() { 
+    const isW = document.getElementById('selStatus').value === 'watched'; 
+    document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); 
+  }
+  function onCategoryChange() { 
+    const c = document.getElementById('selCategory').value; 
+    document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); 
+    document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); 
+  }
 
   function saveMovie() {
-    if (!pending || !hasPass()) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
-    const status = document.getElementById('selStatus').value; const cat = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
+    if (!pending || !hasPass()) return; 
+    const status = document.getElementById('selStatus').value; 
+    const cat = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
       poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
@@ -741,44 +509,38 @@
       scoreGirl: (status === 'watched' && cat !== 'boy') ? parseFloat(document.getElementById('sliGirl').value) : null,
       comment: status === 'watched' ? document.getElementById('txtComment').value.trim() : ''
     });
-    document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
+    document.getElementById('configForm').classList.add('hidden'); 
+    document.getElementById('searchInput').value = ''; 
+    pending = null;
   }
 
   function editRatings(id) {
     if (!hasPass()) return;
-    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt };
-    document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; 
-    
+    const m = db.find(x => x.id === id); if (!m) return; 
+    pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt };
+    document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; 
+    document.getElementById('selStatus').value = m.status; 
     if(m.status === 'watched') {
       document.getElementById('selCategory').value = m.category;
-      const bScore = m.scoreBoy ?? 5;
-      const gScore = m.scoreGirl ?? 5;
-      document.getElementById('sliBoy').value = bScore;
-      document.getElementById('valBoy').textContent = bScore;
-      document.getElementById('sliGirl').value = gScore;
-      document.getElementById('valGirl').textContent = gScore;
+      document.getElementById('sliBoy').value = m.scoreBoy ?? 5;
+      document.getElementById('valBoy').textContent = m.scoreBoy ?? 5;
+      document.getElementById('sliGirl').value = m.scoreGirl ?? 5;
+      document.getElementById('valGirl').textContent = m.scoreGirl ?? 5;
       document.getElementById('txtComment').value = m.comment || '';
     }
-
     const form = document.getElementById('configForm');
-    form.classList.remove('hidden'); 
-    onStatusChange();
-    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    form.classList.remove('hidden'); onStatusChange();
   }
 
-  function deleteMovie(id) { 
-    if (!hasPass()) return;
-    if(confirm("Удалить этот фильм?")) apiDelete(id); 
-  }
+  function deleteMovie(id) { if(confirm("Удалить фильм?")) apiDelete(id); }
   
-  function markWatched(id) { 
+  function markWatched(id) {
     if (!hasPass()) return;
-    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; 
-    document.getElementById('txtComment').value = m.comment || '';
-    const form = document.getElementById('configForm');
-    form.classList.remove('hidden'); 
+    const m = db.find(x => x.id === id); if (!m) return; 
+    pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt }; 
+    document.getElementById('selStatus').value = 'watched'; 
+    document.getElementById('configForm').classList.remove('hidden'); 
     onStatusChange();
-    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   
   function switchTab(b, t) { 
@@ -815,10 +577,11 @@
 
   function render() {
     const grid = document.getElementById('grid'); 
-    const isAuthorized = hasPass();
+    const isAuth = hasPass();
     const addPanel = document.getElementById('addPanel');
 
-    if (!isAuthorized && activeTab === 'watchlist') {
+    // Панель добавления показывается ТОЛЬКО если введен пароль
+    if (!isAuth) {
       addPanel.classList.add('hidden');
     } else {
       addPanel.classList.remove('hidden');
@@ -827,17 +590,9 @@
     let list = db.filter(x => x.status === activeTab);
 
     if (activeTab === 'watched') {
-      if (activeSub !== 'all') {
-        list = list.filter(x => x.category === activeSub);
-      }
-
-      if (activeSort === 'newest') {
-        // Сначала новые
-      } else if (activeSort === 'oldest') {
-        list = list.slice().reverse();
-      } else if (activeSort === 'score') {
-        list.sort((a, b) => getAvgScore(b) - getAvgScore(a));
-      }
+      if (activeSub !== 'all') list = list.filter(x => x.category === activeSub);
+      if (activeSort === 'oldest') list = list.slice().reverse();
+      else if (activeSort === 'score') list.sort((a, b) => getAvgScore(b) - getAvgScore(a));
     }
 
     if (!list.length) { 
@@ -849,59 +604,36 @@
       let tags = '';
       if (m.status === 'watched') {
         const avg = getAvgScore(m);
-        const avgTag = avg > 0 ? `<span class="tag tag-avg">⭐ ${avg.toFixed(1)}/10</span>` : '';
-        
-        const hasBothScores = m.scoreBoy != null && m.scoreGirl != null;
-        const categoryTag = (!hasBothScores && LABELS[m.category]) 
-          ? `<span class="tag tag-viewer">${LABELS[m.category]}</span>` 
-          : '';
-
-        tags = `${categoryTag}${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
+        tags = `${m.category && LABELS[m.category] ? `<span class="tag tag-viewer">${LABELS[m.category]}</span>` : ''}` +
+               `${avg > 0 ? `<span class="tag tag-avg">⭐ ${avg.toFixed(1)}/10</span>` : ''}` +
+               `${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}` +
+               `${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
       }
 
-      const isWatchlist = m.status === 'watchlist';
-      const descHtml = isWatchlist 
-        ? `<div class="card-desc">${esc(m.overview)}</div>` 
-        : `<div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>`;
-
+      const isWl = m.status === 'watchlist';
+      const descHtml = isWl ? `<div class="card-desc">${esc(m.overview)}</div>` : `<div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>`;
+      
+      // Кнопки управления (удалить, изменить) видны только авторизованным
       let acts = '';
-      if (isAuthorized) {
-        acts = isWatchlist
-          ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button>
-             <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
-          : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button>
-             <button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>
-             <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+      if (isAuth) {
+        acts = isWl 
+          ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
+          : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button><button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
       } else {
-        acts = !isWatchlist
-          ? `<button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>`
-          : '';
+        acts = !isWl ? `<button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание</button>` : '';
       }
-
-      const commentHtml = (m.status === 'watched' && m.comment) 
-        ? `<div class="card-comment">${esc(m.comment)}</div>` 
-        : '';
-
-      const genreHtml = m.genre 
-        ? `<span class="dot">•</span><span class="genre">${esc(m.genre)}</span>` 
-        : '';
-
-      const actionsHtml = acts ? `<div class="card-actions">${acts}</div>` : '';
 
       return `
         <article class="card" id="card-${m.id}">
           <img class="card-poster" src="${esc(m.poster)}">
           <div class="card-body">
             <div class="card-title">${esc(m.title)}</div>
-            <div class="card-meta">
-              <span>${esc(m.year)}</span>
-              ${genreHtml}
-            </div>
+            <div class="card-meta"><span>${esc(m.year)}</span>${m.genre ? `<span class="dot">•</span><span class="genre">${esc(m.genre)}</span>` : ''}</div>
             ${descHtml}
-            ${commentHtml}
+            ${m.status === 'watched' && m.comment ? `<div class="card-comment">${esc(m.comment)}</div>` : ''}
             <div class="card-tags">${tags}</div>
           </div>
-          ${actionsHtml}
+          ${acts ? `<div class="card-actions">${acts}</div>` : ''}
         </article>
       `;
     }).join('');
