@@ -5,10 +5,10 @@
     "overview": "Глупые выходки собачки уже давно действуют на нервы старушки-хозяйки. Но есть ли в ее поведении тайный смысл?",
     "poster": "https://image.tmdb.org/t/p/w185/rNKlP3oyKOzn8bmxlLSTwUCN6DB.jpg",
     "year": "2025",
-    "status": "watchlist",
-    "category": "watchlist",
-    "scoreBoy": null,
-    "scoreGirl": null,
+    "status": "watched",
+    "category": "joint",
+    "scoreBoy": 5,
+    "scoreGirl": 5,
     "addedAt": 1790540259506
   },
   {
