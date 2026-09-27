@@ -13,7 +13,7 @@
       --text:        #f1edf7;
       --muted:       #9c94b0;
       --accent:      #9d4edd;
-      --accent-glow:rgba(157, 78, 221, 0.35);
+      --accent-glow: rgba(157, 78, 221, 0.35);
       --accent2:     #f72585;
       --danger:      #ff5252;
       --success:     #2ecc71;
@@ -99,8 +99,28 @@
     .dropdown-item h4 { font-size: 0.98rem; font-weight: 600; margin-bottom: 4px; color: #fff; }
     .dropdown-item p { font-size: 0.82rem; color: var(--muted); }
     
-    .config-form { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; }
-    .config-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .config-form { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; position: relative; }
+    
+    /* КРЕСТИК ЗАКРЫТИЯ ФОРМЫ */
+    .btn-close-config {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.5rem;
+      font-weight: bold;
+      line-height: 1;
+      cursor: pointer;
+      transition: color .2s, transform .2s;
+    }
+    .btn-close-config:hover {
+      color: var(--accent);
+      transform: scale(1.15);
+    }
+
+    .config-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; color: var(--text); padding-right: 30px; }
     .row { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
     .field { flex: 1; min-width: 190px; }
     .field label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 7px; }
@@ -169,24 +189,6 @@
     .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
     .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 6px; }
-    
-    /* Кнопка показа описания */
-    .btn-toggle-desc { 
-      background: none; 
-      border: none; 
-      color: var(--accent); 
-      font-size: .82rem; 
-      font-weight: 600; 
-      cursor: pointer; 
-      text-align: left; 
-      padding: 0; 
-      margin-bottom: 8px; 
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: opacity .2s;
-    }
-    .btn-toggle-desc:hover { opacity: 0.8; text-decoration: underline; }
 
     .card-desc { 
       color: var(--muted); 
@@ -214,10 +216,11 @@
     .tag-avg    { background: rgba(255,190,11,.15); color: var(--star); font-weight: bold; }
     
     .card-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: flex-start; }
-    .btn-action { padding: 7px 14px; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
+    .btn-action { padding: 7px 14px; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; text-align: center; }
     .btn-action:hover { opacity: .82; }
     .btn-watched  { background: var(--success); color: #fff; }
     .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); }
+    .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
     .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); }
     
     .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
@@ -249,6 +252,7 @@
       <div id="dropdown" class="dropdown hidden"></div>
     </div>
     <div id="configForm" class="config-form hidden">
+      <button type="button" class="btn-close-config" onclick="closeConfigForm()" title="Закрыть">&times;</button>
       <div id="configTitle" class="config-title"></div>
       <div class="row">
         <div class="field">
@@ -340,6 +344,11 @@
       el.textContent = txt;
       el.style.color = color;
     }
+  }
+
+  function closeConfigForm() {
+    document.getElementById('configForm').classList.add('hidden');
+    pending = null;
   }
 
   async function apiGet() { 
@@ -492,7 +501,7 @@
     if (el) {
       const isHidden = el.classList.contains('hidden');
       el.classList.toggle('hidden');
-      if (btn) btn.textContent = isHidden ? '📖 Скрыть описание' : '📖 Описание фильма';
+      if (btn) btn.textContent = isHidden ? 'Скрыть описание' : 'Описание фильма';
     }
   }
 
@@ -543,13 +552,15 @@
         tags = `${categoryTag}${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
       }
 
-      const acts = m.status === 'watchlist' 
-        ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
-        : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+      const descButton = `<button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>`;
 
-      // Отображаем ваш комментарий вместо оригинального описания (если он есть)
+      const acts = m.status === 'watchlist' 
+        ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button>${descButton}<button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
+        : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button>${descButton}<button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+
+      // Отображаем ваш комментарий без иконки 💬
       const contentHtml = (m.status === 'watched' && m.comment) 
-        ? `<div class="card-comment">💬 ${esc(m.comment)}</div>` 
+        ? `<div class="card-comment">${esc(m.comment)}</div>` 
         : (m.status === 'watchlist' ? `<div class="card-comment">${esc(m.overview)}</div>` : '');
 
       return `
@@ -558,7 +569,6 @@
           <div class="card-body">
             <div class="card-title">${esc(m.title)}</div>
             <div class="card-year">${esc(m.year)}</div>
-            <button id="btn-desc-${m.id}" class="btn-toggle-desc" onclick="toggleDesc(${m.id})">📖 Описание фильма</button>
             <div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>
             ${contentHtml}
             <div class="card-tags">${tags}</div>
