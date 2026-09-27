@@ -267,10 +267,12 @@
   async function apiSave(m) { 
     const idx = db.findIndex(x => x.id === m.id);
     if (idx !== -1) {
-      // Фильм уже есть: обновляем его на том же месте в массиве
+      // Сохраняем исходную метку времени добавления
+      m.addedAt = db[idx].addedAt || Date.now();
       db[idx] = m;
     } else {
-      // Новый фильм: добавляем в самое начало списка
+      // Для нового фильма задаем текущую метку времени
+      m.addedAt = Date.now();
       db.unshift(m);
     }
     await commitToGitHub("Обновление фильма"); 
@@ -313,7 +315,7 @@
   }
 
   function editRatings(id) {
-    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year };
+    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt };
     document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; 
     
     if(m.status === 'watched') {
@@ -329,15 +331,27 @@
     document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
   }
   function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
-  function markWatched(id) { const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year }; document.getElementById('selStatus').value = 'watched'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange(); }
+  function markWatched(id) { const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange(); }
   
   function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
   function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
 
   function render() {
-    const grid = document.getElementById('grid'); let list = db.filter(x => x.status === activeTab);
-    if (activeTab === 'watched' && activeSub !== 'all') list = list.filter(x => x.category === activeSub);
-    if (!list.length) { grid.innerHTML = '<div class="empty">Здесь пока пусто 🎬</div>'; return; }
+    const grid = document.getElementById('grid'); 
+    let list = db.filter(x => x.status === activeTab);
+
+    // Новые элементы будут сверху
+    list.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+
+    if (activeTab === 'watched' && activeSub !== 'all') {
+      list = list.filter(x => x.category === activeSub);
+    }
+
+    if (!list.length) { 
+      grid.innerHTML = '<div class="empty">Здесь пока пусто 🎬</div>'; 
+      return; 
+    }
+
     grid.innerHTML = list.map(m => {
       const tags = m.status === 'watched' ? `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}/10</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}/10</span>`:''}` : '';
       const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Оценки</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
