@@ -264,7 +264,18 @@
     }
   }
 
-  async function apiSave(m) { db = db.filter(x => x.id !== m.id); db.push(m); await commitToGitHub("Обновление фильма"); }
+  async function apiSave(m) { 
+    const idx = db.findIndex(x => x.id === m.id);
+    if (idx !== -1) {
+      // Фильм уже есть: обновляем его на том же месте в массиве
+      db[idx] = m;
+    } else {
+      // Новый фильм: добавляем в самое начало списка
+      db.unshift(m);
+    }
+    await commitToGitHub("Обновление фильма"); 
+  }
+
   async function apiDelete(id) { db = db.filter(x => x.id !== id); await commitToGitHub("Удаление фильма"); }
 
   function onSearchInput() { clearTimeout(searchTimer); const q = document.getElementById('searchInput').value.trim(); if (q.length < 2) { hideDropdown(); return; } searchTimer = setTimeout(() => fetchMovies(q), 350); }
