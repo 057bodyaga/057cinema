@@ -44,8 +44,8 @@
 
     .add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
     .search-wrap { position: relative; }
-    input[type="text"] { width: 100%; padding: 14px 18px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; }
-    input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
+    input[type="text"], textarea { width: 100%; padding: 14px 18px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; font-family: inherit; }
+    input[type="text"]:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
     
     /* СТИЛЬНЫЙ ВЫЛЕТАЮЩИЙ СПИСОК ПОИСКА */
     .dropdown { 
@@ -168,9 +168,46 @@
     .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
     .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
-    .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 8px; }
-    .card-desc  { color: var(--muted); font-size: .9rem; line-height: 1.45; margin-bottom: 12px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
-    .card-tags  { display: flex; gap: 8px; flex-wrap: wrap; }
+    .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 6px; }
+    
+    /* Кнопка показа описания */
+    .btn-toggle-desc { 
+      background: none; 
+      border: none; 
+      color: var(--accent); 
+      font-size: .82rem; 
+      font-weight: 600; 
+      cursor: pointer; 
+      text-align: left; 
+      padding: 0; 
+      margin-bottom: 8px; 
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity .2s;
+    }
+    .btn-toggle-desc:hover { opacity: 0.8; text-decoration: underline; }
+
+    .card-desc { 
+      color: var(--muted); 
+      font-size: .88rem; 
+      line-height: 1.45; 
+      margin-bottom: 12px; 
+      background: rgba(0,0,0,0.2); 
+      padding: 10px; 
+      border-radius: 8px; 
+      border-left: 3px solid var(--accent); 
+    }
+
+    .card-comment { 
+      color: var(--text); 
+      font-size: .92rem; 
+      line-height: 1.45; 
+      margin-bottom: 12px; 
+      font-style: italic; 
+    }
+    
+    .card-tags  { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
     .tag { padding: 3px 10px; border-radius: 6px; font-size: .82rem; }
     .tag-viewer { background: rgba(255,255,255,.06); }
     .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
@@ -239,6 +276,10 @@
           <label>Оценка Камилы: <span id="valGirl" class="score-val">5</span>/10</label>
           <div class="slider-row"><input type="range" id="sliGirl" min="1" max="10" step="0.5" value="5" oninput="document.getElementById('valGirl').textContent=this.value"></div>
         </div>
+      </div>
+      <div class="field watched-only hidden" style="margin-bottom: 14px;">
+        <label>Ваш комментарий / впечатления:</label>
+        <textarea id="txtComment" rows="3" placeholder="Напишите кратко, как вам фильм..."></textarea>
       </div>
       <button class="btn-primary" id="btnSave" onclick="saveMovie()">Добавить в коллекцию</button>
     </div>
@@ -390,7 +431,9 @@
 
   function pickMovie(m) {
     pending = m; hideDropdown(); document.getElementById('searchInput').value = m.title; document.getElementById('configTitle').textContent = `Настройка: "${m.title}"`;
-    document.getElementById('selStatus').value = 'watchlist'; document.getElementById('configForm').classList.remove('hidden'); onStatusChange();
+    document.getElementById('selStatus').value = 'watchlist'; document.getElementById('configForm').classList.remove('hidden'); 
+    document.getElementById('txtComment').value = '';
+    onStatusChange();
   }
   function onStatusChange() { const isW = document.getElementById('selStatus').value === 'watched'; document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); if (isW) onCategoryChange(); }
   function onCategoryChange() { const c = document.getElementById('selCategory').value; document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); }
@@ -403,7 +446,8 @@
       poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
       year: pending.release_date?.substring(0,4) || pending.year || '—', status, category: cat,
       scoreBoy: (status === 'watched' && cat !== 'girl') ? parseFloat(document.getElementById('sliBoy').value) : null,
-      scoreGirl: (status === 'watched' && cat !== 'boy') ? parseFloat(document.getElementById('sliGirl').value) : null
+      scoreGirl: (status === 'watched' && cat !== 'boy') ? parseFloat(document.getElementById('sliGirl').value) : null,
+      comment: status === 'watched' ? document.getElementById('txtComment').value.trim() : ''
     });
     document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
   }
@@ -420,6 +464,7 @@
       document.getElementById('valBoy').textContent = bScore;
       document.getElementById('sliGirl').value = gScore;
       document.getElementById('valGirl').textContent = gScore;
+      document.getElementById('txtComment').value = m.comment || '';
     }
 
     const form = document.getElementById('configForm');
@@ -430,6 +475,7 @@
   function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
   function markWatched(id) { 
     const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; 
+    document.getElementById('txtComment').value = m.comment || '';
     const form = document.getElementById('configForm');
     form.classList.remove('hidden'); 
     onStatusChange();
@@ -439,6 +485,16 @@
   function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
   function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
   function changeSort(val) { activeSort = val; render(); }
+
+  function toggleDesc(id) {
+    const el = document.getElementById(`desc-${id}`);
+    const btn = document.getElementById(`btn-desc-${id}`);
+    if (el) {
+      const isHidden = el.classList.contains('hidden');
+      el.classList.toggle('hidden');
+      if (btn) btn.textContent = isHidden ? '📖 Скрыть описание' : '📖 Описание фильма';
+    }
+  }
 
   function getAvgScore(m) {
     const scores = [];
@@ -457,11 +513,10 @@
         list = list.filter(x => x.category === activeSub);
       }
 
-      // Сортировка для Просмотрено
       if (activeSort === 'newest') {
-        // Сначала новые (верх файла movies.json)
+        // Сначала новые
       } else if (activeSort === 'oldest') {
-        // Сначала старые (порядок снизу файла movies.json)
+        // Сначала старые
         list = list.slice().reverse();
       } else if (activeSort === 'score') {
         // По средней оценке
@@ -480,7 +535,6 @@
         const avg = getAvgScore(m);
         const avgTag = avg > 0 ? `<span class="tag tag-avg">⭐ ${avg.toFixed(1)}/10</span>` : '';
         
-        // Показываем плашку категории, ТОЛЬКО ЕСЛИ стоят НЕ обе оценки одновременно
         const hasBothScores = m.scoreBoy != null && m.scoreGirl != null;
         const categoryTag = (!hasBothScores && LABELS[m.category]) 
           ? `<span class="tag tag-viewer">${LABELS[m.category]}</span>` 
@@ -493,7 +547,25 @@
         ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
         : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
 
-      return `<article class="card"><img class="card-poster" src="${esc(m.poster)}"><div class="card-body"><div class="card-title">${esc(m.title)}</div><div class="card-year">${esc(m.year)}</div><div class="card-desc">${esc(m.overview)}</div><div class="card-tags">${tags}</div></div><div class="card-actions">${acts}</div></article>`;
+      // Отображаем ваш комментарий вместо оригинального описания (если он есть)
+      const contentHtml = (m.status === 'watched' && m.comment) 
+        ? `<div class="card-comment">💬 ${esc(m.comment)}</div>` 
+        : (m.status === 'watchlist' ? `<div class="card-comment">${esc(m.overview)}</div>` : '');
+
+      return `
+        <article class="card">
+          <img class="card-poster" src="${esc(m.poster)}">
+          <div class="card-body">
+            <div class="card-title">${esc(m.title)}</div>
+            <div class="card-year">${esc(m.year)}</div>
+            <button id="btn-desc-${m.id}" class="btn-toggle-desc" onclick="toggleDesc(${m.id})">📖 Описание фильма</button>
+            <div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>
+            ${contentHtml}
+            <div class="card-tags">${tags}</div>
+          </div>
+          <div class="card-actions">${acts}</div>
+        </article>
+      `;
     }).join('');
   }
 
