@@ -310,6 +310,138 @@
     .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
     .loading { text-align: center; padding: 40px; color: var(--muted); }
     .hidden { display: none !important; }
+
+    /* ==========================================
+       АДАПТИВНАЯ МОБИЛЬНАЯ ВЕРСИЯ (экран < 768px)
+       ========================================== */
+    @media (max-width: 768px) {
+      .wrap {
+        padding: 20px 12px 80px;
+      }
+
+      .site-title {
+        font-size: 2rem;
+      }
+
+      .token-flex {
+        flex-direction: column;
+      }
+
+      .add-panel {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      .config-form {
+        padding: 16px 12px;
+      }
+
+      .field {
+        min-width: 100%;
+      }
+
+      .row {
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      input[type="range"] {
+        height: 24px;
+      }
+
+      /* Перевод карточки фильма в вертикальный вид */
+      .card {
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+      }
+
+      .card-poster {
+        width: 120px;
+        height: 180px;
+      }
+
+      .card-body {
+        width: 100%;
+        text-align: center;
+      }
+
+      .card-meta {
+        justify-content: center;
+      }
+
+      .card-tags {
+        justify-content: center;
+        margin-top: 8px;
+      }
+
+      .card-actions {
+        width: 100%;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .btn-action {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.95rem;
+      }
+
+      /* Табы и выпадающие списки */
+      .tabs {
+        justify-content: center;
+      }
+
+      .tab {
+        padding: 8px 14px;
+        font-size: 0.98rem;
+      }
+
+      .sub-tabs {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .select-wrap {
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .custom-select {
+        flex: 1;
+        max-width: 200px;
+      }
+
+      /* Список выпадающего поиска */
+      .dropdown {
+        max-height: 280px;
+      }
+
+      .dropdown-item {
+        padding: 8px;
+      }
+
+      .dropdown-item img {
+        width: 38px;
+        height: 56px;
+      }
+
+      .dropdown-item h4 {
+        font-size: 0.9rem;
+      }
+
+      /* Плавающая кнопка "Вниз" */
+      .btn-scroll-bottom {
+        bottom: 16px;
+        right: 16px;
+        width: 46px;
+        height: 46px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -503,7 +635,6 @@
   }
 
   async function updateFooterInfo(token) {
-    // 1. Последний добавленный фильм
     let lastMovieText = '—';
     if (db.length > 0) {
       let newestMovie = db[0];
@@ -517,7 +648,6 @@
     }
     document.getElementById('lastAddedText').textContent = lastMovieText;
 
-    // 2. Время последнего обновления репозитория
     const commitDate = await fetchLastCommitDate(token);
     document.getElementById('lastUpdatedText').textContent = commitDate || '—';
   }
@@ -584,7 +714,6 @@
     }
   }
 
-  /* АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ ЖАНРОВ ДЛЯ СТАРЫХ ФИЛЬМОВ */
   async function updateOldGenres() {
     const token = localStorage.getItem('gh_token');
     if(!token) { alert("Сначала введите токен в настройках!"); return; }
