@@ -32,32 +32,42 @@
     .btn-settings { position: absolute; right: 0; background: none; border: none; font-size: 1.6rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
     .btn-settings:hover { opacity: 1; }
 
-    /* Панель токена */
-    .token-panel { background: #1a1235; border: 2px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: center; }
-    .token-panel h3 { margin-bottom: 8px; font-size: 1.1rem; }
-    .token-panel p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
-    .token-flex { display: flex; gap: 10px; max-width: 500px; margin: 0 auto 12px; }
-    .token-flex input { flex: 1; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
-    .token-flex input:focus { border-color: var(--accent); }
-    .btn-save-token { padding: 10px 20px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
-    .btn-save-token:hover { opacity: 0.85; }
-    .status-msg { margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
+    /* Панель настроек в стиле сайта */
+    .token-panel { 
+      background: linear-gradient(135deg, var(--panel), #17122b); 
+      border: 1px solid var(--border); 
+      border-radius: 20px; 
+      padding: 24px; 
+      margin-bottom: 32px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      animation: fadeIn 0.25s ease-out;
+    }
+    .token-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .token-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    
+    .token-flex { display: flex; gap: 10px; max-width: 100%; margin-bottom: 12px; }
+    .token-flex input { flex: 1; padding: 12px 16px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: #fff; outline: none; font-size: 0.95rem; transition: border-color .25s, box-shadow .25s; }
+    .token-flex input:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
+    
+    .btn-save-token { padding: 12px 22px; background: linear-gradient(45deg, var(--accent), var(--accent2)); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+    .btn-save-token:hover { opacity: 0.88; }
+    .status-msg { margin-top: 8px; font-size: 0.88rem; font-weight: 600; }
 
-    /* Плашка информации в настройках */
+    /* Информационная плашка в настройках */
     .info-box-settings {
       margin-top: 18px;
       padding-top: 14px;
-      border-top: 1px dashed var(--border);
+      border-top: 1px solid var(--border);
       color: var(--muted);
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       line-height: 1.6;
-      text-align: left;
-      display: inline-block;
-      width: 100%;
-      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
     .info-box-settings div span {
       color: var(--text);
+      font-weight: 600;
     }
 
     .add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
@@ -326,6 +336,12 @@
         flex-direction: column;
       }
 
+      .token-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
       .add-panel {
         padding: 16px;
         border-radius: 16px;
@@ -448,21 +464,22 @@
   
   <div class="header-zone">
     <h1 class="site-title">🍿 Киношке</h1>
-    <button class="btn-settings" onclick="toggleTokenPanel()">⚙️</button>
+    <button class="btn-settings" onclick="toggleTokenPanel()" title="Настройки">⚙️</button>
   </div>
 
   <div id="tokenPanel" class="token-panel hidden">
-    <h3>🔑 Настройка токена GitHub</h3>
-    <p>Вставьте ваш токен (ghp_...), чтобы сайт мог сохранять фильмы в ваш movies.json.</p>
+    <div class="token-header">
+      <h3>🔒 Секретный админ-токен</h3>
+    </div>
     <div class="token-flex">
-      <input type="text" id="tokenInput" placeholder="Вставьте сюда ghp_...">
-      <button class="btn-save-token" onclick="saveTokenBtn()">Сохранить ключ</button>
+      <input type="password" id="tokenInput" placeholder="Введите админ-токен...">
+      <button class="btn-save-token" onclick="saveTokenBtn()">Применить</button>
     </div>
     <div id="statusMsg" class="status-msg"></div>
 
     <!-- Информационная плашка в настройках -->
     <div id="infoBoxSettings" class="info-box-settings">
-      <div>Последний фильм: <span id="lastAddedText">—</span></div>
+      <div>Последнее добавление: <span id="lastAddedText">—</span></div>
       <div>Обновление сайта: <span id="lastUpdatedText">—</span></div>
     </div>
   </div>
@@ -581,11 +598,11 @@
     const val = document.getElementById('tokenInput').value.trim();
     if(val) {
       localStorage.setItem('gh_token', val);
-      setMsg("Ключ сохранен в браузере! Переподключение...", "var(--success)");
+      setMsg("Ключ сохранен! Переподключение...", "var(--success)");
       apiGet();
     } else {
       localStorage.removeItem('gh_token');
-      setMsg("Токен удален. Работа в режиме чтения.", "var(--danger)");
+      setMsg("Токен удален. Режим чтения.", "var(--danger)");
       apiGet();
     }
   }
