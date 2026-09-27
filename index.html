@@ -45,26 +45,27 @@
     .token-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .token-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
     
-    /* Стили для мигающей индикаторной точки */
+    /* Стили для мигающей индикаторной точки (затухание до конца) */
     .status-dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
       display: inline-block;
-      transition: background-color 0.3s ease;
+      animation: pulseDot 2s infinite ease-in-out;
     }
     .status-dot.online {
       background-color: var(--success);
-      animation: pulseGreen 2s infinite ease-in-out;
+      box-shadow: 0 0 8px var(--success);
     }
     .status-dot.offline {
       background-color: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
     }
 
-    @keyframes pulseGreen {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(46, 204, 113, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    @keyframes pulseDot {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(0.9); opacity: 1; }
     }
 
     .token-flex { display: flex; gap: 10px; max-width: 100%; margin-bottom: 12px; }
@@ -711,7 +712,7 @@
     updateIndicator();
 
     if(!token) {
-      setMsg("⚠️ Работа в режиме чтения (без токена).", "var(--danger)");
+      setMsg("Токен отсутствует", "var(--danger)");
     } else {
       setMsg("", "var(--success)");
     }
