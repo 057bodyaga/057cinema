@@ -459,7 +459,7 @@
       <input type="text" id="tokenInput" placeholder="Вставьте сюда ghp_...">
       <button class="btn-save-token" onclick="saveTokenBtn()">Сохранить ключ</button>
     </div>
-    <div>
+    <div id="genreBtnWrap">
       <button class="btn-save-token btn-auto-genres" onclick="updateOldGenres()">🔄 Заполнить жанры для старых фильмов</button>
     </div>
     <div id="statusMsg" class="status-msg"></div>
@@ -471,7 +471,7 @@
     </div>
   </div>
 
-  <section class="add-panel">
+  <section class="add-panel" id="addPanel">
     <div class="search-wrap">
       <input id="searchInput" type="text" placeholder="Поиск нового фильма" autocomplete="off" oninput="onSearchInput()">
       <div id="dropdown" class="dropdown hidden"></div>
@@ -564,6 +564,10 @@
 
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
 
+  function hasToken() {
+    return !!localStorage.getItem('gh_token');
+  }
+
   function updateSearchPlaceholder() {
     const input = document.getElementById('searchInput');
     if (activeTab === 'watched') {
@@ -586,6 +590,7 @@
     } else {
       localStorage.removeItem('gh_token');
       setMsg("Токен удален. Работа в режиме чтения.", "var(--danger)");
+      apiGet();
     }
   }
 
@@ -654,8 +659,12 @@
 
   async function apiGet() { 
     const token = localStorage.getItem('gh_token');
+    
+    // Переключениевидимости кнопки заполнении жанров
+    document.getElementById('genreBtnWrap').style.display = token ? 'block' : 'none';
+
     if(!token) {
-      setMsg("⚠️ Вы не ввели токен! Добавление работать не будет.", "var(--danger)");
+      setMsg("⚠️ Вы не ввели токен! Работа в режиме чтения.", "var(--danger)");
     } else {
       setMsg("✅ Токен установлен. Проверяем связь...", "var(--star)");
     }
@@ -668,7 +677,7 @@
       const response = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/movies.json`, { headers });
       
       if (!response.ok) {
-        if(response.status === 401 || response.status === 403) {
+        if(token && (response.status === 401 || response.status === 403)) {
           setMsg("❌ Ошибка: Неверный токен или лимит запросов истек!", "var(--danger)");
         }
         throw new Error();
@@ -774,6 +783,10 @@
     if (activeTab === 'watched') {
       searchLocalWatched(q);
     } else {
+      if (!hasToken()) {
+        hideDropdown();
+        return;
+      }
       if (q.length < 2) { hideDropdown(); return; }
       searchTimer = setTimeout(() => fetchMovies(q), 350); 
     }
@@ -854,6 +867,7 @@
   function hideDropdown() { document.getElementById('dropdown').classList.add('hidden'); }
 
   function pickMovie(m) {
+    if (!hasToken()) return;
     m._genre = parseGenres(m.genre_ids);
     pending = m; 
     hideDropdown(); 
@@ -869,7 +883,7 @@
   function onCategoryChange() { const c = document.getElementById('selCategory').value; document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); }
 
   function saveMovie() {
-    if (!pending) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
+    if (!pending || !hasToken()) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
     const status = document.getElementById('selStatus').value; const cat = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
@@ -885,6 +899,7 @@
   }
 
   function editRatings(id) {
+    if (!hasToken()) return;
     const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt };
     document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; 
     
@@ -905,8 +920,13 @@
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
+  function deleteMovie(id) { 
+    if (!hasToken()) return;
+    if(confirm("Удалить этот фильм?")) apiDelete(id); 
+  }
+  
   function markWatched(id) { 
+    if (!hasToken()) return;
     const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; 
     document.getElementById('txtComment').value = m.comment || '';
     const form = document.getElementById('configForm');
@@ -949,6 +969,16 @@
 
   function render() {
     const grid = document.getElementById('grid'); 
+    const isAuthorized = hasToken();
+    const addPanel = document.getElementById('addPanel');
+
+    // Если токена нет и мы во вкладке "Нужно посмотреть", скрываем панель поиска полностью
+    if (!isAuthorized && activeTab === 'watchlist') {
+      addPanel.classList.add('hidden');
+    } else {
+      addPanel.classList.remove('hidden');
+    }
+
     let list = db.filter(x => x.status === activeTab);
 
     if (activeTab === 'watched') {
@@ -991,12 +1021,21 @@
         ? `<div class="card-desc">${esc(m.overview)}</div>` 
         : `<div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>`;
 
-      const acts = isWatchlist
-        ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button>
-           <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
-        : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button>
-           <button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>
-           <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+      // Формирование кнопок в зависимости от наличия токена
+      let acts = '';
+      if (isAuthorized) {
+        acts = isWatchlist
+          ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button>
+             <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
+          : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button>
+             <button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>
+             <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+      } else {
+        // Режим чтения (без ключа)
+        acts = !isWatchlist
+          ? `<button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>`
+          : '';
+      }
 
       const commentHtml = (m.status === 'watched' && m.comment) 
         ? `<div class="card-comment">${esc(m.comment)}</div>` 
@@ -1005,6 +1044,8 @@
       const genreHtml = m.genre 
         ? `<span class="dot">•</span><span class="genre">${esc(m.genre)}</span>` 
         : '';
+
+      const actionsHtml = acts ? `<div class="card-actions">${acts}</div>` : '';
 
       return `
         <article class="card" id="card-${m.id}">
@@ -1019,7 +1060,7 @@
             ${commentHtml}
             <div class="card-tags">${tags}</div>
           </div>
-          <div class="card-actions">${acts}</div>
+          ${actionsHtml}
         </article>
       `;
     }).join('');
