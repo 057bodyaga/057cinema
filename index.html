@@ -185,7 +185,11 @@
     .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
     .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
-    .card-year  { color: var(--muted); font-size: .88rem; margin-bottom: 6px; }
+    
+    /* ГОД И ЖАНР */
+    .card-meta { color: var(--muted); font-size: .88rem; margin-bottom: 6px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .card-meta .genre { color: rgba(241, 237, 247, 0.7); }
+    .card-meta .dot { font-size: 0.6rem; opacity: 0.5; }
 
     /* ОПИСАНИЕ БЕЗ ФИОЛЕТОВОЙ ПОЛОСКИ СЛЕВА */
     .card-desc { 
@@ -355,6 +359,15 @@
   const GH_USER  = '057bodyaga'; 
   const GH_REPO  = '057cinema';
 
+  // Словарик жанров TMDB для превращения ID в текст
+  const GENRES_MAP = {
+    28: "Боевик", 12: "Приключения", 16: "Мультфильм", 35: "Комедия",
+    80: "Криминал", 99: "Документальный", 18: "Драма", 10751: "Семейный",
+    14: "Фэнтези", 36: "История", 27: "Ужасы", 10402: "Музыка",
+    9648: "Детектив", 10749: "Мелодрама", 878: "Фантастика", 10770: "Телефильм",
+    53: "Триллер", 10752: "Военный", 37: "Вестерн"
+  };
+
   let db= []; activeTab='watchlist'; activeSub='all'; activeSort='newest'; pending= null; searchTimer= null; fileSha= null;
 
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
@@ -498,11 +511,19 @@
     } 
   }
 
+  function parseGenres(genreIds) {
+    if (!genreIds || !genreIds.length) return '';
+    return genreIds.map(id => GENRES_MAP[id]).filter(Boolean).slice(0, 2).join(', ');
+  }
+
   function showDropdown(res) {
     const dd = document.getElementById('dropdown'); dd.innerHTML = ''; if (!res.length) { hideDropdown(); return; }
     res.forEach(m => {
+      const genres = parseGenres(m.genre_ids);
+      const metaText = [m.release_date?.substring(0,4), genres].filter(Boolean).join(' • ');
+      
       const item = document.createElement('div'); item.className = 'dropdown-item';
-      item.innerHTML = `<img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w92'+m.poster_path : 'https://placehold.co/42x62'}"><div><h4>${esc(m.title)}</h4><p>${m.release_date?.substring(0,4) ?? '—'}</p></div>`;
+      item.innerHTML = `<img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w92'+m.poster_path : 'https://placehold.co/42x62'}"><div><h4>${esc(m.title)}</h4><p>${esc(metaText || '—')}</p></div>`;
       item.onclick = () => pickMovie(m); dd.appendChild(item);
     });
     dd.classList.remove('hidden');
@@ -515,7 +536,8 @@
       const item = document.createElement('div'); item.className = 'dropdown-item';
       const avg = getAvgScore(m);
       const scoreStr = avg > 0 ? `⭐ ${avg.toFixed(1)}/10` : '';
-      item.innerHTML = `<img src="${esc(m.poster)}"><div><h4>${esc(m.title)}</h4><p>${esc(m.year)} ${scoreStr ? '• ' + scoreStr : ''}</p></div>`;
+      const metaText = [m.year, m.genre].filter(Boolean).join(' • ');
+      item.innerHTML = `<img src="${esc(m.poster)}"><div><h4>${esc(m.title)}</h4><p>${esc(metaText)} ${scoreStr ? '• ' + scoreStr : ''}</p></div>`;
       item.onclick = () => scrollToWatchedMovie(m.id); 
       dd.appendChild(item);
     });
@@ -549,8 +571,13 @@
   function hideDropdown() { document.getElementById('dropdown').classList.add('hidden'); }
 
   function pickMovie(m) {
-    pending = m; hideDropdown(); document.getElementById('searchInput').value = m.title; document.getElementById('configTitle').textContent = `Настройка: "${m.title}"`;
-    document.getElementById('selStatus').value = 'watchlist'; document.getElementById('configForm').classList.remove('hidden'); 
+    m._genre = parseGenres(m.genre_ids);
+    pending = m; 
+    hideDropdown(); 
+    document.getElementById('searchInput').value = m.title; 
+    document.getElementById('configTitle').textContent = `Настройка: "${m.title}"`;
+    document.getElementById('selStatus').value = 'watchlist'; 
+    document.getElementById('configForm').classList.remove('hidden'); 
     document.getElementById('txtComment').value = '';
     onStatusChange();
   }
@@ -564,7 +591,9 @@
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
       poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
-      year: pending.release_date?.substring(0,4) || pending.year || '—', status, category: cat,
+      year: pending.release_date?.substring(0,4) || pending.year || '—', 
+      genre: pending._genre || pending.genre || '',
+      status, category: cat,
       scoreBoy: (status === 'watched' && cat !== 'girl') ? parseFloat(document.getElementById('sliBoy').value) : null,
       scoreGirl: (status === 'watched' && cat !== 'boy') ? parseFloat(document.getElementById('sliGirl').value) : null,
       comment: status === 'watched' ? document.getElementById('txtComment').value.trim() : ''
@@ -573,7 +602,7 @@
   }
 
   function editRatings(id) {
-    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt };
+    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt };
     document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; 
     
     if(m.status === 'watched') {
@@ -595,7 +624,7 @@
 
   function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
   function markWatched(id) { 
-    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; 
+    const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; 
     document.getElementById('txtComment').value = m.comment || '';
     const form = document.getElementById('configForm');
     form.classList.remove('hidden'); 
@@ -690,12 +719,19 @@
         ? `<div class="card-comment">${esc(m.comment)}</div>` 
         : '';
 
+      const genreHtml = m.genre 
+        ? `<span class="dot">•</span><span class="genre">${esc(m.genre)}</span>` 
+        : '';
+
       return `
         <article class="card" id="card-${m.id}">
           <img class="card-poster" src="${esc(m.poster)}">
           <div class="card-body">
             <div class="card-title">${esc(m.title)}</div>
-            <div class="card-year">${esc(m.year)}</div>
+            <div class="card-meta">
+              <span>${esc(m.year)}</span>
+              ${genreHtml}
+            </div>
             ${descHtml}
             ${commentHtml}
             <div class="card-tags">${tags}</div>
