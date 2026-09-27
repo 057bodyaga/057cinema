@@ -73,10 +73,14 @@
     .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
     .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
     
-    .sub-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .sub-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+    .sub-tabs-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .sub-tab { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 7px 15px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: border-color .2s, color .2s; }
     .sub-tab.active { border-color: var(--accent); color: var(--accent); }
     
+    .sort-wrap { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--muted); }
+    .sort-wrap select { padding: 6px 10px; width: auto; font-size: .85rem; }
+
     .grid { display: flex; flex-direction: column; gap: 18px; }
     .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; }
     .card:hover { border-color: rgba(157,78,221,.4); }
@@ -89,6 +93,7 @@
     .tag { padding: 3px 10px; border-radius: 6px; font-size: .82rem; }
     .tag-viewer { background: rgba(255,255,255,.06); }
     .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
+    .tag-avg    { background: rgba(255,190,11,.15); color: var(--star); font-weight: bold; }
     
     .card-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: flex-start; }
     .btn-action { padding: 7px 14px; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
@@ -163,10 +168,20 @@
     <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
   </div>
   <div id="subTabs" class="sub-tabs hidden">
-    <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
-    <button class="sub-tab"        onclick="switchSub(this,'joint')">🍿 Совместный</button>
-    <button class="sub-tab"        onclick="switchSub(this,'boy')">👨 Бодяга</button>
-    <button class="sub-tab"        onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
+    <div class="sub-tabs-group">
+      <button class="sub-tab active" onclick="switchSub(this,'all')">Все</button>
+      <button class="sub-tab"        onclick="switchSub(this,'joint')">🍿 Совместный</button>
+      <button class="sub-tab"        onclick="switchSub(this,'boy')">👨 Бодяга</button>
+      <button class="sub-tab"        onclick="switchSub(this,'girl')">👩 Каракумикуи</button>
+    </div>
+    <div class="sort-wrap">
+      <label for="selSort">Сортировка:</label>
+      <select id="selSort" onchange="changeSort(this.value)">
+        <option value="newest">Сначала новые</option>
+        <option value="oldest">Сначала старые</option>
+        <option value="score">По средней оценке</option>
+      </select>
+    </div>
   </div>
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
 </div>
@@ -177,7 +192,7 @@
   const GH_USER  = '057bodyaga'; 
   const GH_REPO  = '057cinema';
 
-  let db= []; activeTab='watchlist'; activeSub='all'; pending= null; searchTimer= null; fileSha= null;
+  let db= []; activeTab='watchlist'; activeSub='all'; activeSort='newest'; pending= null; searchTimer= null; fileSha= null;
 
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
 
@@ -268,11 +283,9 @@
   async function apiSave(m) { 
     const idx = db.findIndex(x => x.id === m.id);
     if (idx !== -1) {
-      // Сохраняем исходную метку времени добавления
       m.addedAt = db[idx].addedAt || Date.now();
       db[idx] = m;
     } else {
-      // Для нового фильма задаем текущую метку времени
       m.addedAt = Date.now();
       db.unshift(m);
     }
@@ -332,8 +345,6 @@
     const form = document.getElementById('configForm');
     form.classList.remove('hidden'); 
     onStatusChange();
-    
-    // Плавный скролл к блоку изменения/оценки
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
@@ -347,16 +358,37 @@
   
   function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
   function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
+  function changeSort(val) { activeSort = val; render(); }
+
+  // Вспомогательная функция расчёта средней оценки
+  function getAvgScore(m) {
+    const scores = [];
+    if (m.scoreBoy != null) scores.push(m.scoreBoy);
+    if (m.scoreGirl != null) scores.push(m.scoreGirl);
+    if (!scores.length) return 0;
+    return scores.reduce((a, b) => a + b, 0) / scores.length;
+  }
 
   function render() {
     const grid = document.getElementById('grid'); 
     let list = db.filter(x => x.status === activeTab);
 
-    // Новые элементы будут сверху
-    list.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    if (activeTab === 'watched') {
+      if (activeSub !== 'all') {
+        list = list.filter(x => x.category === activeSub);
+      }
 
-    if (activeTab === 'watched' && activeSub !== 'all') {
-      list = list.filter(x => x.category === activeSub);
+      // Сортировки для вкладки Просмотрено
+      if (activeSort === 'newest') {
+        list.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+      } else if (activeSort === 'oldest') {
+        list.sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
+      } else if (activeSort === 'score') {
+        list.sort((a, b) => getAvgScore(b) - getAvgScore(a));
+      }
+    } else {
+      // Для "Нужно посмотреть" сортируем новые сверху
+      list.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
     }
 
     if (!list.length) { 
@@ -365,8 +397,17 @@
     }
 
     grid.innerHTML = list.map(m => {
-      const tags = m.status === 'watched' ? `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}/10</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}/10</span>`:''}` : '';
-      const acts = m.status === 'watchlist' ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+      let tags = '';
+      if (m.status === 'watched') {
+        const avg = getAvgScore(m);
+        const avgTag = avg > 0 ? `<span class="tag tag-avg">⭐ ${avg.toFixed(1)}/10</span>` : '';
+        tags = `<span class="tag tag-viewer">${LABELS[m.category] ?? m.category}</span>${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
+      }
+
+      const acts = m.status === 'watchlist' 
+        ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
+        : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button><button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+
       return `<article class="card"><img class="card-poster" src="${esc(m.poster)}"><div class="card-body"><div class="card-title">${esc(m.title)}</div><div class="card-year">${esc(m.year)}</div><div class="card-desc">${esc(m.overview)}</div><div class="card-tags">${tags}</div></div><div class="card-actions">${acts}</div></article>`;
     }).join('');
   }
