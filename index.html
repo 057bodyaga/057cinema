@@ -22,8 +22,8 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; position: relative; }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 16px 100px; position: relative; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; position: relative; }
     
     .header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
     .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -43,6 +43,23 @@
     .btn-save-token:hover { opacity: 0.85; }
     .btn-auto-genres { background: linear-gradient(135deg, #4a00e0, var(--accent)); margin-top: 6px; }
     .status-msg { margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
+
+    /* Плашка информации в настройках */
+    .info-box-settings {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.6;
+      text-align: left;
+      display: inline-block;
+      width: 100%;
+      max-width: 500px;
+    }
+    .info-box-settings div span {
+      color: var(--text);
+    }
 
     .add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
     .search-wrap { position: relative; }
@@ -260,7 +277,7 @@
       100% { border-color: var(--border); box-shadow: none; transform: scale(1); }
     }
 
-    /* КРАСИВАЯ НЕВЗРАЧНАЯ КНОПКА СКАЧИВАНИЯ / ПРОКРУТКИ ВНИЗ */
+    /* КНОПКА ПРОКРУТКИ ВНИЗ */
     .btn-scroll-bottom {
       position: fixed;
       bottom: 24px;
@@ -268,61 +285,26 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: rgba(19, 15, 34, 0.65);
-      border: 1px solid rgba(157, 78, 221, 0.25);
+      background: rgba(26, 21, 46, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
       color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       transition: all 0.25s ease;
-      z-index: 90;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 99;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     .btn-scroll-bottom:hover {
-      background: rgba(157, 78, 221, 0.25);
-      color: #fff;
+      color: var(--text);
       border-color: var(--accent);
+      background: rgba(157, 78, 221, 0.3);
       transform: translateY(2px);
-    }
-
-    .btn-scroll-bottom svg {
-      width: 20px;
-      height: 20px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* ИНФОРМАЦИОННАЯ ПЛАШКА СЛЕВА ВНИЗУ */
-    .footer-info {
-      margin-top: 50px;
-      padding: 14px 18px;
-      background: rgba(19, 15, 34, 0.5);
-      border: 1px solid rgba(44, 34, 77, 0.6);
-      border-radius: 12px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-width: fit-content;
-    }
-
-    .footer-info .info-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .footer-info .info-value {
-      color: rgba(241, 237, 247, 0.85);
-      font-weight: 600;
     }
 
     .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
@@ -331,7 +313,7 @@
   </style>
 </head>
 <body>
-<div class="wrap" id="top">
+<div class="wrap">
   
   <div class="header-zone">
     <h1 class="site-title">🍿 Киношке</h1>
@@ -349,11 +331,17 @@
       <button class="btn-save-token btn-auto-genres" onclick="updateOldGenres()">🔄 Заполнить жанры для старых фильмов</button>
     </div>
     <div id="statusMsg" class="status-msg"></div>
+
+    <!-- Информационная плашка в настройках -->
+    <div id="infoBoxSettings" class="info-box-settings">
+      <div>Последний фильм: <span id="lastAddedText">—</span></div>
+      <div>Обновление сайта: <span id="lastUpdatedText">—</span></div>
+    </div>
   </div>
 
   <section class="add-panel">
     <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Поиск фильма..." autocomplete="off" oninput="onSearchInput()">
+      <input id="searchInput" type="text" placeholder="Поиск нового фильма" autocomplete="off" oninput="onSearchInput()">
       <div id="dropdown" class="dropdown hidden"></div>
     </div>
     <div id="configForm" class="config-form hidden">
@@ -421,28 +409,10 @@
   </div>
 
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
-
-  <!-- Плашка информации о последнем обновлении -->
-  <footer id="footerInfo" class="footer-info">
-    <div class="info-item">
-      <span>🎬 Последний добавлен:</span>
-      <span id="lastMovieDate" class="info-value">—</span>
-    </div>
-    <div class="info-item">
-      <span>🕒 Обновление сайта:</span>
-      <span id="lastCommitDate" class="info-value">—</span>
-    </div>
-  </footer>
-
-  <div id="bottomAnchor"></div>
 </div>
 
-<!-- Невзрачная плавающая кнопка прокрутки вниз -->
-<button class="btn-scroll-bottom" onclick="scrollToBottom()" title="В самый низ">
-  <svg viewBox="0 0 24 24">
-    <path d="M12 5v14M19 12l-7 7-7-7"/>
-  </svg>
-</button>
+<!-- Невзрачная красивая кнопка вниз -->
+<button class="btn-scroll-bottom" onclick="scrollToBottom()" title="В самый низ">↓</button>
 
 <script>
   const TMDB_KEY = 'af2e801d23d9fad3c709a796331ac8f7';
@@ -461,10 +431,6 @@
   let db= []; activeTab='watchlist'; activeSub='all'; activeSort='newest'; pending= null; searchTimer= null; fileSha= null;
 
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
-
-  function scrollToBottom() {
-    document.getElementById('bottomAnchor').scrollIntoView({ behavior: 'smooth' });
-  }
 
   function updateSearchPlaceholder() {
     const input = document.getElementById('searchInput');
@@ -504,61 +470,56 @@
     pending = null;
   }
 
-  function formatDate(timestamp) {
-    if (!timestamp) return '—';
-    const d = new Date(timestamp);
-    if (isNaN(d.getTime())) return '—';
-    
-    return d.toLocaleString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  function scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  function formatDate(d) {
+    if (!d || isNaN(d.getTime())) return '—';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year}, ${hours}:${minutes}`;
   }
 
   async function fetchLastCommitDate(token) {
     try {
       const headers = { "Accept": "application/vnd.github.v3+json" };
-      if(token) headers["Authorization"] = `token ${token}`;
-
+      if (token) headers["Authorization"] = `token ${token}`;
       const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/commits?path=movies.json&page=1&per_page=1`, { headers });
       if (res.ok) {
         const commits = await res.json();
-        if (commits && commits.length > 0) {
-          const commitDate = commits[0].commit.committer.date;
-          document.getElementById('lastCommitDate').textContent = formatDate(commitDate);
-          return;
+        if (commits.length > 0) {
+          const dateStr = commits[0].commit.committer.date;
+          return formatDate(new Date(dateStr));
         }
       }
     } catch (e) {
-      console.error("Ошибка получения даты последнего коммита:", e);
+      console.error("Не удалось получить дату коммита:", e);
     }
-    document.getElementById('lastCommitDate').textContent = '—';
+    return null;
   }
 
-  function updateFooterMeta() {
-    if (!db || db.length === 0) {
-      document.getElementById('lastMovieDate').textContent = '—';
-      return;
-    }
-
-    let maxAddedAt = 0;
-    let latestMovieName = '';
-
-    db.forEach(m => {
-      if (m.addedAt && m.addedAt > maxAddedAt) {
-        maxAddedAt = m.addedAt;
-        latestMovieName = m.title;
+  async function updateFooterInfo(token) {
+    // 1. Последний добавленный фильм
+    let lastMovieText = '—';
+    if (db.length > 0) {
+      let newestMovie = db[0];
+      for (let m of db) {
+        if ((m.addedAt || 0) > (newestMovie.addedAt || 0)) {
+          newestMovie = m;
+        }
       }
-    });
-
-    if (maxAddedAt > 0) {
-      document.getElementById('lastMovieDate').textContent = `${formatDate(maxAddedAt)} (${latestMovieName})`;
-    } else {
-      document.getElementById('lastMovieDate').textContent = '—';
+      const dateFormatted = newestMovie.addedAt ? formatDate(new Date(newestMovie.addedAt)) : '—';
+      lastMovieText = `${dateFormatted} (${newestMovie.title})`;
     }
+    document.getElementById('lastAddedText').textContent = lastMovieText;
+
+    // 2. Время последнего обновления репозитория
+    const commitDate = await fetchLastCommitDate(token);
+    document.getElementById('lastUpdatedText').textContent = commitDate || '—';
   }
 
   async function apiGet() { 
@@ -592,8 +553,7 @@
       
       if(token) setMsg("✅ Подключение успешно! База синхронизирована.", "var(--success)");
       
-      updateFooterMeta();
-      fetchLastCommitDate(token);
+      updateFooterInfo(token);
       render();
     } catch (e) {
       document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить movies.json. Либо файла нет, либо токен не даёт доступ.</div>';
@@ -614,8 +574,7 @@
       });
       if (res.ok) { 
         fileSha = (await res.json()).content.sha; 
-        updateFooterMeta();
-        fetchLastCommitDate(token);
+        updateFooterInfo(token);
         render(); 
       } else { 
         alert("GitHub отклонил сохранение. Проверьте права токена!"); 
