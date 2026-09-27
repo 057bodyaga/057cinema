@@ -142,7 +142,7 @@
     .sub-tab { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 7px 15px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: border-color .2s, color .2s; }
     .sub-tab.active { border-color: var(--accent); color: var(--accent); }
     
-    /* СТИЛИЗАЦИЯ СОРТИРОВКИ В ДИЗАЙН САЙТА */
+    /* СТИЛИЗАЦИЯ СОРТИРОВКИ */
     .sort-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
     .sort-wrap label { font-weight: 600; }
     
@@ -183,7 +183,7 @@
     }
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
-    .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s; }
+    .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s, box-shadow .3s; }
     .card:hover { border-color: rgba(157,78,221,.4); }
     .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
     .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -215,14 +215,48 @@
     .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
     .tag-avg    { background: rgba(255,190,11,.15); color: var(--star); font-weight: bold; }
     
-    .card-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: flex-start; }
-    .btn-action { padding: 7px 14px; border: none; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; text-align: center; }
-    .btn-action:hover { opacity: .82; }
-    .btn-watched  { background: var(--success); color: #fff; }
-    .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); }
-    .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
-    .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); }
+    /* ВЫРАВНИВАНИЕ И КРАСИВЫЕ ОТСТУПЫ ДЛЯ КНОПОК */
+    .card-actions { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      flex-shrink: 0; 
+      justify-content: center; 
+      width: 155px;
+    }
     
+    .btn-action { 
+      width: 100%;
+      padding: 10px 14px; 
+      border: none; 
+      border-radius: 10px; 
+      font-size: .88rem; 
+      font-weight: 600; 
+      cursor: pointer; 
+      white-space: nowrap; 
+      transition: all .2s; 
+      text-align: center; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-action:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-watched  { background: var(--success); color: #fff; }
+    .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); border: 1px solid rgba(157,78,221,.4); }
+    .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
+    .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); border: 1px solid rgba(255,82,82,.2); }
+    
+    /* ЭФФЕКТ ПОДСВЕТКИ КАРТОЧКИ ПРИ ПЕРЕХОДЕ ИЗ ПОИСКА */
+    .card-highlight {
+      animation: highlightPulse 2.5s ease-out;
+    }
+
+    @keyframes highlightPulse {
+      0% { border-color: var(--accent2); box-shadow: 0 0 25px rgba(247, 37, 133, 0.6); transform: scale(1.02); }
+      50% { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+      100% { border-color: var(--border); box-shadow: none; transform: scale(1); }
+    }
+
     .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-style: italic; }
     .loading { text-align: center; padding: 40px; color: var(--muted); }
     .hidden { display: none !important; }
@@ -248,7 +282,7 @@
 
   <section class="add-panel">
     <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Как называется фильм?" autocomplete="off" oninput="onSearchInput()">
+      <input id="searchInput" type="text" placeholder="Поиск фильма..." autocomplete="off" oninput="onSearchInput()">
       <div id="dropdown" class="dropdown hidden"></div>
     </div>
     <div id="configForm" class="config-form hidden">
@@ -321,6 +355,15 @@
   let db= []; activeTab='watchlist'; activeSub='all'; activeSort='newest'; pending= null; searchTimer= null; fileSha= null;
 
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
+
+  function updateSearchPlaceholder() {
+    const input = document.getElementById('searchInput');
+    if (activeTab === 'watched') {
+      input.placeholder = 'Поиск по просмотренным фильмам...';
+    } else {
+      input.placeholder = 'Как называется фильм?';
+    }
+  }
 
   function toggleTokenPanel() {
     document.getElementById('tokenPanel').classList.toggle('hidden');
@@ -424,8 +467,35 @@
 
   async function apiDelete(id) { db = db.filter(x => x.id !== id); await commitToGitHub("Удаление фильма"); }
 
-  function onSearchInput() { clearTimeout(searchTimer); const q = document.getElementById('searchInput').value.trim(); if (q.length < 2) { hideDropdown(); return; } searchTimer = setTimeout(() => fetchMovies(q), 350); }
-  async function fetchMovies(q) { try { const data = await (await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=ru-RU`)).json(); showDropdown(data.results?.slice(0, 6) ?? []); } catch { hideDropdown(); } }
+  function onSearchInput() { 
+    clearTimeout(searchTimer); 
+    const q = document.getElementById('searchInput').value.trim(); 
+    if (q.length < 1) { hideDropdown(); return; } 
+
+    if (activeTab === 'watched') {
+      // Искать ТОЛЬКО среди просмотренных
+      searchLocalWatched(q);
+    } else {
+      // Искать новые фильмы в TMDB
+      if (q.length < 2) { hideDropdown(); return; }
+      searchTimer = setTimeout(() => fetchMovies(q), 350); 
+    }
+  }
+
+  function searchLocalWatched(q) {
+    const query = q.toLowerCase();
+    const results = db.filter(m => m.status === 'watched' && m.title.toLowerCase().includes(query));
+    showWatchedDropdown(results);
+  }
+
+  async function fetchMovies(q) { 
+    try { 
+      const data = await (await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=ru-RU`)).json(); 
+      showDropdown(data.results?.slice(0, 6) ?? []); 
+    } catch { 
+      hideDropdown(); 
+    } 
+  }
 
   function showDropdown(res) {
     const dd = document.getElementById('dropdown'); dd.innerHTML = ''; if (!res.length) { hideDropdown(); return; }
@@ -436,6 +506,48 @@
     });
     dd.classList.remove('hidden');
   }
+
+  function showWatchedDropdown(res) {
+    const dd = document.getElementById('dropdown'); dd.innerHTML = ''; 
+    if (!res.length) { hideDropdown(); return; }
+    res.forEach(m => {
+      const item = document.createElement('div'); item.className = 'dropdown-item';
+      const avg = getAvgScore(m);
+      const scoreStr = avg > 0 ? `⭐ ${avg.toFixed(1)}/10` : '';
+      item.innerHTML = `<img src="${esc(m.poster)}"><div><h4>${esc(m.title)}</h4><p>${esc(m.year)} ${scoreStr ? '• ' + scoreStr : ''}</p></div>`;
+      item.onclick = () => scrollToWatchedMovie(m.id); 
+      dd.appendChild(item);
+    });
+    dd.classList.remove('hidden');
+  }
+
+  function scrollToWatchedMovie(id) {
+    hideDropdown();
+    document.getElementById('searchInput').value = '';
+    
+    // Если стоит фильтр по подвкладке, переключаем на 'all', если фильм не виден
+    if (activeSub !== 'all') {
+      const m = db.find(x => x.id === id);
+      if (m && m.category !== activeSub) {
+        activeSub = 'all';
+        document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active'));
+        const allBtn = document.querySelector('.sub-tab');
+        if(allBtn) allBtn.classList.add('active');
+        render();
+      }
+    }
+
+    setTimeout(() => {
+      const card = document.getElementById(`card-${id}`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.remove('card-highlight');
+        void card.offsetWidth; // перезапуск анимации
+        card.classList.add('card-highlight');
+      }
+    }, 100);
+  }
+
   function hideDropdown() { document.getElementById('dropdown').classList.add('hidden'); }
 
   function pickMovie(m) {
@@ -444,6 +556,7 @@
     document.getElementById('txtComment').value = '';
     onStatusChange();
   }
+
   function onStatusChange() { const isW = document.getElementById('selStatus').value === 'watched'; document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); if (isW) onCategoryChange(); }
   function onCategoryChange() { const c = document.getElementById('selCategory').value; document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); }
 
@@ -481,6 +594,7 @@
     onStatusChange();
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
+
   function deleteMovie(id) { if(confirm("Удалить этот фильм?")) apiDelete(id); }
   function markWatched(id) { 
     const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, addedAt: m.addedAt }; document.getElementById('selStatus').value = 'watched'; 
@@ -491,7 +605,17 @@
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   
-  function switchTab(b, t) { activeTab = t; document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); render(); }
+  function switchTab(b, t) { 
+    activeTab = t; 
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); 
+    b.classList.add('active'); 
+    document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); 
+    updateSearchPlaceholder();
+    hideDropdown();
+    document.getElementById('searchInput').value = '';
+    render(); 
+  }
+
   function switchSub(b, s) { activeSub = s; document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active')); b.classList.add('active'); render(); }
   function changeSort(val) { activeSort = val; render(); }
 
@@ -552,25 +676,31 @@
         tags = `${categoryTag}${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
       }
 
-      const descButton = `<button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>`;
+      // На вкладке "Нужно посмотреть" описание отображается ВСЕГДА
+      const isWatchlist = m.status === 'watchlist';
+      const descHtml = isWatchlist 
+        ? `<div class="card-desc">${esc(m.overview)}</div>` 
+        : `<div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>`;
 
-      const acts = m.status === 'watchlist' 
-        ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button>${descButton}<button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
-        : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button>${descButton}<button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
+      const acts = isWatchlist
+        ? `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button>
+           <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>` 
+        : `<button class="btn-action btn-edit" onclick="editRatings(${m.id})">Изменить</button>
+           <button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>
+           <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
 
-      // Отображаем ваш комментарий без иконки 💬
-      const contentHtml = (m.status === 'watched' && m.comment) 
+      const commentHtml = (m.status === 'watched' && m.comment) 
         ? `<div class="card-comment">${esc(m.comment)}</div>` 
-        : (m.status === 'watchlist' ? `<div class="card-comment">${esc(m.overview)}</div>` : '');
+        : '';
 
       return `
-        <article class="card">
+        <article class="card" id="card-${m.id}">
           <img class="card-poster" src="${esc(m.poster)}">
           <div class="card-body">
             <div class="card-title">${esc(m.title)}</div>
             <div class="card-year">${esc(m.year)}</div>
-            <div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>
-            ${contentHtml}
+            ${descHtml}
+            ${commentHtml}
             <div class="card-tags">${tags}</div>
           </div>
           <div class="card-actions">${acts}</div>
@@ -582,6 +712,7 @@
   function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) hideDropdown(); });
   
+  updateSearchPlaceholder();
   apiGet();
 </script>
 </body>
