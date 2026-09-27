@@ -41,7 +41,6 @@
     .token-flex input:focus { border-color: var(--accent); }
     .btn-save-token { padding: 10px 20px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
     .btn-save-token:hover { opacity: 0.85; }
-    .btn-auto-genres { background: linear-gradient(135deg, #4a00e0, var(--accent)); margin-top: 6px; }
     .status-msg { margin-top: 10px; font-size: 0.85rem; font-weight: bold; }
 
     /* Плашка информации в настройках */
@@ -459,9 +458,6 @@
       <input type="text" id="tokenInput" placeholder="Вставьте сюда ghp_...">
       <button class="btn-save-token" onclick="saveTokenBtn()">Сохранить ключ</button>
     </div>
-    <div id="genreBtnWrap">
-      <button class="btn-save-token btn-auto-genres" onclick="updateOldGenres()">🔄 Заполнить жанры для старых фильмов</button>
-    </div>
     <div id="statusMsg" class="status-msg"></div>
 
     <!-- Информационная плашка в настройках -->
@@ -625,7 +621,7 @@
     try {
       const headers = { "Accept": "application/vnd.github.v3+json" };
       if (token) headers["Authorization"] = `token ${token}`;
-      const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/commits?path=movies.json&page=1&per_page=1`, { headers });
+      const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/commits?per_page=1`, { headers });
       if (res.ok) {
         const commits = await res.json();
         if (commits.length > 0) {
@@ -654,14 +650,11 @@
     document.getElementById('lastAddedText').textContent = lastMovieText;
 
     const commitDate = await fetchLastCommitDate(token);
-    document.getElementById('lastUpdatedText').textContent = commitDate || '—';
+    document.getElementById('lastUpdatedText').textContent = commitDate || formatDate(new Date());
   }
 
   async function apiGet() { 
     const token = localStorage.getItem('gh_token');
-    
-    // Переключениевидимости кнопки заполнении жанров
-    document.getElementById('genreBtnWrap').style.display = token ? 'block' : 'none';
 
     if(!token) {
       setMsg("⚠️ Вы не ввели токен! Работа в режиме чтения.", "var(--danger)");
@@ -720,44 +713,6 @@
       }
     } catch {
       alert("Ошибка сети при отправке данных на GitHub.");
-    }
-  }
-
-  async function updateOldGenres() {
-    const token = localStorage.getItem('gh_token');
-    if(!token) { alert("Сначала введите токен в настройках!"); return; }
-
-    const missing = db.filter(m => !m.genre);
-    if (missing.length === 0) {
-      setMsg("✅ У всех фильмов в вашей базе уже указаны жанры!", "var(--success)");
-      return;
-    }
-
-    setMsg(`⏳ Загружаем жанры из TMDB для ${missing.length} фильмов...`, "var(--star)");
-
-    let count = 0;
-    for (let m of missing) {
-      try {
-        const res = await fetch(`https://api.themoviedb.org/3/movie/${m.id}?api_key=${TMDB_KEY}&language=ru-RU`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.genres && data.genres.length > 0) {
-            m.genre = data.genres.map(g => g.name).slice(0, 2).join(', ');
-            count++;
-          }
-        }
-      } catch (e) {
-        console.error(`Ошибка при получении жанра для ID ${m.id}`, e);
-      }
-    }
-
-    if (count > 0) {
-      setMsg(`💾 Сохраняем обновлённые фильмы на GitHub...`, "var(--star)");
-      await commitToGitHub("Автоматическое обновление жанров для старых фильмов");
-      setMsg(`🎉 Успешно обновлены жанры для ${count} фильмов!`, "var(--success)");
-      render();
-    } else {
-      setMsg("Не удалось найти жанры для старых фильмов.", "var(--danger)");
     }
   }
 
