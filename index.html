@@ -43,8 +43,30 @@
       animation: fadeIn 0.25s ease-out;
     }
     .token-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .token-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .token-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
     
+    /* Стили для мигающей индикаторной точки */
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      transition: background-color 0.3s ease;
+    }
+    .status-dot.online {
+      background-color: var(--success);
+      animation: pulseGreen 2s infinite ease-in-out;
+    }
+    .status-dot.offline {
+      background-color: var(--danger);
+    }
+
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(46, 204, 113, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    }
+
     .token-flex { display: flex; gap: 10px; max-width: 100%; margin-bottom: 12px; }
     .token-flex input { flex: 1; padding: 12px 16px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: #fff; outline: none; font-size: 0.95rem; transition: border-color .25s, box-shadow .25s; }
     .token-flex input:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
@@ -469,10 +491,10 @@
 
   <div id="tokenPanel" class="token-panel hidden">
     <div class="token-header">
-      <h3>🔒 Секретный админ-токен</h3>
+      <h3><span id="statusDot" class="status-dot offline"></span> Админ токен</h3>
     </div>
     <div class="token-flex">
-      <input type="password" id="tokenInput" placeholder="Введите админ-токен...">
+      <input type="text" id="tokenInput" placeholder="Введите админ-токен...">
       <button class="btn-save-token" onclick="saveTokenBtn()">Применить</button>
     </div>
     <div id="statusMsg" class="status-msg"></div>
@@ -576,9 +598,21 @@
   let db= []; activeTab='watchlist'; activeSub='all'; activeSort='newest'; pending= null; searchTimer= null; fileSha= null;
 
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
+  updateIndicator();
 
   function hasToken() {
     return !!localStorage.getItem('gh_token');
+  }
+
+  function updateIndicator() {
+    const dot = document.getElementById('statusDot');
+    if (hasToken()) {
+      dot.classList.remove('offline');
+      dot.classList.add('online');
+    } else {
+      dot.classList.remove('online');
+      dot.classList.add('offline');
+    }
   }
 
   function updateSearchPlaceholder() {
@@ -598,11 +632,13 @@
     const val = document.getElementById('tokenInput').value.trim();
     if(val) {
       localStorage.setItem('gh_token', val);
-      setMsg("Ключ сохранен! Переподключение...", "var(--success)");
+      setMsg("Ключ сохранен!", "var(--success)");
+      updateIndicator();
       apiGet();
     } else {
       localStorage.removeItem('gh_token');
       setMsg("Токен удален. Режим чтения.", "var(--danger)");
+      updateIndicator();
       apiGet();
     }
   }
@@ -672,11 +708,12 @@
 
   async function apiGet() { 
     const token = localStorage.getItem('gh_token');
+    updateIndicator();
 
     if(!token) {
-      setMsg("⚠️ Вы не ввели токен! Работа в режиме чтения.", "var(--danger)");
+      setMsg("⚠️ Работа в режиме чтения (без токена).", "var(--danger)");
     } else {
-      setMsg("✅ Токен установлен. Проверяем связь...", "var(--star)");
+      setMsg("", "var(--success)");
     }
     
     try {
@@ -699,8 +736,6 @@
       const raw = atob(data.content.replace(/\s/g, ''));
       const jsonString = decodeURIComponent(Array.from(raw).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
       db = JSON.parse(jsonString);
-      
-      if(token) setMsg("✅ Подключение успешно! База синхронизирована.", "var(--success)");
       
       updateFooterInfo(token);
       render();
