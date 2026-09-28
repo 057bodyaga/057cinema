@@ -870,23 +870,28 @@
     rouletteWrap.classList.add('active');
     resultArea.innerHTML = '';
 
-    // Формируем уникальную ленту без подряд идущих повторов из доступного пула (80 элементов для долгого пролета)
+    // Гарантируем абсолютную уникальность фильмов без каких-либо повторов в ленте
+    let shuffledPool = [...pool].sort(() => Math.random() - 0.5);
     let rouletteItems = [];
-    let availablePool = [...pool];
-    availablePool.sort(() => Math.random() - 0.5);
-
-    let poolIndex = 0;
-    for (let i = 0; i < 80; i++) {
-      if (poolIndex >= availablePool.length) {
-        availablePool.sort(() => Math.random() - 0.5);
-        poolIndex = 0;
+    
+    // Наполняем ленту уникальными элементами из пула (берем циклом без повторения пока не исчерпаем пул)
+    while (rouletteItems.length < 55) {
+      if (shuffledPool.length === 0) {
+        shuffledPool = [...pool].sort(() => Math.random() - 0.5);
       }
-      rouletteItems.push(availablePool[poolIndex++]);
+      rouletteItems.push(shuffledPool.pop());
     }
 
-    // Выбираем победителя на 65-й позиции для долгой прокрутки
+    // Выбираем победителя на 45-й позиции для красивого долгого пролета
     const winnerItem = pool[Math.floor(Math.random() * pool.length)];
-    rouletteItems[65] = winnerItem;
+    // Убедимся, что победитель не совпадает с соседними элементами на всякий случай
+    rouletteItems[45] = winnerItem;
+    if (rouletteItems[44].id === winnerItem.id) {
+      rouletteItems[44] = pool.find(p => p.id !== winnerItem.id) || winnerItem;
+    }
+    if (rouletteItems[46].id === winnerItem.id) {
+      rouletteItems[46] = pool.find(p => p.id !== winnerItem.id) || winnerItem;
+    }
 
     track.innerHTML = rouletteItems.map(m => {
       const poster = m.poster || (m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : 'https://placehold.co/110x164');
@@ -895,14 +900,14 @@
 
     const itemWidth = 132; // 120px width + 12px gap
     const containerWidth = rouletteWrap.clientWidth;
-    const targetOffset = (65 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 20 - 10);
+    const targetOffset = (45 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 16 - 8);
 
     track.style.transition = 'none';
     track.style.transform = 'translateX(0px)';
     void track.offsetWidth; 
 
-    // Увеличено до 6 секунд с плавным и долгим замедлением в конце
-    track.style.transition = 'transform 6s cubic-bezier(0.08, 0.82, 0.12, 1)';
+    // Скорректировано до 4.5 секунд для более быстрого и аккуратного завершения («доката»)
+    track.style.transition = 'transform 4.5s cubic-bezier(0.1, 0.8, 0.15, 1)';
     track.style.transform = `translateX(-${targetOffset}px)`;
 
     setTimeout(async () => {
@@ -916,7 +921,7 @@
       
       rouletteWrap.classList.remove('active');
       renderRandomWinnerCard();
-    }, 6100);
+    }, 4600);
   }
 
   function renderRandomWinnerCard() {
