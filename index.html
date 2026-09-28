@@ -639,7 +639,7 @@
 
   <!-- Модальное окно выбора жанра -->
   <div id="genreModal" class="genre-modal hidden">
-    <button type="button" class="btn-close-config" onclick="toggleGenreModal()" title="Закрыть">&times;</button>
+    <button type="button" class="btn-close-config" onclick="closeGenreModal()" title="Закрыть">&times;</button>
     <div class="config-title">Фильтр по жанрам</div>
     <div class="genre-modal-grid" id="genreModalGrid"></div>
   </div>
@@ -726,15 +726,22 @@
 
   function toggleGenreModal() {
     const modal = document.getElementById('genreModal');
-    if (modal.classList.contains('hidden')) {
+    if (modal.classList.contains('hidden') || modal.classList.contains('hiding')) {
       modal.classList.remove('hidden');
       modal.classList.remove('hiding');
     } else {
+      closeGenreModal();
+    }
+  }
+
+  function closeGenreModal() {
+    const modal = document.getElementById('genreModal');
+    if (!modal.classList.contains('hidden') && !modal.classList.contains('hiding')) {
       modal.classList.add('hiding');
       setTimeout(() => {
         modal.classList.add('hidden');
         modal.classList.remove('hiding');
-      }, 200); // Время должно совпадать с длительностью анимации fadeOut в CSS
+      }, 200);
     }
   }
 
@@ -1076,7 +1083,7 @@
   function selectGenre(val, name) {
     activeSub = val;
     document.getElementById('currentGenreLabel').textContent = name;
-    toggleGenreModal();
+    closeGenreModal();
     updateGenreFilterOptions();
     render();
   }
