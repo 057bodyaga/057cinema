@@ -523,14 +523,6 @@
             <option value="watched">Уже посмотрели</option>
           </select>
         </div>
-        <div class="field watched-only hidden">
-          <label>Кто смотрел?</label>
-          <select id="selCategory" onchange="onCategoryChange()">
-            <option value="joint">🍿 Совместный</option>
-            <option value="boy">👨 Бодяга</option>
-            <option value="girl">👩 Каракумикуи</option>
-          </select>
-        </div>
       </div>
       <div class="row watched-only hidden">
         <div class="field" id="boyField">
@@ -559,10 +551,7 @@
     <div class="select-wrap">
       <label for="selFilter">Фильтр:</label>
       <select id="selFilter" class="custom-select" onchange="changeSubFilter(this.value)">
-        <option value="all">Все</option>
-        <option value="joint">🍿 Совместный</option>
-        <option value="boy">👨 Бодяга</option>
-        <option value="girl">👩 Каракумикуи</option>
+        <option value="all">Все жанры</option>
       </select>
     </div>
 
@@ -584,7 +573,6 @@
 
 <script>
   const TMDB_KEY = 'af2e801d23d9fad3c709a796331ac8f7';
-  const LABELS   = { joint: '🍿 Совместный', boy: '👨 Бодяга', girl: '👩 Каракумикуи' };
   const GH_USER  = '057bodyaga'; 
   const GH_REPO  = '057cinema';
 
@@ -739,6 +727,7 @@
       db = JSON.parse(jsonString);
       
       updateFooterInfo(token);
+      updateGenreFilterOptions();
       render();
     } catch (e) {
       document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить movies.json. Либо файла нет, либо токен не даёт доступ.</div>';
@@ -760,6 +749,7 @@
       if (res.ok) { 
         fileSha = (await res.json()).content.sha; 
         updateFooterInfo(token);
+        updateGenreFilterOptions();
         render(); 
       } else { 
         alert("GitHub отклонил сохранение. Проверьте права токена!"); 
@@ -854,7 +844,7 @@
     
     if (activeSub !== 'all') {
       const m = db.find(x => x.id === id);
-      if (m && m.category !== activeSub) {
+      if (m && m.genre && !m.genre.toLowerCase().includes(activeSub.toLowerCase())) {
         activeSub = 'all';
         document.getElementById('selFilter').value = 'all';
         render();
@@ -887,20 +877,23 @@
     onStatusChange();
   }
 
-  function onStatusChange() { const isW = document.getElementById('selStatus').value === 'watched'; document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); if (isW) onCategoryChange(); }
-  function onCategoryChange() { const c = document.getElementById('selCategory').value; document.getElementById('boyField').classList.toggle('hidden', c === 'girl'); document.getElementById('girlField').classList.toggle('hidden', c === 'boy'); }
+  function onStatusChange() { 
+    const isW = document.getElementById('selStatus').value === 'watched'; 
+    document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); 
+  }
 
   function saveMovie() {
     if (!pending || !hasToken()) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
-    const status = document.getElementById('selStatus').value; const cat = status === 'watched' ? document.getElementById('selCategory').value : 'watchlist';
+    const status = document.getElementById('selStatus').value; 
+    const cat = status === 'watched' ? 'joint' : 'watchlist';
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
       poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
       year: pending.release_date?.substring(0,4) || pending.year || '—', 
       genre: pending._genre || pending.genre || '',
       status, category: cat,
-      scoreBoy: (status === 'watched' && cat !== 'girl') ? parseFloat(document.getElementById('sliBoy').value) : null,
-      scoreGirl: (status === 'watched' && cat !== 'boy') ? parseFloat(document.getElementById('sliGirl').value) : null,
+      scoreBoy: status === 'watched' ? 5 : null,
+      scoreGirl: status === 'watched' ? 5 : null,
       comment: status === 'watched' ? document.getElementById('txtComment').value.trim() : ''
     });
     document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
@@ -912,7 +905,6 @@
     document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; 
     
     if(m.status === 'watched') {
-      document.getElementById('selCategory').value = m.category;
       const bScore = m.scoreBoy ?? 5;
       const gScore = m.scoreGirl ?? 5;
       document.getElementById('sliBoy').value = bScore;
@@ -954,6 +946,36 @@
     render(); 
   }
 
+  function updateGenreFilterOptions() {
+    const selFilter = document.getElementById('selFilter');
+    const watchedMovies = db.filter(x => x.status === 'watched');
+    
+    const genresSet = new Set();
+    watchedMovies.forEach(m => {
+      if (m.genre) {
+        m.genre.split(',').forEach(g => {
+          const trimmed = g.trim();
+          if (trimmed) genresSet.add(trimmed);
+        });
+      }
+    });
+
+    const sortedGenres = Array.from(genresSet).sort((a, b) => a.localeCompare(b));
+    const currentVal = activeSub;
+
+    let html = '<option value="all">Все жанры</option>';
+    sortedGenres.forEach(g => {
+      const selected = currentVal === g ? 'selected' : '';
+      html += `<option value="${esc(g)}" ${selected}>${esc(g)}</option>`;
+    });
+
+    selFilter.innerHTML = html;
+    if (!genresSet.has(currentVal) && currentVal !== 'all') {
+      activeSub = 'all';
+      selFilter.value = 'all';
+    }
+  }
+
   function changeSubFilter(val) { activeSub = val; render(); }
   function changeSort(val) { activeSort = val; render(); }
 
@@ -980,7 +1002,6 @@
     const isAuthorized = hasToken();
     const addPanel = document.getElementById('addPanel');
 
-    // Если токена нет и мы во вкладке "Нужно посмотреть", скрываем панель поиска полностью
     if (!isAuthorized && activeTab === 'watchlist') {
       addPanel.classList.add('hidden');
     } else {
@@ -991,16 +1012,14 @@
 
     if (activeTab === 'watched') {
       if (activeSub !== 'all') {
-        list = list.filter(x => x.category === activeSub);
+        list = list.filter(x => x.genre && x.genre.toLowerCase().includes(activeSub.toLowerCase()));
       }
 
       if (activeSort === 'newest') {
         // Сначала новые
       } else if (activeSort === 'oldest') {
-        // Сначала старые
         list = list.slice().reverse();
       } else if (activeSort === 'score') {
-        // По средней оценке
         list.sort((a, b) => getAvgScore(b) - getAvgScore(a));
       }
     }
@@ -1015,13 +1034,7 @@
       if (m.status === 'watched') {
         const avg = getAvgScore(m);
         const avgTag = avg > 0 ? `<span class="tag tag-avg">⭐ ${avg.toFixed(1)}/10</span>` : '';
-        
-        const hasBothScores = m.scoreBoy != null && m.scoreGirl != null;
-        const categoryTag = (!hasBothScores && LABELS[m.category]) 
-          ? `<span class="tag tag-viewer">${LABELS[m.category]}</span>` 
-          : '';
-
-        tags = `${categoryTag}${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
+        tags = `${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
       }
 
       const isWatchlist = m.status === 'watchlist';
@@ -1029,7 +1042,6 @@
         ? `<div class="card-desc">${esc(m.overview)}</div>` 
         : `<div id="desc-${m.id}" class="card-desc hidden">${esc(m.overview)}</div>`;
 
-      // Формирование кнопок в зависимости от наличия токена
       let acts = '';
       if (isAuthorized) {
         acts = isWatchlist
@@ -1039,7 +1051,6 @@
              <button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>
              <button class="btn-action btn-delete" onclick="deleteMovie(${m.id})">Удалить</button>`;
       } else {
-        // Режим чтения (без ключа)
         acts = !isWatchlist
           ? `<button id="btn-desc-${m.id}" class="btn-action btn-desc-action" onclick="toggleDesc(${m.id})">Описание фильма</button>`
           : '';
