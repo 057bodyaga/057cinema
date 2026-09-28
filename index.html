@@ -220,7 +220,7 @@
     .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
     .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); margin-bottom: -12px; padding-bottom: 12px; }
 
-    /* Стили для вкладки «Случайный» и кейс-рулетки */
+    /* Стили для вкладки «Случайный» и увеличенной рулетки */
     .random-tab-panel {
       background: var(--panel);
       backdrop-filter: blur(12px);
@@ -282,18 +282,18 @@
     .btn-reroll:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-reroll:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-    /* Кейс-рулетка CS2 */
+    /* Увеличенная кейс-рулетка CS2 */
     .case-roulette-wrap {
       position: relative;
       width: 100%;
-      height: 150px;
-      background: rgba(9, 7, 15, 0.9);
+      height: 200px; /* Увеличена высота */
+      background: rgba(9, 7, 15, 0.95);
       border: 2px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
       margin-bottom: 20px;
       display: none;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
     }
     .case-roulette-wrap.active { display: block; }
     .case-pointer {
@@ -304,7 +304,7 @@
       width: 4px;
       height: 100%;
       background: var(--accent2);
-      box-shadow: 0 0 12px var(--accent2);
+      box-shadow: 0 0 15px var(--accent2);
       z-index: 10;
       pointer-events: none;
     }
@@ -312,10 +312,10 @@
       content: '';
       position: absolute;
       top: 0;
-      left: -6px;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 10px solid var(--accent2);
+      left: -7px;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-top: 12px solid var(--accent2);
     }
     .case-track {
       position: absolute;
@@ -324,15 +324,15 @@
       height: 100%;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       will-change: transform;
     }
     .case-item {
-      width: 90px;
-      height: 130px;
+      width: 120px; /* Увеличен размер элементов */
+      height: 176px;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       flex-shrink: 0;
       display: flex;
@@ -342,10 +342,10 @@
       padding: 4px;
     }
     .case-item img {
-      width: 75px;
-      height: 110px;
+      width: 110px;
+      height: 164px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
     }
     
     .sub-tabs { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
@@ -827,28 +827,13 @@
   async function startRoll() {
     if (isRolling) return;
     
-    if (randomMode === 'watchlist') {
-      const list = db.filter(x => x.status === 'watchlist');
-      if (!list.length) {
-        alert("В списке «Нужно посмотреть» пока нет фильмов!");
-        return;
-      }
-    }
-
-    isRolling = true;
-    const btnRoll = document.getElementById('btnRoll');
-    if (btnRoll) btnRoll.disabled = true;
-
-    const rouletteWrap = document.getElementById('caseRouletteWrap');
-    const track = document.getElementById('caseTrack');
-    const resultArea = document.getElementById('randomResultArea');
-    
-    rouletteWrap.classList.add('active');
-    resultArea.innerHTML = '';
-
     let pool = [];
     if (randomMode === 'watchlist') {
       pool = db.filter(x => x.status === 'watchlist');
+      if (!pool.length) {
+        alert("В списке «Нужно посмотреть» пока нет фильмов!");
+        return;
+      }
     } else {
       try {
         const randomPage = Math.floor(Math.random() * 50) + 1;
@@ -872,37 +857,53 @@
 
     if (!pool.length) {
       alert("Не удалось загрузить фильмы для рулетки.");
-      isRolling = false;
-      if (btnRoll) btnRoll.disabled = false;
       return;
     }
 
-    // Выбираем победителя заранее
-    const winnerItem = pool[Math.floor(Math.random() * pool.length)];
+    isRolling = true;
+    const btnRoll = document.getElementById('btnRoll');
+    if (btnRoll) btnRoll.disabled = true;
 
-    // Генерируем ленту для анимации (около 40 элементов, победитель на 30-й позиции)
+    const rouletteWrap = document.getElementById('caseRouletteWrap');
+    const track = document.getElementById('caseTrack');
+    const resultArea = document.getElementById('randomResultArea');
+    
+    rouletteWrap.classList.add('active');
+    resultArea.innerHTML = '';
+
+    // Формируем длинную уникальную ленту без подряд идущих повторов (где возможно)
     let rouletteItems = [];
-    for (let i = 0; i < 40; i++) {
-      const rnd = pool[Math.floor(Math.random() * pool.length)];
+    let lastId = null;
+    
+    // Создаем массив длиной 60 элементов для более долгого кручения
+    for (let i = 0; i < 60; i++) {
+      let filteredPool = pool.filter(m => m.id !== lastId);
+      if (!filteredPool.length) filteredPool = pool;
+      const rnd = filteredPool[Math.floor(Math.random() * filteredPool.length)];
       rouletteItems.push(rnd);
+      lastId = rnd.id;
     }
-    rouletteItems[30] = winnerItem; // Фиксируем победителя
+
+    // Выбираем победителя на 45-й позиции
+    const winnerItem = pool[Math.floor(Math.random() * pool.length)];
+    rouletteItems[45] = winnerItem;
 
     track.innerHTML = rouletteItems.map(m => {
-      const poster = m.poster || (m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : 'https://placehold.co/90x130');
+      const poster = m.poster || (m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : 'https://placehold.co/110x164');
       return `<div class="case-item"><img src="${esc(poster)}"></div>`;
     }).join('');
 
-    // Вычисляем смещение для остановки ровно на 30-м элементе по центру
-    const itemWidth = 100; // 90px width + 10px gap
+    // Вычисляем смещение для остановки ровно на 45-м элементе по центру
+    const itemWidth = 132; // 120px width + 12px gap
     const containerWidth = rouletteWrap.clientWidth;
-    const targetOffset = (30 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 20 - 10);
+    const targetOffset = (45 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 24 - 12);
 
     track.style.transition = 'none';
     track.style.transform = 'translateX(0px)';
     void track.offsetWidth; // сброс стилей
 
-    track.style.transition = 'transform 4s cubic-bezier(0.08, 0.82, 0.12, 1)';
+    // Увеличили длительность до 8 секунд для долгого вращения с плавным замедлением
+    track.style.transition = 'transform 8s cubic-bezier(0.04, 0.75, 0.1, 1)';
     track.style.transform = `translateX(-${targetOffset}px)`;
 
     setTimeout(async () => {
@@ -916,7 +917,7 @@
       
       rouletteWrap.classList.remove('active');
       renderRandomWinnerCard();
-    }, 4100);
+    }, 8100);
   }
 
   function renderRandomWinnerCard() {
