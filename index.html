@@ -7,8 +7,8 @@
   <style>
     :root {
       --bg:          #09070f;
-      --panel:       rgba(19, 15, 34, 0.85); /* Чуطь полупрозрачные панели для кинематографичности */
-      --card:        rgba(26, 21, 46, 0.9);
+      --panel:       rgba(19, 15, 34, 0.88);
+      --card:        rgba(26, 21, 46, 0.92);
       --border:      #2c224d;
       --text:        #f1edf7;
       --muted:       #9c94b0;
@@ -23,7 +23,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     
-    /* Атмосферный фон с постером кинотеатра */
     body { 
       background-color: var(--bg); 
       color: var(--text); 
@@ -33,26 +32,29 @@
       overflow-x: hidden;
     }
 
-    /* Фоновый слой постера с размытием и затемнением */
-    body::before {
-      content: '';
+    /* Плавные фоновые слои для смены постеров */
+    .cinema-bg-layer {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-image: var(--cinema-bg, none);
       background-size: cover;
       background-position: center;
       filter: blur(45px) brightness(0.25) saturate(1.2);
-      transform: scale(1.1); /* Чтобы не было белых краев при размытии */
-      transition: background-image 0.8s ease-in-out;
+      transform: scale(1.1);
+      transition: opacity 1s ease-in-out;
       z-index: -2;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .cinema-bg-layer.active {
+      opacity: 1;
     }
 
-    /* Легкая общая виньетка для глубины */
+    /* Виньетка для глубины */
     body::after {
       content: '';
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle, rgba(9, 7, 15, 0.4) 0%, rgba(9, 7, 15, 0.85) 100%);
+      background: radial-gradient(circle, rgba(9, 7, 15, 0.4) 0%, rgba(9, 7, 15, 0.88) 100%);
       z-index: -1;
       pointer-events: none;
     }
@@ -81,7 +83,7 @@
     .token-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .token-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
     
-    /* Стили для мигающей индикаторной точки (затухание до конца) */
+    /* Стили для мигающей индикаторной точки */
     .status-dot {
       width: 10px;
       height: 10px;
@@ -112,7 +114,6 @@
     .btn-save-token:hover { opacity: 0.88; }
     .status-msg { margin-top: 8px; font-size: 0.88rem; font-weight: 600; }
 
-    /* Информационная плашка в настройках */
     .info-box-settings {
       margin-top: 18px;
       padding-top: 14px;
@@ -144,7 +145,6 @@
     input[type="text"], textarea { width: 100%; padding: 14px 18px; background: rgba(9, 7, 15, 0.8); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; font-family: inherit; }
     input[type="text"]:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
     
-    /* СТИЛЬНЫЙ ВЫЛЕТАЮЩИЙ СПИСОК ПОИСКА */
     .dropdown { 
       position: absolute; 
       top: calc(100% + 10px); 
@@ -203,7 +203,6 @@
     
     .config-form { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; position: relative; }
     
-    /* КРЕСТИК ЗАКРЫТИЯ ФОРМЫ */
     .btn-close-config {
       position: absolute;
       top: 14px;
@@ -241,7 +240,6 @@
     
     .sub-tabs { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
     
-    /* Стили для кнопки-триггера модального окна фильтра жанров */
     .filter-btn-trigger {
       display: inline-flex;
       align-items: center;
@@ -265,7 +263,6 @@
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
-    /* Модальное окно фильтра жанров */
     .genre-modal {
       background: var(--card);
       border: 1px solid var(--border);
@@ -308,7 +305,6 @@
       box-shadow: 0 0 12px var(--accent-glow);
     }
 
-    /* ЕДИНЫЙ СТИЛЬ ДЛЯ ВЫПАДАЮЩИХ СПИСКОВ СОРТИРОВКИ */
     .select-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
     .select-wrap label { font-weight: 600; }
     
@@ -349,18 +345,42 @@
     }
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
-    .card { display: flex; gap: 18px; background: var(--panel); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s, box-shadow .3s, transform .2s; }
-    .card:hover { border-color: rgba(157,78,221,.4); box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
-    .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
+    
+    /* Карточка фильма: плавное увеличение при наведении */
+    .card { 
+      display: flex; 
+      gap: 18px; 
+      background: var(--panel); 
+      backdrop-filter: blur(8px); 
+      -webkit-backdrop-filter: blur(8px); 
+      border: 1px solid var(--border); 
+      border-radius: 16px; 
+      padding: 18px; 
+      transition: border-color .25s, box-shadow .25s, transform .25s; 
+    }
+    .card:hover { 
+      border-color: rgba(157,78,221,.5); 
+      box-shadow: 0 12px 35px rgba(0,0,0,0.6); 
+      transform: scale(1.015); 
+    }
+
+    /* Увеличенные постеры (115px на 172px) */
+    .card-poster { 
+      width: 115px; 
+      height: 172px; 
+      object-fit: cover; 
+      border-radius: 10px; 
+      flex-shrink: 0; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    
     .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
     
-    /* ГОД И ЖАНР */
     .card-meta { color: var(--muted); font-size: .88rem; margin-bottom: 6px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .card-meta .genre { color: rgba(241, 237, 247, 0.7); }
     .card-meta .dot { font-size: 0.6rem; opacity: 0.5; }
 
-    /* ОПИСАНИЕ БЕЗ ФИОЛЕТОВОЙ ПОЛОСКИ СЛЕВА */
     .card-desc { 
       color: var(--muted); 
       font-size: .88rem; 
@@ -385,7 +405,6 @@
     .tag-score  { background: rgba(157,78,221,.12); color: var(--star); }
     .tag-avg    { background: rgba(255,190,11,.15); color: var(--star); font-weight: bold; }
     
-    /* ВЫРАВНИВАНИЕ И КРАСИВЫЕ ОТСТУПЫ ДЛЯ КНОПОК */
     .card-actions { 
       display: flex; 
       flex-direction: column; 
@@ -416,7 +435,6 @@
     .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
     .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); border: 1px solid rgba(255,82,82,.2); }
     
-    /* ЭФФЕКТ ПОДСВЕТКИ КАРТОЧКИ ПРИ ПЕРЕХОДЕ ИЗ ПОИСКА */
     .card-highlight {
       animation: highlightPulse 2.5s ease-out;
     }
@@ -427,7 +445,6 @@
       100% { border-color: var(--border); box-shadow: none; transform: scale(1); }
     }
 
-    /* КНОПКА ПРОКРУТКИ ВНИЗ */
     .btn-scroll-bottom {
       position: fixed;
       bottom: 24px;
@@ -461,9 +478,6 @@
     .loading { text-align: center; padding: 40px; color: var(--muted); }
     .hidden { display: none !important; }
 
-    /* ==========================================
-       АДАПТИВНАЯ МОБИЛЬНАЯ ВЕРСИЯ (экран < 768px)
-       ========================================== */
     @media (max-width: 768px) {
       .wrap {
         padding: 20px 12px 80px;
@@ -505,7 +519,6 @@
         height: 24px;
       }
 
-      /* Перевод карточки фильма в вертикальный вид */
       .card {
         flex-direction: column;
         align-items: center;
@@ -514,8 +527,8 @@
       }
 
       .card-poster {
-        width: 120px;
-        height: 180px;
+        width: 130px;
+        height: 195px;
       }
 
       .card-body {
@@ -546,7 +559,6 @@
         font-size: 0.95rem;
       }
 
-      /* Табы и выпадающие списки */
       .tabs {
         justify-content: center;
       }
@@ -572,7 +584,6 @@
         max-width: 200px;
       }
 
-      /* Список выпадающего поиска */
       .dropdown {
         max-height: 280px;
       }
@@ -590,7 +601,6 @@
         font-size: 0.9rem;
       }
 
-      /* Плавающая кнопка "Вниз" */
       .btn-scroll-bottom {
         bottom: 16px;
         right: 16px;
@@ -601,6 +611,11 @@
   </style>
 </head>
 <body>
+
+<!-- Двойной слой для плавного перелива фоновых постеров -->
+<div id="bgLayer1" class="cinema-bg-layer active"></div>
+<div id="bgLayer2" class="cinema-bg-layer"></div>
+
 <div class="wrap">
   
   <div class="header-zone">
@@ -710,6 +725,8 @@
   };
 
   let db= []; activeTab='watchlist'; activeSub='all'; activeSort='newest'; pending= null; searchTimer= null; fileSha= null;
+  let activeBgLayer = 1;
+  let currentBgPoster = '';
 
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
   updateIndicator();
@@ -841,16 +858,29 @@
     document.getElementById('lastUpdatedText').textContent = commitDate || formatDate(new Date());
   }
 
-  // Установка фонового постера кинотеатра
+  // Абсолютно плавная смена фонового постера через два слоя
   function setCinemaBackground(posterUrl) {
-    if (posterUrl) {
-      document.body.style.setProperty('--cinema-bg', `url('${posterUrl}')`);
+    if (!posterUrl || currentBgPoster === posterUrl) return;
+    currentBgPoster = posterUrl;
+
+    const layer1 = document.getElementById('bgLayer1');
+    const layer2 = document.getElementById('bgLayer2');
+
+    if (activeBgLayer === 1) {
+      layer2.style.backgroundImage = `url('${posterUrl}')`;
+      layer2.classList.add('active');
+      layer1.classList.remove('active');
+      activeBgLayer = 2;
+    } else {
+      layer1.style.backgroundImage = `url('${posterUrl}')`;
+      layer1.classList.add('active');
+      layer2.classList.remove('active');
+      activeBgLayer = 1;
     }
   }
 
   function updateDefaultBackground() {
     if (db.length > 0) {
-      // Берем случайный постер из базы для атмосферы по умолчанию
       const randomMovie = db[Math.floor(Math.random() * db.length)];
       if (randomMovie && randomMovie.poster) {
         setCinemaBackground(randomMovie.poster);
@@ -1053,7 +1083,7 @@
     const cat = status === 'watched' ? 'joint' : 'watchlist';
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
-      poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/95x142'),
+      poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/115x172'),
       year: pending.release_date?.substring(0,4) || pending.year || '—', 
       genre: pending._genre || pending.genre || '',
       status, category: cat,
