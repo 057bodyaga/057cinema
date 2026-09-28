@@ -44,9 +44,7 @@
       pointer-events: none;
       opacity: 0;
     }
-    .cinema-bg-layer.active {
-      opacity: 1;
-    }
+    .cinema-bg-layer.active { opacity: 1; }
 
     body::after {
       content: '';
@@ -86,14 +84,8 @@
       display: inline-block;
       animation: pulseDot 2s infinite ease-in-out;
     }
-    .status-dot.online {
-      background-color: var(--success);
-      box-shadow: 0 0 8px var(--success);
-    }
-    .status-dot.offline {
-      background-color: var(--danger);
-      box-shadow: 0 0 8px var(--danger);
-    }
+    .status-dot.online { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
+    .status-dot.offline { background-color: var(--danger); box-shadow: 0 0 8px var(--danger); }
 
     @keyframes pulseDot {
       0% { transform: scale(0.9); opacity: 1; }
@@ -120,10 +112,7 @@
       flex-direction: column;
       gap: 4px;
     }
-    .info-box-settings div span {
-      color: var(--text);
-      font-weight: 600;
-    }
+    .info-box-settings div span { color: var(--text); font-weight: 600; }
 
     .add-panel { 
       background: linear-gradient(135deg, var(--panel), rgba(23, 18, 43, 0.9)); 
@@ -211,10 +200,7 @@
       cursor: pointer;
       transition: color .2s, transform .2s;
     }
-    .btn-close-config:hover {
-      color: var(--accent);
-      transform: scale(1.15);
-    }
+    .btn-close-config:hover { color: var(--accent); transform: scale(1.15); }
 
     .config-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; color: var(--text); padding-right: 30px; }
     .row { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -230,62 +216,70 @@
     .btn-primary:disabled { opacity: .45; cursor: default; }
     
     .tabs-container { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-    .tabs { display: flex; gap: 6px; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
     .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
     .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); margin-bottom: -12px; padding-bottom: 12px; }
 
-    /* Дропдаун случайного фильма */
-    .random-dropdown-wrap { position: relative; display: inline-block; }
-    .btn-random-trigger {
-      background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(247, 37, 133, 0.2));
-      border: 1px solid rgba(157, 78, 221, 0.4);
-      color: var(--text);
-      padding: 9px 18px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 10px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-    .btn-random-trigger:hover {
-      border-color: var(--accent);
-      background: linear-gradient(135deg, rgba(157, 78, 221, 0.35), rgba(247, 37, 133, 0.35));
-      box-shadow: 0 0 15px var(--accent-glow);
-    }
-    .random-menu {
-      position: absolute;
-      right: 0;
-      top: calc(100% + 8px);
-      background: rgba(26, 21, 46, 0.95);
+    /* Стили для вкладки «Случайный» */
+    .random-tab-panel {
+      background: var(--panel);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(157, 78, 221, 0.3);
-      border-radius: 14px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 15px rgba(157, 78, 221, 0.15);
-      padding: 6px;
-      z-index: 250;
-      min-width: 250px;
-      animation: fadeIn 0.2s ease-out;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      animation: fadeIn 0.25s ease-out;
     }
-    .random-menu-item {
-      padding: 11px 14px;
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 0.9rem;
+    .random-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-random-mode {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 18px;
+      background: rgba(9, 7, 15, 0.8);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      transition: all 0.25s ease;
+      text-align: center;
     }
-    .random-menu-item:hover {
-      background: rgba(157, 78, 221, 0.25);
+    .btn-random-mode:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .btn-random-mode.active {
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(247, 37, 133, 0.25));
+      border-color: var(--accent);
       color: #fff;
+      box-shadow: 0 0 15px var(--accent-glow);
     }
+    .random-action-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .btn-reroll {
+      flex: 1;
+      padding: 14px;
+      background: linear-gradient(45deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+    .btn-reroll:hover { opacity: 0.9; transform: translateY(-1px); }
     
     .sub-tabs { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
     
@@ -303,14 +297,7 @@
       cursor: pointer;
       transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
     }
-    .filter-btn-trigger:hover {
-      border-color: var(--accent);
-      background-color: var(--card);
-    }
-    .filter-btn-trigger:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
+    .filter-btn-trigger:hover { border-color: var(--accent); background-color: var(--card); }
 
     .genre-modal {
       background: var(--card);
@@ -322,15 +309,8 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       animation: fadeIn 0.2s ease-out forwards;
     }
-    .genre-modal.hiding {
-      animation: fadeOut 0.2s ease-in forwards;
-    }
-    .genre-modal-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
+    .genre-modal.hiding { animation: fadeOut 0.2s ease-in forwards; }
+    .genre-modal-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .genre-chip {
       padding: 8px 14px;
       background: rgba(9, 7, 15, 0.8);
@@ -342,11 +322,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    .genre-chip:hover {
-      border-color: var(--accent);
-      color: var(--text);
-      transform: translateY(-1px);
-    }
+    .genre-chip:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
     .genre-chip.active {
       background: linear-gradient(135deg, rgba(157, 78, 221, 0.3), rgba(247, 37, 133, 0.2));
       border-color: var(--accent);
@@ -378,24 +354,9 @@
       appearance: none;
       transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s, transform 0.2s;
     }
-
-    .custom-select:hover {
-      border-color: var(--accent);
-      background-color: var(--card);
-      transform: translateY(-1px);
-    }
-
-    .custom-select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 12px var(--accent-glow);
-    }
-
-    .custom-select option {
-      background-color: #130f22;
-      color: var(--text);
-      padding: 12px;
-      text-align: center;
-    }
+    .custom-select:hover { border-color: var(--accent); background-color: var(--card); transform: translateY(-1px); }
+    .custom-select:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+    .custom-select option { background-color: #130f22; color: var(--text); padding: 12px; text-align: center; }
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
     
@@ -487,10 +448,7 @@
       border: 1px solid rgba(157, 78, 221, 0.4);
       box-shadow: 0 4px 12px rgba(131, 38, 92, 0.25); 
     }
-    .btn-watched:hover {
-      border-color: var(--accent);
-      box-shadow: 0 6px 16px var(--accent-glow);
-    }
+    .btn-watched:hover { border-color: var(--accent); box-shadow: 0 6px 16px var(--accent-glow); }
 
     .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); border: 1px solid rgba(157,78,221,.4); }
     .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
@@ -550,11 +508,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
+    .stat-label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
 
     .btn-scroll-bottom {
       position: fixed;
@@ -577,7 +531,6 @@
       z-index: 99;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
-
     .btn-scroll-bottom:hover {
       color: var(--text);
       border-color: var(--accent);
@@ -590,156 +543,33 @@
     .hidden { display: none !important; }
 
     @media (max-width: 768px) {
-      .wrap {
-        padding: 20px 12px 80px;
-      }
-
-      .site-title {
-        font-size: 2rem;
-      }
-
-      .token-flex {
-        flex-direction: column;
-      }
-
-      .token-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-
-      .add-panel {
-        padding: 16px;
-        border-radius: 16px;
-      }
-
-      .config-form {
-        padding: 16px 12px;
-      }
-
-      .field {
-        min-width: 100%;
-      }
-
-      .row {
-        gap: 12px;
-        margin-bottom: 10px;
-      }
-
-      input[type="range"] {
-        height: 24px;
-      }
-
-      .card {
-        flex-direction: column;
-        align-items: center;
-        gap: 14px;
-        padding: 16px;
-      }
-
-      .card-poster {
-        width: 130px;
-        height: 182px;
-      }
-
-      .card-body {
-        width: 100%;
-        text-align: center;
-      }
-
-      .card-meta {
-        justify-content: center;
-      }
-
-      .card-tags {
-        justify-content: center;
-        margin-top: 8px;
-      }
-
-      .card-actions {
-        width: 100%;
-        flex-direction: column;
-        gap: 8px;
-        padding-top: 12px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-      }
-
-      .btn-action {
-        width: 100%;
-        padding: 12px;
-        font-size: 0.95rem;
-      }
-
-      .tabs-container {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .tabs {
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .tab {
-        padding: 8px 14px;
-        font-size: 0.95rem;
-      }
-
-      .random-dropdown-wrap {
-        width: 100%;
-        display: block;
-      }
-
-      .btn-random-trigger {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .random-menu {
-        left: 0;
-        right: 0;
-        width: 100%;
-      }
-
-      .sub-tabs {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-
-      .select-wrap {
-        justify-content: space-between;
-        width: 100%;
-      }
-
-      .custom-select {
-        flex: 1;
-        max-width: 200px;
-      }
-
-      .dropdown {
-        max-height: 280px;
-      }
-
-      .dropdown-item {
-        padding: 8px;
-      }
-
-      .dropdown-item img {
-        width: 38px;
-        height: 56px;
-      }
-
-      .dropdown-item h4 {
-        font-size: 0.9rem;
-      }
-
-      .btn-scroll-bottom {
-        bottom: 16px;
-        right: 16px;
-        width: 46px;
-        height: 46px;
-      }
+      .wrap { padding: 20px 12px 80px; }
+      .site-title { font-size: 2rem; }
+      .token-flex { flex-direction: column; }
+      .token-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .add-panel { padding: 16px; border-radius: 16px; }
+      .config-form { padding: 16px 12px; }
+      .field { min-width: 100%; }
+      .row { gap: 12px; margin-bottom: 10px; }
+      input[type="range"] { height: 24px; }
+      .card { flex-direction: column; align-items: center; gap: 14px; padding: 16px; }
+      .card-poster { width: 130px; height: 182px; }
+      .card-body { width: 100%; text-align: center; }
+      .card-meta { justify-content: center; }
+      .card-tags { justify-content: center; margin-top: 8px; }
+      .card-actions { width: 100%; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+      .btn-action { width: 100%; padding: 12px; font-size: 0.95rem; }
+      .tabs-container { flex-direction: column; align-items: stretch; }
+      .tabs { justify-content: center; flex-wrap: wrap; }
+      .tab { padding: 8px 14px; font-size: 0.95rem; }
+      .sub-tabs { flex-direction: column; align-items: stretch; gap: 10px; }
+      .select-wrap { justify-content: space-between; width: 100%; }
+      .custom-select { flex: 1; max-width: 200px; }
+      .dropdown { max-height: 280px; }
+      .dropdown-item { padding: 8px; }
+      .dropdown-item img { width: 38px; height: 56px; }
+      .dropdown-item h4 { font-size: 0.9rem; }
+      .btn-scroll-bottom { bottom: 16px; right: 16px; width: 46px; height: 46px; }
     }
   </style>
 </head>
@@ -810,18 +640,8 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab(this,'watchlist')">Нужно посмотреть</button>
       <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
+      <button class="tab"        onclick="switchTab(this,'random')">Случайный</button>
       <button class="tab"        onclick="switchTab(this,'stats')">Статистика</button>
-    </div>
-    
-    <div class="random-dropdown-wrap">
-      <button type="button" class="btn-random-trigger" onclick="toggleRandomMenu(event)">
-        Случайный фильм ▼
-      </button>
-      <div id="randomMenu" class="random-menu hidden">
-        <div class="random-menu-item" onclick="pickRandomMovie('watchlist')">Из «Нужно посмотреть»</div>
-        <div class="random-menu-item" onclick="pickRandomMovie('all_local')">Из всех ваших фильмов</div>
-        <div class="random-menu-item" onclick="pickRandomMovie('world')">Вообще из всех в мире</div>
-      </div>
     </div>
   </div>
 
@@ -871,12 +691,14 @@
   let activeBgLayer = 1;
   let currentBgPoster = '';
 
+  // Переменные для режима вкладки «Случайный»
+  let randomMode = 'watchlist'; // 'watchlist' или 'world'
+  let currentRandomMovie = null;
+
   document.getElementById('tokenInput').value = localStorage.getItem('gh_token') || '';
   updateIndicator();
 
-  function hasToken() {
-    return !!localStorage.getItem('gh_token');
-  }
+  function hasToken() { return !!localStorage.getItem('gh_token'); }
 
   function updateIndicator() {
     const dot = document.getElementById('statusDot');
@@ -902,43 +724,44 @@
     document.getElementById('tokenPanel').classList.toggle('hidden');
   }
 
-  function toggleRandomMenu(e) {
-    e.stopPropagation();
-    const menu = document.getElementById('randomMenu');
-    menu.classList.toggle('hidden');
+  function setRandomMode(mode) {
+    randomMode = mode;
+    document.getElementById('btnModeWatchlist').classList.toggle('active', mode === 'watchlist');
+    document.getElementById('btnModeWorld').classList.toggle('active', mode === 'world');
+    loadRandomMovie();
   }
 
-  async function pickRandomMovie(mode) {
-    document.getElementById('randomMenu').classList.add('hidden');
+  async function loadRandomMovie() {
+    const grid = document.getElementById('grid');
 
-    if (mode === 'watchlist') {
+    if (randomMode === 'watchlist') {
       const list = db.filter(x => x.status === 'watchlist');
       if (!list.length) {
-        alert("В списке «Нужно посмотреть» пока нет фильмов!");
+        grid.innerHTML = `
+          <div class="random-tab-panel">
+            <div class="random-controls">
+              <button type="button" id="btnModeWatchlist" class="btn-random-mode ${randomMode==='watchlist'?'active':''}" onclick="setRandomMode('watchlist')">Из списка нужно посмотреть</button>
+              <button type="button" id="btnModeWorld" class="btn-random-mode ${randomMode==='world'?'active':''}" onclick="setRandomMode('world')">Со всего мира</button>
+            </div>
+            <div class="empty">В списке «Нужно посмотреть» пока нет фильмов</div>
+          </div>
+        `;
         return;
       }
-      const randomItem = list[Math.floor(Math.random() * list.length)];
-      
-      const tabBtn = document.querySelectorAll('.tab')[0];
-      switchTab(tabBtn, 'watchlist');
-      scrollToWatchedMovie(randomItem.id);
+      currentRandomMovie = list[Math.floor(Math.random() * list.length)];
+      renderRandomTabContent();
 
-    } else if (mode === 'all_local') {
-      if (!db.length) {
-        alert("Ваша база фильмов пока пуста!");
-        return;
-      }
-      const randomItem = db[Math.floor(Math.random() * db.length)];
-      
-      const tabIdx = randomItem.status === 'watched' ? 1 : 0;
-      const tabBtn = document.querySelectorAll('.tab')[tabIdx];
-      switchTab(tabBtn, randomItem.status);
-      scrollToWatchedMovie(randomItem.id);
+    } else if (randomMode === 'world') {
+      grid.innerHTML = `
+        <div class="random-tab-panel">
+          <div class="random-controls">
+            <button type="button" id="btnModeWatchlist" class="btn-random-mode ${randomMode==='watchlist'?'active':''}" onclick="setRandomMode('watchlist')">Из списка нужно посмотреть</button>
+            <button type="button" id="btnModeWorld" class="btn-random-mode ${randomMode==='world'?'active':''}" onclick="setRandomMode('world')">Со всего мира</button>
+          </div>
+          <div class="loading">Подбираем случайный фильм со всего мира...</div>
+        </div>
+      `;
 
-    } else if (mode === 'world') {
-      const grid = document.getElementById('grid');
-      grid.innerHTML = '<div class="loading">Подбираем случайный фильм со всего мира...</div>';
-      
       try {
         const randomPage = Math.floor(Math.random() * 300) + 1;
         const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_KEY}&language=ru-RU&sort_by=popularity.desc&page=${randomPage}&vote_count.gte=100`);
@@ -948,29 +771,102 @@
           const randomIndex = Math.floor(Math.random() * data.results.length);
           const m = data.results[randomIndex];
           
-          m._genre = parseGenres(m.genre_ids);
-          m._runtime = await fetchMovieDetails(m.id);
-          pending = m;
+          const genreStr = parseGenres(m.genre_ids);
+          const runtimeVal = await fetchMovieDetails(m.id);
 
-          document.getElementById('searchInput').value = m.title;
-          document.getElementById('configTitle').textContent = `Случайный из мира: "${m.title}"`;
-          document.getElementById('selStatus').value = 'watchlist';
-          document.getElementById('configForm').classList.remove('hidden');
-          document.getElementById('txtComment').value = '';
-          onStatusChange();
-          
-          document.getElementById('configForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-          render();
+          currentRandomMovie = {
+            id: m.id,
+            title: m.title,
+            overview: m.overview || 'Описания нет.',
+            poster: m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : 'https://placehold.co/125x175',
+            year: m.release_date?.substring(0,4) || '—',
+            genre: genreStr,
+            runtime: runtimeVal,
+            vote_average: m.vote_average || 0,
+            status: 'world'
+          };
+          renderRandomTabContent();
         } else {
-          alert("Не удалось найти случайный фильм, попробуйте еще раз.");
-          render();
+          grid.innerHTML = '<div class="empty">Не удалось найти фильм, попробуйте еще раз.</div>';
         }
       } catch (e) {
         console.error(e);
-        alert("Ошибка при запросе случайного фильма.");
-        render();
+        grid.innerHTML = '<div class="empty">Ошибка при запросе случайного фильма.</div>';
       }
     }
+  }
+
+  function renderRandomTabContent() {
+    const grid = document.getElementById('grid');
+    const m = currentRandomMovie;
+    if (!m) return;
+
+    if (m.poster) setCinemaBackground(m.poster);
+
+    let siteScoreHtml = '';
+    if (m.vote_average) {
+      siteScoreHtml = `<span class="tag tag-avg">Сайт TMDB: ${m.vote_average.toFixed(1)}/10</span>`;
+    }
+
+    const genreHtml = m.genre ? `<span class="dot">•</span><span class="genre">${esc(m.genre)}</span>` : '';
+    const runtimeHtml = m.runtime ? `<span class="dot">•</span><span>${m.runtime} мин</span>` : '';
+
+    let actionBtn = '';
+    if (hasToken() && randomMode === 'watchlist') {
+      actionBtn = `<button class="btn-action btn-watched" onclick="markWatched(${m.id})">Посмотрели!</button>`;
+    } else if (hasToken() && randomMode === 'world') {
+      actionBtn = `<button class="btn-action btn-watched" onclick="addWorldMovieToWatchlist()">В нужно посмотреть</button>`;
+    }
+
+    grid.innerHTML = `
+      <div class="random-tab-panel">
+        <div class="random-controls">
+          <button type="button" id="btnModeWatchlist" class="btn-random-mode ${randomMode==='watchlist'?'active':''}" onclick="setRandomMode('watchlist')">Из списка нужно посмотреть</button>
+          <button type="button" id="btnModeWorld" class="btn-random-mode ${randomMode==='world'?'active':''}" onclick="setRandomMode('world')">Со всего мира</button>
+        </div>
+
+        <div class="random-action-row">
+          <button type="button" class="btn-reroll" onclick="loadRandomMovie()">Реролл</button>
+        </div>
+
+        <article class="card" style="margin-top: 15px;">
+          <img class="card-poster" src="${esc(m.poster)}">
+          <div class="card-body">
+            <div class="card-title">${esc(m.title)}</div>
+            <div class="card-meta">
+              <span>${esc(m.year)}</span>
+              ${genreHtml}
+              ${runtimeHtml}
+            </div>
+            <div class="card-desc">${esc(m.overview)}</div>
+            <div class="card-tags">
+              ${siteScoreHtml}
+            </div>
+          </div>
+          ${actionBtn ? `<div class="card-actions">${actionBtn}</div>` : ''}
+        </article>
+      </div>
+    `;
+  }
+
+  async function addWorldMovieToWatchlist() {
+    if (!currentRandomMovie || !hasToken()) return;
+    const m = currentRandomMovie;
+    await apiSave({
+      id: m.id,
+      title: m.title,
+      overview: m.overview,
+      poster: m.poster,
+      year: m.year,
+      genre: m.genre,
+      runtime: m.runtime,
+      status: 'watchlist',
+      category: 'watchlist',
+      scoreBoy: null,
+      scoreGirl: null,
+      comment: ''
+    });
+    alert(`Фильм "${m.title}" добавлен в список «Нужно посмотреть»!`);
   }
 
   function saveTokenBtn() {
@@ -990,10 +886,7 @@
 
   function setMsg(txt, color) {
     const el = document.getElementById('statusMsg');
-    if(el) {
-      el.textContent = txt;
-      el.style.color = color;
-    }
+    if(el) { el.textContent = txt; el.style.color = color; }
   }
 
   function closeConfigForm() {
@@ -1223,10 +1116,7 @@
     if (activeTab === 'watched') {
       searchLocalWatched(q);
     } else {
-      if (!hasToken()) {
-        hideDropdown();
-        return;
-      }
+      if (!hasToken()) { hideDropdown(); return; }
       if (q.length < 2) { hideDropdown(); return; }
       searchTimer = setTimeout(() => fetchMovies(q), 350); 
     }
@@ -1393,7 +1283,13 @@
     updateSearchPlaceholder();
     hideDropdown();
     document.getElementById('searchInput').value = '';
-    render(); 
+
+    if (t === 'random') {
+      document.getElementById('addPanel').classList.add('hidden');
+      loadRandomMovie();
+    } else {
+      render();
+    }
   }
 
   function updateGenreFilterOptions() {
@@ -1511,6 +1407,12 @@
     const isAuthorized = hasToken();
     const addPanel = document.getElementById('addPanel');
 
+    if (activeTab === 'random') {
+      addPanel.classList.add('hidden');
+      loadRandomMovie();
+      return;
+    }
+
     if (activeTab === 'stats') {
       addPanel.classList.add('hidden');
       grid.innerHTML = renderStats();
@@ -1571,14 +1473,8 @@
           : '';
       }
 
-      const commentHtml = (m.status === 'watched' && m.comment) 
-        ? `<div class="card-comment">${esc(m.comment)}</div>` 
-        : '';
-
-      const genreHtml = m.genre 
-        ? `<span class="dot">•</span><span class="genre">${esc(m.genre)}</span>` 
-        : '';
-
+      const commentHtml = (m.status === 'watched' && m.comment) ? `<div class="card-comment">${esc(m.comment)}</div>` : '';
+      const genreHtml = m.genre ? `<span class="dot">•</span><span class="genre">${esc(m.genre)}</span>` : '';
       const actionsHtml = acts ? `<div class="card-actions">${acts}</div>` : '';
 
       return `
@@ -1604,9 +1500,6 @@
   
   document.addEventListener('click', e => { 
     if (!e.target.closest('.search-wrap')) hideDropdown(); 
-    if (!e.target.closest('.random-dropdown-wrap')) {
-      document.getElementById('randomMenu').classList.add('hidden');
-    }
   });
   
   updateSearchPlaceholder();
