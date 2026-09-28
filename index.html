@@ -358,9 +358,10 @@
       transform: scale(1.015); 
     }
 
+    /* Постеры уменьшены в высоте и чуть растянуты по ширине (компактно и гармонично в ряду) */
     .card-poster { 
-      width: 150px; 
-      height: 225px; 
+      width: 125px; 
+      height: 175px; 
       object-fit: cover; 
       border-radius: 10px; 
       flex-shrink: 0; 
@@ -407,7 +408,6 @@
       width: 155px;
     }
     
-    /* Стили кнопок действий теперь полностью гармонируют с сайтом */
     .btn-action { 
       width: 100%;
       padding: 11px 14px; 
@@ -559,8 +559,8 @@
       }
 
       .card-poster {
-        width: 150px;
-        height: 225px;
+        width: 130px;
+        height: 182px;
       }
 
       .card-body {
@@ -948,7 +948,6 @@
       const jsonString = decodeURIComponent(Array.from(raw).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
       db = JSON.parse(jsonString);
       
-      // Автопроверка и дозагрузка длительности фильмов, если её не было
       let needsUpdate = false;
       for (let m of db) {
         if (!m.runtime) {
@@ -1148,7 +1147,7 @@
     const cat = status === 'watched' ? 'joint' : 'watchlist';
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
-      poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/150x225'),
+      poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/125x175'),
       year: pending.release_date?.substring(0,4) || pending.year || '—', 
       genre: pending._genre || pending.genre || '',
       runtime: pending._runtime || 0,
