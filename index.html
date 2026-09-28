@@ -7,8 +7,8 @@
   <style>
     :root {
       --bg:          #09070f;
-      --panel:       #130f22;
-      --card:        #1a152e;
+      --panel:       rgba(19, 15, 34, 0.85); /* Чуطь полупрозрачные панели для кинематографичности */
+      --card:        rgba(26, 21, 46, 0.9);
       --border:      #2c224d;
       --text:        #f1edf7;
       --muted:       #9c94b0;
@@ -22,8 +22,42 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; position: relative; }
+    
+    /* Атмосферный фон с постером кинотеатра */
+    body { 
+      background-color: var(--bg); 
+      color: var(--text); 
+      font-family: 'Segoe UI', sans-serif; 
+      min-height: 100vh; 
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Фоновый слой постера с размытием и затемнением */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: var(--cinema-bg, none);
+      background-size: cover;
+      background-position: center;
+      filter: blur(45px) brightness(0.25) saturate(1.2);
+      transform: scale(1.1); /* Чтобы не было белых краев при размытии */
+      transition: background-image 0.8s ease-in-out;
+      z-index: -2;
+    }
+
+    /* Легкая общая виньетка для глубины */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle, rgba(9, 7, 15, 0.4) 0%, rgba(9, 7, 15, 0.85) 100%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; position: relative; z-index: 1; }
     
     .header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
     .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -34,7 +68,9 @@
 
     /* Панель настроек в стиле сайта */
     .token-panel { 
-      background: linear-gradient(135deg, var(--panel), #17122b); 
+      background: linear-gradient(135deg, var(--panel), rgba(23, 18, 43, 0.9)); 
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border); 
       border-radius: 20px; 
       padding: 24px; 
@@ -69,7 +105,7 @@
     }
 
     .token-flex { display: flex; gap: 10px; max-width: 100%; margin-bottom: 12px; }
-    .token-flex input { flex: 1; padding: 12px 16px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: #fff; outline: none; font-size: 0.95rem; transition: border-color .25s, box-shadow .25s; }
+    .token-flex input { flex: 1; padding: 12px 16px; background: rgba(9, 7, 15, 0.8); border: 2px solid var(--border); border-radius: 12px; color: #fff; outline: none; font-size: 0.95rem; transition: border-color .25s, box-shadow .25s; }
     .token-flex input:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
     
     .btn-save-token { padding: 12px 22px; background: linear-gradient(45deg, var(--accent), var(--accent2)); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
@@ -93,9 +129,19 @@
       font-weight: 600;
     }
 
-    .add-panel { background: linear-gradient(135deg, var(--panel), #17122b); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); position: relative; }
+    .add-panel { 
+      background: linear-gradient(135deg, var(--panel), rgba(23, 18, 43, 0.9)); 
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border); 
+      border-radius: 20px; 
+      padding: 24px; 
+      margin-bottom: 32px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45); 
+      position: relative; 
+    }
     .search-wrap { position: relative; }
-    input[type="text"], textarea { width: 100%; padding: 14px 18px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; font-family: inherit; }
+    input[type="text"], textarea { width: 100%; padding: 14px 18px; background: rgba(9, 7, 15, 0.8); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; font-family: inherit; }
     input[type="text"]:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
     
     /* СТИЛЬНЫЙ ВЫЛЕТАЮЩИЙ СПИСОК ПОИСКА */
@@ -180,7 +226,7 @@
     .row { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
     .field { flex: 1; min-width: 190px; }
     .field label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 7px; }
-    select { width: 100%; padding: 11px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); outline: none; cursor: pointer; }
+    select { width: 100%; padding: 11px 12px; background: rgba(9, 7, 15, 0.8); border: 1px solid var(--border); border-radius: 8px; color: var(--text); outline: none; cursor: pointer; }
     .slider-row { display: flex; align-items: center; gap: 10px; }
     input[type="range"] { flex: 1; accent-color: var(--accent); }
     .score-val { font-weight: 700; color: var(--star); min-width: 32px; }
@@ -241,7 +287,7 @@
     }
     .genre-chip {
       padding: 8px 14px;
-      background: var(--bg);
+      background: rgba(9, 7, 15, 0.8);
       border: 1px solid var(--border);
       border-radius: 10px;
       color: var(--muted);
@@ -303,8 +349,8 @@
     }
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
-    .card { display: flex; gap: 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s, box-shadow .3s; }
-    .card:hover { border-color: rgba(157,78,221,.4); }
+    .card { display: flex; gap: 18px; background: var(--panel); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: border-color .2s, box-shadow .3s, transform .2s; }
+    .card:hover { border-color: rgba(157,78,221,.4); box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     .card-poster { width: 95px; height: 142px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
     .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 3px; }
@@ -795,6 +841,23 @@
     document.getElementById('lastUpdatedText').textContent = commitDate || formatDate(new Date());
   }
 
+  // Установка фонового постера кинотеатра
+  function setCinemaBackground(posterUrl) {
+    if (posterUrl) {
+      document.body.style.setProperty('--cinema-bg', `url('${posterUrl}')`);
+    }
+  }
+
+  function updateDefaultBackground() {
+    if (db.length > 0) {
+      // Берем случайный постер из базы для атмосферы по умолчанию
+      const randomMovie = db[Math.floor(Math.random() * db.length)];
+      if (randomMovie && randomMovie.poster) {
+        setCinemaBackground(randomMovie.poster);
+      }
+    }
+  }
+
   async function apiGet() { 
     const token = localStorage.getItem('gh_token');
     updateIndicator();
@@ -828,6 +891,7 @@
       
       updateFooterInfo(token);
       updateGenreFilterOptions();
+      updateDefaultBackground();
       render();
     } catch (e) {
       document.getElementById('grid').innerHTML = '<div class="empty">Не удалось загрузить movies.json. Либо файла нет, либо токен не даёт доступ.</div>';
@@ -850,6 +914,7 @@
         fileSha = (await res.json()).content.sha; 
         updateFooterInfo(token);
         updateGenreFilterOptions();
+        updateDefaultBackground();
         render(); 
       } else { 
         alert("GitHub отклонил сохранение. Проверьте права токена!"); 
@@ -1178,7 +1243,7 @@
       const actionsHtml = acts ? `<div class="card-actions">${acts}</div>` : '';
 
       return `
-        <article class="card" id="card-${m.id}">
+        <article class="card" id="card-${m.id}" onmouseenter="setCinemaBackground('${esc(m.poster)}')">
           <img class="card-poster" src="${esc(m.poster)}">
           <div class="card-body">
             <div class="card-title">${esc(m.title)}</div>
