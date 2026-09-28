@@ -303,40 +303,45 @@
     .select-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
     .select-wrap label { font-weight: 600; }
     
+    /* Стилизованный селект сортировки с центрированием текста */
     .custom-select { 
-      padding: 8px 32px 8px 14px; 
+      padding: 9px 32px 9px 14px; 
       width: auto; 
       font-size: .88rem; 
       font-weight: 600;
       color: var(--text);
-      background-color: var(--panel);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%209c94b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-color: rgba(16, 12, 27, 0.95);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239c94b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 10px center;
+      background-position: right 12px center;
       border: 1px solid var(--border);
       border-radius: 10px;
       outline: none;
       cursor: pointer;
+      text-align: center;
+      text-align-last: center;
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s, transform 0.2s;
     }
 
     .custom-select:hover {
       border-color: var(--accent);
       background-color: var(--card);
+      transform: translateY(-1px);
     }
 
     .custom-select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent-glow);
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .custom-select option {
-      background-color: var(--card);
+      background-color: #130f22;
       color: var(--text);
-      padding: 10px;
+      padding: 12px;
+      text-align: center;
     }
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
@@ -358,7 +363,6 @@
       transform: scale(1.015); 
     }
 
-    /* Постеры уменьшены в высоте и чуть растянуты по ширине (компактно и гармонично в ряду) */
     .card-poster { 
       width: 125px; 
       height: 175px; 
@@ -411,7 +415,6 @@
     .btn-action { 
       width: 100%;
       padding: 11px 14px; 
-      border: none; 
       border-radius: 10px; 
       font-size: .88rem; 
       font-weight: 600; 
@@ -423,11 +426,36 @@
       align-items: center;
       justify-content: center;
     }
-    .btn-action:hover { opacity: .88; transform: translateY(-1px); }
-    .btn-watched  { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
+    .btn-action:hover { opacity: .92; transform: translateY(-1px); }
+
+    /* Обновленная более темная и глубокая кнопка «Посмотрели!» */
+    .btn-watched { 
+      background: linear-gradient(135deg, rgba(74, 33, 114, 0.9), rgba(131, 38, 92, 0.9)); 
+      color: #fff; 
+      border: 1px solid rgba(157, 78, 221, 0.4);
+      box-shadow: 0 4px 12px rgba(131, 38, 92, 0.25); 
+    }
+    .btn-watched:hover {
+      border-color: var(--accent);
+      box-shadow: 0 6px 16px var(--accent-glow);
+    }
+
     .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); border: 1px solid rgba(157,78,221,.4); }
     .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
-    .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); border: 1px solid rgba(255,82,82,.2); }
+    
+    /* Стилизованная кнопка «Удалить» в гармоничном темном стиле с красным акцентом */
+    .btn-delete { 
+      background: rgba(30, 15, 22, 0.85); 
+      color: #ff6b6b; 
+      border: 1px solid rgba(255, 82, 82, 0.25); 
+      box-shadow: 0 2px 8px rgba(255, 82, 82, 0.1);
+    }
+    .btn-delete:hover {
+      background: rgba(255, 82, 82, 0.15);
+      border-color: rgba(255, 82, 82, 0.5);
+      color: #ff8585;
+      box-shadow: 0 4px 12px rgba(255, 82, 82, 0.2);
+    }
     
     .card-highlight {
       animation: highlightPulse 2.5s ease-out;
