@@ -32,7 +32,6 @@
       overflow-x: hidden;
     }
 
-    /* Плавные фоновые слои для смены постеров */
     .cinema-bg-layer {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -49,7 +48,6 @@
       opacity: 1;
     }
 
-    /* Виньетка для глубины */
     body::after {
       content: '';
       position: fixed;
@@ -64,11 +62,9 @@
     .header-zone { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; }
     .site-title { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    /* Кнопка настройки */
     .btn-settings { position: absolute; right: 0; background: none; border: none; font-size: 1.6rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
     .btn-settings:hover { opacity: 1; }
 
-    /* Панель настроек в стиле сайта */
     .token-panel { 
       background: linear-gradient(135deg, var(--panel), rgba(23, 18, 43, 0.9)); 
       backdrop-filter: blur(12px);
@@ -83,7 +79,6 @@
     .token-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .token-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
     
-    /* Стили для мигающей индикаторной точки */
     .status-dot {
       width: 10px;
       height: 10px;
@@ -346,7 +341,6 @@
 
     .grid { display: flex; flex-direction: column; gap: 18px; }
     
-    /* Карточка фильма: плавное увеличение при наведении */
     .card { 
       display: flex; 
       gap: 18px; 
@@ -364,10 +358,10 @@
       transform: scale(1.015); 
     }
 
-    /* Увеличенные постеры (115px на 172px) */
+    /* Увеличенные постеры (теперь 130px на 195px) */
     .card-poster { 
-      width: 115px; 
-      height: 172px; 
+      width: 130px; 
+      height: 195px; 
       object-fit: cover; 
       border-radius: 10px; 
       flex-shrink: 0; 
@@ -443,6 +437,45 @@
       0% { border-color: var(--accent2); box-shadow: 0 0 25px rgba(247, 37, 133, 0.6); transform: scale(1.02); }
       50% { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
       100% { border-color: var(--border); box-shadow: none; transform: scale(1); }
+    }
+
+    /* Блок статистики */
+    .stats-container {
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      animation: fadeIn 0.25s ease-out;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 600;
     }
 
     .btn-scroll-bottom {
@@ -527,8 +560,8 @@
       }
 
       .card-poster {
-        width: 130px;
-        height: 195px;
+        width: 140px;
+        height: 210px;
       }
 
       .card-body {
@@ -561,11 +594,12 @@
 
       .tabs {
         justify-content: center;
+        flex-wrap: wrap;
       }
 
       .tab {
         padding: 8px 14px;
-        font-size: 0.98rem;
+        font-size: 0.95rem;
       }
 
       .sub-tabs {
@@ -612,7 +646,6 @@
 </head>
 <body>
 
-<!-- Двойной слой для плавного перелива фоновых постеров -->
 <div id="bgLayer1" class="cinema-bg-layer active"></div>
 <div id="bgLayer2" class="cinema-bg-layer"></div>
 
@@ -633,7 +666,6 @@
     </div>
     <div id="statusMsg" class="status-msg"></div>
 
-    <!-- Информационная плашка в настройках -->
     <div id="infoBoxSettings" class="info-box-settings">
       <div>Последнее добавление: <span id="lastAddedText">—</span></div>
       <div>Обновление сайта: <span id="lastUpdatedText">—</span></div>
@@ -678,6 +710,7 @@
   <div class="tabs">
     <button class="tab active" onclick="switchTab(this,'watchlist')">Нужно посмотреть</button>
     <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
+    <button class="tab"        onclick="switchTab(this,'stats')">📊 Статистика</button>
   </div>
 
   <div id="subTabs" class="sub-tabs hidden">
@@ -698,7 +731,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно выбора жанра -->
   <div id="genreModal" class="genre-modal hidden">
     <button type="button" class="btn-close-config" onclick="closeGenreModal()" title="Закрыть">&times;</button>
     <div class="config-title">Фильтр по жанрам</div>
@@ -708,7 +740,6 @@
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
 </div>
 
-<!-- Невзрачная красивая кнопка вниз -->
 <button class="btn-scroll-bottom" onclick="scrollToBottom()" title="В самый низ">↓</button>
 
 <script>
@@ -858,7 +889,6 @@
     document.getElementById('lastUpdatedText').textContent = commitDate || formatDate(new Date());
   }
 
-  // Абсолютно плавная смена фонового постера через два слоя
   function setCinemaBackground(posterUrl) {
     if (!posterUrl || currentBgPoster === posterUrl) return;
     currentBgPoster = posterUrl;
@@ -1083,7 +1113,7 @@
     const cat = status === 'watched' ? 'joint' : 'watchlist';
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
-      poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/115x172'),
+      poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/130x195'),
       year: pending.release_date?.substring(0,4) || pending.year || '—', 
       genre: pending._genre || pending.genre || '',
       status, category: cat,
@@ -1134,9 +1164,14 @@
     activeTab = t; 
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); 
     b.classList.add('active'); 
-    document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); 
+    
+    const isWatched = (t === 'watched');
+    const isStats = (t === 'stats');
+
+    document.getElementById('subTabs').classList.toggle('hidden', !isWatched); 
     document.getElementById('genreModal').classList.add('hidden');
     document.getElementById('genreModal').classList.remove('hiding');
+    
     updateSearchPlaceholder();
     hideDropdown();
     document.getElementById('searchInput').value = '';
@@ -1203,10 +1238,53 @@
     return scores.reduce((a, b) => a + b, 0) / scores.length;
   }
 
+  function renderStats() {
+    const watchedList = db.filter(x => x.status === 'watched');
+    const watchlistList = db.filter(x => x.status === 'watchlist');
+    
+    let totalScore = 0;
+    let scoredCount = 0;
+    watchedList.forEach(m => {
+      const avg = getAvgScore(m);
+      if (avg > 0) {
+        totalScore += avg;
+        scoredCount++;
+      }
+    });
+    const overallAvg = scoredCount > 0 ? (totalScore / scoredCount).toFixed(1) : '—';
+
+    return `
+      <div class="stats-container">
+        <div class="config-title" style="font-size: 1.3rem; margin-bottom: 8px;">📊 Общая статистика кинотеатра</div>
+        <div class="card-desc">Сводные данные по всем вашим совместным просмотрам и планам.</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${watchedList.length}</div>
+            <div class="stat-label">Просмотрено фильмов</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${watchlistList.length}</div>
+            <div class="stat-label">В списке «Нужно посмотреть»</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">⭐ ${overallAvg}</div>
+            <div class="stat-label">Средняя оценка всей коллекции</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   function render() {
     const grid = document.getElementById('grid'); 
     const isAuthorized = hasToken();
     const addPanel = document.getElementById('addPanel');
+
+    if (activeTab === 'stats') {
+      addPanel.classList.add('hidden');
+      grid.innerHTML = renderStats();
+      return;
+    }
 
     if (!isAuthorized && activeTab === 'watchlist') {
       addPanel.classList.add('hidden');
