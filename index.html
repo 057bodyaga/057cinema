@@ -751,7 +751,7 @@
 <div class="wrap">
   
   <div class="header-zone">
-    <h1 class="site-title">🍿 Киношке</h1>
+    <h1 class="site-title">Киношке</h1>
     <button class="btn-settings" onclick="toggleTokenPanel()" title="Настройки">⚙️</button>
   </div>
 
@@ -815,12 +815,12 @@
     
     <div class="random-dropdown-wrap">
       <button type="button" class="btn-random-trigger" onclick="toggleRandomMenu(event)">
-        🎲 Случайный фильм ▼
+        Случайный фильм ▼
       </button>
       <div id="randomMenu" class="random-menu hidden">
-        <div class="random-menu-item" onclick="pickRandomMovie('watchlist')">🎲 Из «Нужно посмотреть»</div>
-        <div class="random-menu-item" onclick="pickRandomMovie('all_local')">🔥 Из всех ваших фильмов</div>
-        <div class="random-menu-item" onclick="pickRandomMovie('world')">🌍 Вообще из всех в мире</div>
+        <div class="random-menu-item" onclick="pickRandomMovie('watchlist')">Из «Нужно посмотреть»</div>
+        <div class="random-menu-item" onclick="pickRandomMovie('all_local')">Из всех ваших фильмов</div>
+        <div class="random-menu-item" onclick="pickRandomMovie('world')">Вообще из всех в мире</div>
       </div>
     </div>
   </div>
@@ -940,7 +940,6 @@
       grid.innerHTML = '<div class="loading">Подбираем случайный фильм со всего мира...</div>';
       
       try {
-        // Генерируем случайную страницу от 1 до 500 для поиска популярного/интересного кино
         const randomPage = Math.floor(Math.random() * 300) + 1;
         const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_KEY}&language=ru-RU&sort_by=popularity.desc&page=${randomPage}&vote_count.gte=100`);
         const data = await res.json();
@@ -1121,7 +1120,7 @@
       
       if (!response.ok) {
         if(token && (response.status === 401 || response.status === 403)) {
-          setMsg("❌ Ошибка: Неверный токен или лимит запросов истек!", "var(--danger)");
+          setMsg("Ошибка: Неверный токен или лимит запросов истек!", "var(--danger)");
         }
         throw new Error();
       }
@@ -1541,7 +1540,7 @@
     }
 
     if (!list.length) { 
-      grid.innerHTML = '<div class="empty">Здесь пока пусто 🎬</div>'; 
+      grid.innerHTML = '<div class="empty">Здесь пока пусто</div>'; 
       return; 
     }
 
