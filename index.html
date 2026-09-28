@@ -190,7 +190,71 @@
     
     .sub-tabs { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
     
-    /* ЕДИНЫЙ СТИЛЬ ДЛЯ ВЫПАДАЮЩИХ СПИСКОВ СОРТИРОВКИ И ФИЛЬТРАЦИИ */
+    /* Стили для кнопки-триггера модального окна фильтра жанров */
+    .filter-btn-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+    }
+    .filter-btn-trigger:hover {
+      border-color: var(--accent);
+      background-color: var(--card);
+    }
+    .filter-btn-trigger:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* Модальное окно фильтра жанров */
+    .genre-modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: fadeIn 0.2s ease-out;
+    }
+    .genre-modal-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .genre-chip {
+      padding: 8px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .genre-chip:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .genre-chip.active {
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.3), rgba(247, 37, 133, 0.2));
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* ЕДИНЫЙ СТИЛЬ ДЛЯ ВЫПАДАЮЩИХ СПИСКОВ СОРТИРОВКИ */
     .select-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
     .select-wrap label { font-weight: 600; }
     
@@ -549,10 +613,10 @@
 
   <div id="subTabs" class="sub-tabs hidden">
     <div class="select-wrap">
-      <label for="selFilter">Фильтр:</label>
-      <select id="selFilter" class="custom-select" onchange="changeSubFilter(this.value)">
-        <option value="all">Все жанры</option>
-      </select>
+      <label>Фильтр:</label>
+      <button type="button" class="filter-btn-trigger" id="genreBtnTrigger" onclick="toggleGenreModal()">
+        <span id="currentGenreLabel">Все жанры</span> ▼
+      </button>
     </div>
 
     <div class="select-wrap">
@@ -563,6 +627,13 @@
         <option value="score">По средней оценке</option>
       </select>
     </div>
+  </div>
+
+  <!-- Модальное окно выбора жанра -->
+  <div id="genreModal" class="genre-modal hidden">
+    <button type="button" class="btn-close-config" onclick="toggleGenreModal()" title="Закрыть">&times;</button>
+    <div class="config-title">Фильтр по жанрам</div>
+    <div class="genre-modal-grid" id="genreModalGrid"></div>
   </div>
 
   <div id="grid" class="grid"><div class="loading">Загрузка...</div></div>
@@ -643,6 +714,10 @@
   function closeConfigForm() {
     document.getElementById('configForm').classList.add('hidden');
     pending = null;
+  }
+
+  function toggleGenreModal() {
+    document.getElementById('genreModal').classList.toggle('hidden');
   }
 
   function scrollToBottom() {
@@ -846,7 +921,7 @@
       const m = db.find(x => x.id === id);
       if (m && m.genre && !m.genre.toLowerCase().includes(activeSub.toLowerCase())) {
         activeSub = 'all';
-        document.getElementById('selFilter').value = 'all';
+        updateGenreFilterOptions();
         render();
       }
     }
@@ -940,6 +1015,7 @@
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); 
     b.classList.add('active'); 
     document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); 
+    document.getElementById('genreModal').classList.add('hidden');
     updateSearchPlaceholder();
     hideDropdown();
     document.getElementById('searchInput').value = '';
@@ -947,7 +1023,8 @@
   }
 
   function updateGenreFilterOptions() {
-    const selFilter = document.getElementById('selFilter');
+    const gridEl = document.getElementById('genreModalGrid');
+    const labelEl = document.getElementById('currentGenreLabel');
     const watchedMovies = db.filter(x => x.status === 'watched');
     
     const genresSet = new Set();
@@ -961,22 +1038,30 @@
     });
 
     const sortedGenres = Array.from(genresSet).sort((a, b) => a.localeCompare(b));
-    const currentVal = activeSub;
+    
+    if (!genresSet.has(activeSub) && activeSub !== 'all') {
+      activeSub = 'all';
+    }
 
-    let html = '<option value="all">Все жанры</option>';
+    labelEl.textContent = activeSub === 'all' ? 'Все жанры' : activeSub;
+
+    let html = `<button type="button" class="genre-chip ${activeSub === 'all' ? 'active' : ''}" onclick="selectGenre('all', 'Все жанры')">Все жанры</button>`;
     sortedGenres.forEach(g => {
-      const selected = currentVal === g ? 'selected' : '';
-      html += `<option value="${esc(g)}" ${selected}>${esc(g)}</option>`;
+      const isActive = activeSub === g ? 'active' : '';
+      html += `<button type="button" class="genre-chip ${isActive}" onclick="selectGenre('${esc(g)}', '${esc(g)}')">${esc(g)}</button>`;
     });
 
-    selFilter.innerHTML = html;
-    if (!genresSet.has(currentVal) && currentVal !== 'all') {
-      activeSub = 'all';
-      selFilter.value = 'all';
-    }
+    gridEl.innerHTML = html;
   }
 
-  function changeSubFilter(val) { activeSub = val; render(); }
+  function selectGenre(val, name) {
+    activeSub = val;
+    document.getElementById('currentGenreLabel').textContent = name;
+    document.getElementById('genreModal').classList.add('hidden');
+    updateGenreFilterOptions();
+    render();
+  }
+
   function changeSort(val) { activeSort = val; render(); }
 
   function toggleDesc(id) {
