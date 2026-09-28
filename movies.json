@@ -11,7 +11,8 @@
     "scoreGirl": 3.5,
     "comment": "Концовка неожиданная, фильм с ИИ кадрами, куча мяса и детей актеров, прикольный саундтрек",
     "addedAt": 1790539400884,
-    "genre": "комедия, ужасы"
+    "genre": "комедия, ужасы",
+    "runtime": 86
   },
   {
     "id": 161,
@@ -23,7 +24,8 @@
     "category": "joint",
     "scoreBoy": 9,
     "scoreGirl": 8,
-    "genre": "триллер, криминал"
+    "genre": "триллер, криминал",
+    "runtime": 116
   },
   {
     "id": 1423191,
@@ -35,7 +37,8 @@
     "category": "joint",
     "scoreBoy": 5,
     "scoreGirl": 5,
-    "genre": "ужасы, фантастика"
+    "genre": "ужасы, фантастика",
+    "runtime": 95
   },
   {
     "id": 23082,
@@ -47,7 +50,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 7,
-    "genre": "комедия, фэнтези"
+    "genre": "комедия, фэнтези",
+    "runtime": 139
   },
   {
     "id": 1291595,
@@ -59,7 +63,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 8,
-    "genre": "ужасы, триллер"
+    "genre": "ужасы, триллер",
+    "runtime": 106
   },
   {
     "id": 1516724,
@@ -71,7 +76,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 6,
-    "genre": "комедия"
+    "genre": "комедия",
+    "runtime": 95
   },
   {
     "id": 985939,
@@ -83,7 +89,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 8,
-    "genre": "триллер"
+    "genre": "триллер",
+    "runtime": 107
   },
   {
     "id": 1273221,
@@ -95,7 +102,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 7,
-    "genre": "комедия"
+    "genre": "комедия",
+    "runtime": 96
   },
   {
     "id": 1284041,
@@ -107,7 +115,8 @@
     "category": "joint",
     "scoreBoy": 5,
     "scoreGirl": 6,
-    "genre": "ужасы, фантастика"
+    "genre": "ужасы, фантастика",
+    "runtime": 110
   },
   {
     "id": 1083381,
@@ -119,7 +128,8 @@
     "category": "joint",
     "scoreBoy": 2,
     "scoreGirl": 2,
-    "genre": "ужасы, детектив"
+    "genre": "ужасы, детектив",
+    "runtime": 110
   },
   {
     "id": 1398050,
@@ -131,7 +141,8 @@
     "category": "watchlist",
     "scoreBoy": null,
     "scoreGirl": null,
-    "genre": "комедия"
+    "genre": "комедия",
+    "runtime": 102
   },
   {
     "id": 283366,
@@ -143,7 +154,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 6,
-    "genre": "приключения, фэнтези"
+    "genre": "приключения, фэнтези",
+    "runtime": 126
   },
   {
     "id": 27205,
@@ -155,7 +167,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 9,
-    "genre": "боевик, фантастика"
+    "genre": "боевик, фантастика",
+    "runtime": 148
   },
   {
     "id": 640,
@@ -167,7 +180,8 @@
     "category": "joint",
     "scoreBoy": 10,
     "scoreGirl": 10,
-    "genre": "драма, криминал"
+    "genre": "драма, криминал",
+    "runtime": 141
   },
   {
     "id": 150540,
@@ -179,7 +193,8 @@
     "category": "watchlist",
     "scoreBoy": null,
     "scoreGirl": null,
-    "genre": "мультфильм, семейный"
+    "genre": "мультфильм, семейный",
+    "runtime": 95
   },
   {
     "id": 1430077,
@@ -191,7 +206,8 @@
     "category": "joint",
     "scoreBoy": 2,
     "scoreGirl": 4,
-    "genre": "ужасы, триллер"
+    "genre": "ужасы, триллер",
+    "runtime": 107
   },
   {
     "id": 645710,
@@ -203,7 +219,8 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 8,
-    "genre": "триллер"
+    "genre": "триллер",
+    "runtime": 117
   },
   {
     "id": 1339713,
@@ -215,7 +232,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 7,
-    "genre": "ужасы, триллер"
+    "genre": "ужасы, триллер",
+    "runtime": 108
   },
   {
     "id": 1307118,
@@ -227,7 +245,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 6,
-    "genre": "ужасы, фантастика"
+    "genre": "ужасы, фантастика",
+    "runtime": 99
   },
   {
     "id": 4970,
@@ -239,7 +258,8 @@
     "category": "joint",
     "scoreBoy": 3,
     "scoreGirl": 4,
-    "genre": "ужасы, детектив"
+    "genre": "ужасы, детектив",
+    "runtime": 98
   },
   {
     "id": 256591,
@@ -251,7 +271,8 @@
     "category": "joint",
     "scoreBoy": 9,
     "scoreGirl": 9,
-    "genre": "мелодрама, комедия"
+    "genre": "мелодрама, комедия",
+    "runtime": 104
   },
   {
     "id": 493675,
@@ -263,7 +284,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 7,
-    "genre": "драма, детектив"
+    "genre": "драма, детектив",
+    "runtime": 106
   },
   {
     "id": 28355,
@@ -275,7 +297,8 @@
     "category": "joint",
     "scoreBoy": 5,
     "scoreGirl": 6,
-    "genre": "ужасы, детектив"
+    "genre": "ужасы, детектив",
+    "runtime": 109
   },
   {
     "id": 1402,
@@ -287,7 +310,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 6,
-    "genre": "драма"
+    "genre": "драма",
+    "runtime": 117
   },
   {
     "id": 8844,
@@ -299,7 +323,8 @@
     "category": "watchlist",
     "scoreBoy": null,
     "scoreGirl": null,
-    "genre": "приключения, фэнтези"
+    "genre": "приключения, фэнтези",
+    "runtime": 104
   },
   {
     "id": 57800,
@@ -311,7 +336,8 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 7,
-    "genre": "мультфильм, комедия"
+    "genre": "мультфильм, комедия",
+    "runtime": 88
   },
   {
     "id": 8355,
@@ -323,7 +349,8 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 9,
-    "genre": "мультфильм, комедия"
+    "genre": "мультфильм, комедия",
+    "runtime": 94
   },
   {
     "id": 950,
@@ -335,7 +362,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 7,
-    "genre": "мультфильм, семейный"
+    "genre": "мультфильм, семейный",
+    "runtime": 91
   },
   {
     "id": 425,
@@ -347,7 +375,8 @@
     "category": "joint",
     "scoreBoy": 5,
     "scoreGirl": 6,
-    "genre": "мультфильм, комедия"
+    "genre": "мультфильм, комедия",
+    "runtime": 81
   },
   {
     "id": 550,
@@ -359,7 +388,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 6,
-    "genre": "драма, триллер"
+    "genre": "драма, триллер",
+    "runtime": 139
   },
   {
     "id": 436969,
@@ -371,7 +401,8 @@
     "category": "joint",
     "scoreBoy": 9,
     "scoreGirl": 9,
-    "genre": "боевик, комедия"
+    "genre": "боевик, комедия",
+    "runtime": 132
   },
   {
     "id": 297761,
@@ -383,7 +414,8 @@
     "category": "joint",
     "scoreBoy": 9,
     "scoreGirl": 9,
-    "genre": "боевик, приключения"
+    "genre": "боевик, приключения",
+    "runtime": 118
   },
   {
     "id": 155,
@@ -395,7 +427,8 @@
     "category": "joint",
     "scoreBoy": 3,
     "scoreGirl": 5,
-    "genre": "боевик, триллер"
+    "genre": "боевик, триллер",
+    "runtime": 152
   },
   {
     "id": 1400940,
@@ -407,7 +440,8 @@
     "category": "watchlist",
     "scoreBoy": null,
     "scoreGirl": null,
-    "genre": "ужасы, триллер"
+    "genre": "ужасы, триллер",
+    "runtime": 108
   },
   {
     "id": 1160923,
@@ -419,7 +453,8 @@
     "category": "joint",
     "scoreBoy": 5,
     "scoreGirl": 5,
-    "genre": "ужасы, триллер"
+    "genre": "ужасы, триллер",
+    "runtime": 101
   },
   {
     "id": 1064028,
@@ -431,7 +466,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 7,
-    "genre": "ужасы, фантастика"
+    "genre": "ужасы, фантастика",
+    "runtime": 95
   },
   {
     "id": 274,
@@ -443,7 +479,8 @@
     "category": "girl",
     "scoreBoy": null,
     "scoreGirl": 9,
-    "genre": "криминал, триллер"
+    "genre": "криминал, триллер",
+    "runtime": 118
   },
   {
     "id": 68718,
@@ -455,7 +492,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 8,
-    "genre": "драма, вестерн"
+    "genre": "драма, вестерн",
+    "runtime": 165
   },
   {
     "id": 106646,
@@ -467,7 +505,8 @@
     "category": "joint",
     "scoreBoy": 10,
     "scoreGirl": 8,
-    "genre": "криминал, драма"
+    "genre": "криминал, драма",
+    "runtime": 180
   },
   {
     "id": 1569200,
@@ -479,7 +518,8 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 7,
-    "genre": "триллер, драма"
+    "genre": "триллер, драма",
+    "runtime": 90
   },
   {
     "id": 936075,
@@ -491,7 +531,8 @@
     "category": "boy",
     "scoreBoy": 5,
     "scoreGirl": null,
-    "genre": "музыка, драма"
+    "genre": "музыка, драма",
+    "runtime": 128
   },
   {
     "id": 911430,
@@ -503,7 +544,8 @@
     "category": "joint",
     "scoreBoy": 9,
     "scoreGirl": 8,
-    "genre": "боевик, драма"
+    "genre": "боевик, драма",
+    "runtime": 155
   },
   {
     "id": 1071585,
@@ -515,7 +557,8 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 8,
-    "genre": "боевик, фантастика"
+    "genre": "боевик, фантастика",
+    "runtime": 120
   },
   {
     "id": 1304313,
@@ -527,7 +570,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 5,
-    "genre": "ужасы, детектив"
+    "genre": "ужасы, детектив",
+    "runtime": 135
   },
   {
     "id": 536554,
@@ -539,7 +583,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 6,
-    "genre": "фантастика, ужасы"
+    "genre": "фантастика, ужасы",
+    "runtime": 101
   },
   {
     "id": 75656,
@@ -551,7 +596,8 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 9,
-    "genre": "триллер, криминал"
+    "genre": "триллер, криминал",
+    "runtime": 115
   },
   {
     "id": 8587,
@@ -563,7 +609,8 @@
     "category": "joint",
     "scoreBoy": 7,
     "scoreGirl": 10,
-    "genre": "мультфильм, семейный"
+    "genre": "мультфильм, семейный",
+    "runtime": 88
   },
   {
     "id": 9732,
@@ -575,7 +622,8 @@
     "category": "joint",
     "scoreBoy": 6,
     "scoreGirl": 10,
-    "genre": "приключения, мультфильм"
+    "genre": "приключения, мультфильм",
+    "runtime": 81
   },
   {
     "id": 11324,
@@ -587,7 +635,8 @@
     "category": "joint",
     "scoreBoy": 9,
     "scoreGirl": 9,
-    "genre": "драма, триллер"
+    "genre": "драма, триллер",
+    "runtime": 138
   },
   {
     "id": 419430,
@@ -599,6 +648,7 @@
     "category": "joint",
     "scoreBoy": 8,
     "scoreGirl": 7,
-    "genre": "детектив, триллер"
+    "genre": "детектив, триллер",
+    "runtime": 104
   }
 ]
