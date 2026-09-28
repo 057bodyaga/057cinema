@@ -358,7 +358,6 @@
       transform: scale(1.015); 
     }
 
-    /* Еще более крупные постеры (150px на 225px) */
     .card-poster { 
       width: 150px; 
       height: 225px; 
@@ -408,9 +407,10 @@
       width: 155px;
     }
     
+    /* Стили кнопок действий теперь полностью гармонируют с сайтом */
     .btn-action { 
       width: 100%;
-      padding: 10px 14px; 
+      padding: 11px 14px; 
       border: none; 
       border-radius: 10px; 
       font-size: .88rem; 
@@ -424,7 +424,7 @@
       justify-content: center;
     }
     .btn-action:hover { opacity: .88; transform: translateY(-1px); }
-    .btn-watched  { background: var(--success); color: #fff; }
+    .btn-watched  { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
     .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); border: 1px solid rgba(157,78,221,.4); }
     .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
     .btn-delete   { background: rgba(255,82,82,.12); color: var(--danger); border: 1px solid rgba(255,82,82,.2); }
@@ -948,6 +948,21 @@
       const jsonString = decodeURIComponent(Array.from(raw).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
       db = JSON.parse(jsonString);
       
+      // Автопроверка и дозагрузка длительности фильмов, если её не было
+      let needsUpdate = false;
+      for (let m of db) {
+        if (!m.runtime) {
+          const rt = await fetchMovieDetails(m.id);
+          if (rt) {
+            m.runtime = rt;
+            needsUpdate = true;
+          }
+        }
+      }
+      if (needsUpdate && hasToken()) {
+        await commitToGitHub("Автообновление длительности фильмов", true);
+      }
+      
       updateFooterInfo(token);
       updateGenreFilterOptions();
       updateDefaultBackground();
@@ -957,9 +972,9 @@
     }
   }
 
-  async function commitToGitHub(msg) {
+  async function commitToGitHub(msg, silent = false) {
     const token = localStorage.getItem('gh_token');
-    if(!token) { alert("Нельзя сохранить! Сначала введите рабочий токен вверху страницы."); return; }
+    if(!token) { if(!silent) alert("Нельзя сохранить! Сначала введите рабочий токен вверху страницы."); return; }
     
     const base64 = btoa(encodeURIComponent(JSON.stringify(db, null, 2)).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
     
@@ -971,15 +986,17 @@
       });
       if (res.ok) { 
         fileSha = (await res.json()).content.sha; 
-        updateFooterInfo(token);
-        updateGenreFilterOptions();
-        updateDefaultBackground();
-        render(); 
+        if (!silent) {
+          updateFooterInfo(token);
+          updateGenreFilterOptions();
+          updateDefaultBackground();
+          render(); 
+        }
       } else { 
-        alert("GitHub отклонил сохранение. Проверьте права токена!"); 
+        if (!silent) alert("GitHub отклонил сохранение. Проверьте права токена!"); 
       }
     } catch {
-      alert("Ошибка сети при отправке данных на GitHub.");
+      if (!silent) alert("Ошибка сети при отправке данных на GitHub.");
     }
   }
 
@@ -997,7 +1014,6 @@
   }
 
   async function apiSave(m) { 
-    // Если у фильма нет длительности, запрашиваем её из TMDB перед сохранением
     if (!m.runtime) {
       m.runtime = await fetchMovieDetails(m.id);
     }
@@ -1279,7 +1295,7 @@
     const overallAvg = scoredCount > 0 ? (totalScore / scoredCount).toFixed(1) : '—';
     const totalHours = Math.floor(totalMinutes / 60);
     const remMinutes = totalMinutes % 60;
-    const timeString = totalMinutes > 0 ? `${totalHours} ч ${remMinutes} мин` : '—';
+    const timeString = totalMinutes > 0 ? `${totalHours} ч ${remMinutes} мин` : '0 ч 0 мин';
 
     return `
       <div class="stats-container">
