@@ -122,6 +122,11 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-8px); }
+    }
+
     .dropdown::-webkit-scrollbar { width: 6px; }
     .dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     .dropdown::-webkit-scrollbar-thumb:hover { background: var(--accent); }
@@ -223,7 +228,10 @@
       margin-bottom: 20px;
       position: relative;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      animation: fadeIn 0.2s ease-out;
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    .genre-modal.hiding {
+      animation: fadeOut 0.2s ease-in forwards;
     }
     .genre-modal-grid {
       display: flex;
@@ -717,7 +725,17 @@
   }
 
   function toggleGenreModal() {
-    document.getElementById('genreModal').classList.toggle('hidden');
+    const modal = document.getElementById('genreModal');
+    if (modal.classList.contains('hidden')) {
+      modal.classList.remove('hidden');
+      modal.classList.remove('hiding');
+    } else {
+      modal.classList.add('hiding');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('hiding');
+      }, 200); // Время должно совпадать с длительностью анимации fadeOut в CSS
+    }
   }
 
   function scrollToBottom() {
@@ -1016,6 +1034,7 @@
     b.classList.add('active'); 
     document.getElementById('subTabs').classList.toggle('hidden', t !== 'watched'); 
     document.getElementById('genreModal').classList.add('hidden');
+    document.getElementById('genreModal').classList.remove('hiding');
     updateSearchPlaceholder();
     hideDropdown();
     document.getElementById('searchInput').value = '';
@@ -1057,7 +1076,7 @@
   function selectGenre(val, name) {
     activeSub = val;
     document.getElementById('currentGenreLabel').textContent = name;
-    document.getElementById('genreModal').classList.add('hidden');
+    toggleGenreModal();
     updateGenreFilterOptions();
     render();
   }
