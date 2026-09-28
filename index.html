@@ -870,16 +870,13 @@
     rouletteWrap.classList.add('active');
     resultArea.innerHTML = '';
 
-    // Формируем уникальную ленту без подряд идущих повторов из доступного пула
+    // Формируем уникальную ленту без подряд идущих повторов из доступного пула (80 элементов для долгого пролета)
     let rouletteItems = [];
     let availablePool = [...pool];
-    
-    // Перемешиваем пул для разнообразия
     availablePool.sort(() => Math.random() - 0.5);
 
-    // Создаем ленту из 40 элементов (победитель на 30-й позиции)
     let poolIndex = 0;
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 80; i++) {
       if (poolIndex >= availablePool.length) {
         availablePool.sort(() => Math.random() - 0.5);
         poolIndex = 0;
@@ -887,9 +884,9 @@
       rouletteItems.push(availablePool[poolIndex++]);
     }
 
-    // Выбираем победителя на 30-й позиции
+    // Выбираем победителя на 65-й позиции для долгой прокрутки
     const winnerItem = pool[Math.floor(Math.random() * pool.length)];
-    rouletteItems[30] = winnerItem;
+    rouletteItems[65] = winnerItem;
 
     track.innerHTML = rouletteItems.map(m => {
       const poster = m.poster || (m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : 'https://placehold.co/110x164');
@@ -898,14 +895,14 @@
 
     const itemWidth = 132; // 120px width + 12px gap
     const containerWidth = rouletteWrap.clientWidth;
-    const targetOffset = (30 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 20 - 10);
+    const targetOffset = (65 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 20 - 10);
 
     track.style.transition = 'none';
     track.style.transform = 'translateX(0px)';
     void track.offsetWidth; 
 
-    // Сделали быстрее и динамичнее (3.5 секунды с резким стартом и мягким финишем)
-    track.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.85, 0.2, 1)';
+    // Увеличено до 6 секунд с плавным и долгим замедлением в конце
+    track.style.transition = 'transform 6s cubic-bezier(0.08, 0.82, 0.12, 1)';
     track.style.transform = `translateX(-${targetOffset}px)`;
 
     setTimeout(async () => {
@@ -919,7 +916,7 @@
       
       rouletteWrap.classList.remove('active');
       renderRandomWinnerCard();
-    }, 3600);
+    }, 6100);
   }
 
   function renderRandomWinnerCard() {
