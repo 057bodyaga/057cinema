@@ -229,9 +229,63 @@
     .btn-primary:hover { opacity: .88; }
     .btn-primary:disabled { opacity: .45; cursor: default; }
     
-    .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
+    .tabs-container { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .tabs { display: flex; gap: 6px; }
     .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
-    .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
+    .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); margin-bottom: -12px; padding-bottom: 12px; }
+
+    /* Дропдаун случайного фильма */
+    .random-dropdown-wrap { position: relative; display: inline-block; }
+    .btn-random-trigger {
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(247, 37, 133, 0.2));
+      border: 1px solid rgba(157, 78, 221, 0.4);
+      color: var(--text);
+      padding: 9px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-random-trigger:hover {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.35), rgba(247, 37, 133, 0.35));
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .random-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: rgba(26, 21, 46, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 15px rgba(157, 78, 221, 0.15);
+      padding: 6px;
+      z-index: 250;
+      min-width: 250px;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .random-menu-item {
+      padding: 11px 14px;
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .random-menu-item:hover {
+      background: rgba(157, 78, 221, 0.25);
+      color: #fff;
+    }
     
     .sub-tabs { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
     
@@ -303,7 +357,6 @@
     .select-wrap { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
     .select-wrap label { font-weight: 600; }
     
-    /* Стилизованный селект сортировки с центрированием текста */
     .custom-select { 
       padding: 9px 32px 9px 14px; 
       width: auto; 
@@ -428,7 +481,6 @@
     }
     .btn-action:hover { opacity: .92; transform: translateY(-1px); }
 
-    /* Обновленная более темная и глубокая кнопка «Посмотрели!» */
     .btn-watched { 
       background: linear-gradient(135deg, rgba(74, 33, 114, 0.9), rgba(131, 38, 92, 0.9)); 
       color: #fff; 
@@ -443,7 +495,6 @@
     .btn-edit     { background: rgba(157,78,221,.2); color: var(--accent); border: 1px solid rgba(157,78,221,.4); }
     .btn-desc-action { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
     
-    /* Стилизованная кнопка «Удалить» в гармоничном темном стиле с красным акцентом */
     .btn-delete { 
       background: rgba(30, 15, 22, 0.85); 
       color: #ff6b6b; 
@@ -619,6 +670,11 @@
         font-size: 0.95rem;
       }
 
+      .tabs-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
       .tabs {
         justify-content: center;
         flex-wrap: wrap;
@@ -627,6 +683,22 @@
       .tab {
         padding: 8px 14px;
         font-size: 0.95rem;
+      }
+
+      .random-dropdown-wrap {
+        width: 100%;
+        display: block;
+      }
+
+      .btn-random-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .random-menu {
+        left: 0;
+        right: 0;
+        width: 100%;
       }
 
       .sub-tabs {
@@ -734,10 +806,23 @@
     </div>
   </section>
   
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab(this,'watchlist')">Нужно посмотреть</button>
-    <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
-    <button class="tab"        onclick="switchTab(this,'stats')">Статистика</button>
+  <div class="tabs-container">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'watchlist')">Нужно посмотреть</button>
+      <button class="tab"        onclick="switchTab(this,'watched')">Просмотрено</button>
+      <button class="tab"        onclick="switchTab(this,'stats')">Статистика</button>
+    </div>
+    
+    <div class="random-dropdown-wrap">
+      <button type="button" class="btn-random-trigger" onclick="toggleRandomMenu(event)">
+        🎲 Случайный фильм ▼
+      </button>
+      <div id="randomMenu" class="random-menu hidden">
+        <div class="random-menu-item" onclick="pickRandomMovie('watchlist')">🎲 Из «Нужно посмотреть»</div>
+        <div class="random-menu-item" onclick="pickRandomMovie('all_local')">🔥 Из всех ваших фильмов</div>
+        <div class="random-menu-item" onclick="pickRandomMovie('world')">🌍 Вообще из всех в мире</div>
+      </div>
+    </div>
   </div>
 
   <div id="subTabs" class="sub-tabs hidden">
@@ -815,6 +900,78 @@
 
   function toggleTokenPanel() {
     document.getElementById('tokenPanel').classList.toggle('hidden');
+  }
+
+  function toggleRandomMenu(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('randomMenu');
+    menu.classList.toggle('hidden');
+  }
+
+  async function pickRandomMovie(mode) {
+    document.getElementById('randomMenu').classList.add('hidden');
+
+    if (mode === 'watchlist') {
+      const list = db.filter(x => x.status === 'watchlist');
+      if (!list.length) {
+        alert("В списке «Нужно посмотреть» пока нет фильмов!");
+        return;
+      }
+      const randomItem = list[Math.floor(Math.random() * list.length)];
+      
+      const tabBtn = document.querySelectorAll('.tab')[0];
+      switchTab(tabBtn, 'watchlist');
+      scrollToWatchedMovie(randomItem.id);
+
+    } else if (mode === 'all_local') {
+      if (!db.length) {
+        alert("Ваша база фильмов пока пуста!");
+        return;
+      }
+      const randomItem = db[Math.floor(Math.random() * db.length)];
+      
+      const tabIdx = randomItem.status === 'watched' ? 1 : 0;
+      const tabBtn = document.querySelectorAll('.tab')[tabIdx];
+      switchTab(tabBtn, randomItem.status);
+      scrollToWatchedMovie(randomItem.id);
+
+    } else if (mode === 'world') {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '<div class="loading">Подбираем случайный фильм со всего мира...</div>';
+      
+      try {
+        // Генерируем случайную страницу от 1 до 500 для поиска популярного/интересного кино
+        const randomPage = Math.floor(Math.random() * 300) + 1;
+        const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_KEY}&language=ru-RU&sort_by=popularity.desc&page=${randomPage}&vote_count.gte=100`);
+        const data = await res.json();
+        
+        if (data.results && data.results.length > 0) {
+          const randomIndex = Math.floor(Math.random() * data.results.length);
+          const m = data.results[randomIndex];
+          
+          m._genre = parseGenres(m.genre_ids);
+          m._runtime = await fetchMovieDetails(m.id);
+          pending = m;
+
+          document.getElementById('searchInput').value = m.title;
+          document.getElementById('configTitle').textContent = `Случайный из мира: "${m.title}"`;
+          document.getElementById('selStatus').value = 'watchlist';
+          document.getElementById('configForm').classList.remove('hidden');
+          document.getElementById('txtComment').value = '';
+          onStatusChange();
+          
+          document.getElementById('configForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          render();
+        } else {
+          alert("Не удалось найти случайный фильм, попробуйте еще раз.");
+          render();
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Ошибка при запросе случайного фильма.");
+        render();
+      }
+    }
   }
 
   function saveTokenBtn() {
@@ -1445,7 +1602,13 @@
   }
 
   function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) hideDropdown(); });
+  
+  document.addEventListener('click', e => { 
+    if (!e.target.closest('.search-wrap')) hideDropdown(); 
+    if (!e.target.closest('.random-dropdown-wrap')) {
+      document.getElementById('randomMenu').classList.add('hidden');
+    }
+  });
   
   updateSearchPlaceholder();
   apiGet();
