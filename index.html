@@ -870,25 +870,32 @@
     rouletteWrap.classList.add('active');
     resultArea.innerHTML = '';
 
-    // Гарантируем абсолютную уникальность фильмов без повторов (лента на 100 элементов для долгого пролета)
-    let shuffledPool = [...pool].sort(() => Math.random() - 0.5);
+    // Генерируем массив уникальных фильмов без повторений (строго по одному разу за цикл перемешивания)
     let rouletteItems = [];
-    
-    while (rouletteItems.length < 100) {
-      if (shuffledPool.length === 0) {
-        shuffledPool = [...pool].sort(() => Math.random() - 0.5);
+    let currentBatch = [];
+
+    function getNextUniqueMovie() {
+      if (currentBatch.length === 0) {
+        currentBatch = [...pool].sort(() => Math.random() - 0.5);
       }
-      rouletteItems.push(shuffledPool.pop());
+      return currentBatch.pop();
     }
 
-    // Выбираем победителя на 80-й позиции для очень длинной прокрутки
-    const winnerItem = pool[Math.floor(Math.random() * pool.length)];
-    rouletteItems[80] = winnerItem;
-    if (rouletteItems[79].id === winnerItem.id) {
-      rouletteItems[79] = pool.find(p => p.id !== winnerItem.id) || winnerItem;
+    // Наполняем огромную ленту на 150 элементов
+    for (let i = 0; i < 150; i++) {
+      rouletteItems.push(getNextUniqueMovie());
     }
-    if (rouletteItems[81].id === winnerItem.id) {
-      rouletteItems[81] = pool.find(p => p.id !== winnerItem.id) || winnerItem;
+
+    // Выбираем победителя на 120-й позиции (очень долгий и зрелищный пролет)
+    const winnerItem = pool[Math.floor(Math.random() * pool.length)];
+    rouletteItems[120] = winnerItem;
+    
+    // Дополнительно страхуем соседей победителя, чтобы они тоже не совпадали
+    if (rouletteItems[119].id === winnerItem.id) {
+      rouletteItems[119] = pool.find(p => p.id !== winnerItem.id) || winnerItem;
+    }
+    if (rouletteItems[121].id === winnerItem.id) {
+      rouletteItems[121] = pool.find(p => p.id !== winnerItem.id) || winnerItem;
     }
 
     track.innerHTML = rouletteItems.map(m => {
@@ -898,14 +905,14 @@
 
     const itemWidth = 132; // 120px width + 12px gap
     const containerWidth = rouletteWrap.clientWidth;
-    const targetOffset = (80 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 16 - 8);
+    const targetOffset = (120 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 16 - 8);
 
     track.style.transition = 'none';
     track.style.transform = 'translateX(0px)';
     void track.offsetWidth; 
 
-    // Увеличено до 6.5 секунд для долгого пролета с аккуратным докатом в конце
-    track.style.transition = 'transform 6.5s cubic-bezier(0.08, 0.82, 0.12, 1)';
+    // Время прокрутки 7 секунд — лента долго несется на средней/высокой скорости, перебирая множество фильмов
+    track.style.transition = 'transform 7s cubic-bezier(0.06, 0.85, 0.1, 1)';
     track.style.transform = `translateX(-${targetOffset}px)`;
 
     setTimeout(async () => {
@@ -919,7 +926,7 @@
       
       rouletteWrap.classList.remove('active');
       renderRandomWinnerCard();
-    }, 6600);
+    }, 7100);
   }
 
   function renderRandomWinnerCard() {
