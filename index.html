@@ -221,7 +221,6 @@
     .tab { background: none; border: none; color: var(--muted); padding: 9px 22px; font-size: 1.1rem; font-weight: 600; cursor: pointer; border-radius: 8px 8px 0 0; transition: color .2s; }
     .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); margin-bottom: -12px; padding-bottom: 12px; }
 
-    /* Стили для вкладки «Случайный» и рулетки */
     .random-tab-panel {
       background: var(--panel);
       backdrop-filter: blur(12px);
@@ -283,7 +282,6 @@
     .btn-reroll:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-reroll:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-    /* Увеличенная рулетка CS2 */
     .case-roulette-wrap {
       position: relative;
       width: 100%;
@@ -970,6 +968,9 @@
   async function addWorldMovieToWatchlist() {
     if (!currentRandomMovie || !hasToken()) return;
     const m = currentRandomMovie;
+    if (!m.runtime) {
+      m.runtime = await fetchMovieDetails(m.id);
+    }
     await apiSave({
       id: m.id,
       title: m.title,
@@ -977,7 +978,7 @@
       poster: m.poster,
       year: m.year,
       genre: m.genre,
-      runtime: m.runtime,
+      runtime: m.runtime || 0,
       status: 'watchlist',
       category: 'watchlist',
       scoreBoy: null,
@@ -1145,7 +1146,7 @@
       
       let needsUpdate = false;
       for (let m of db) {
-        if (!m.runtime) {
+        if (!m.runtime || m.runtime === 0) {
           const rt = await fetchMovieDetails(m.id);
           if (rt) {
             m.runtime = rt;
@@ -1208,14 +1209,14 @@
   }
 
   async function apiSave(m) { 
-    if (!m.runtime) {
+    if (!m.runtime || m.runtime === 0) {
       m.runtime = await fetchMovieDetails(m.id);
     }
 
     const idx = db.findIndex(x => x.id === m.id);
     if (idx !== -1) {
       m.addedAt = db[idx].addedAt || Date.now();
-      if (!m.runtime) m.runtime = db[idx].runtime || 0;
+      if (!m.runtime || m.runtime === 0) m.runtime = db[idx].runtime || 0;
       db[idx] = m;
     } else {
       m.addedAt = Date.now();
@@ -1339,26 +1340,38 @@
     document.querySelectorAll('.watched-only').forEach(el => el.classList.toggle('hidden', !isW)); 
   }
 
-  function saveMovie() {
-    if (!pending || !hasToken()) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
+  async function saveMovie() {
+    if (!pending || !hasToken()) return; 
+    const btn = document.getElementById('btnSave'); 
+    btn.disabled = true;
+    
     const status = document.getElementById('selStatus').value; 
     const cat = status === 'watched' ? 'joint' : 'watchlist';
     
     const bScore = parseFloat(document.getElementById('sliBoy').value);
     const gScore = parseFloat(document.getElementById('sliGirl').value);
 
-    apiSave({
+    let runtimeVal = pending._runtime || 0;
+    if (!runtimeVal || runtimeVal === 0) {
+      runtimeVal = await fetchMovieDetails(pending.id);
+    }
+
+    await apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
       poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/125x175'),
       year: pending.release_date?.substring(0,4) || pending.year || '—', 
       genre: pending._genre || pending.genre || '',
-      runtime: pending._runtime || 0,
+      runtime: runtimeVal,
       status, category: cat,
       scoreBoy: status === 'watched' ? bScore : null,
       scoreGirl: status === 'watched' ? gScore : null,
       comment: status === 'watched' ? document.getElementById('txtComment').value.trim() : ''
     });
-    document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
+    
+    document.getElementById('configForm').classList.add('hidden'); 
+    document.getElementById('searchInput').value = ''; 
+    pending = null; 
+    btn.disabled = false;
   }
 
   function editRatings(id) {
