@@ -123,7 +123,8 @@
       padding: 24px; 
       margin-bottom: 32px; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.45); 
-      position: relative; 
+      position: relative;
+      z-index: 50;
     }
     .search-wrap { position: relative; }
     input[type="text"], textarea { width: 100%; padding: 14px 18px; background: rgba(9, 7, 15, 0.8); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; font-family: inherit; }
@@ -134,15 +135,15 @@
       top: calc(100% + 10px); 
       left: 0; 
       right: 0; 
-      background: rgba(26, 21, 46, 0.95); 
+      background: rgba(26, 21, 46, 0.98); 
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(157, 78, 221, 0.3); 
+      border: 1px solid rgba(157, 78, 221, 0.4); 
       border-radius: 16px; 
       max-height: 380px; 
       overflow-y: auto; 
-      z-index: 200; 
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(157, 78, 221, 0.15); 
+      z-index: 9999; 
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 25px rgba(157, 78, 221, 0.2); 
       padding: 6px;
       animation: fadeIn 0.2s ease-out;
     }
@@ -870,7 +871,6 @@
     rouletteWrap.classList.add('active');
     resultArea.innerHTML = '';
 
-    // Бесшовное заполнение ленты без повторов фильмов
     let rouletteItems = [];
     let currentBatch = [];
 
@@ -885,7 +885,6 @@
       rouletteItems.push(getNextUniqueMovie());
     }
 
-    // Фиксируем победителя на 105-й позиции
     const winnerItem = pool[Math.floor(Math.random() * pool.length)];
     rouletteItems[105] = winnerItem;
     
@@ -901,7 +900,7 @@
       return `<div class="case-item"><img src="${esc(poster)}"></div>`;
     }).join('');
 
-    const itemWidth = 132; // 120px width + 12px gap
+    const itemWidth = 132;
     const containerWidth = rouletteWrap.clientWidth;
     const targetOffset = (105 * itemWidth) - (containerWidth / 2) + (itemWidth / 2) + (Math.random() * 16 - 8);
 
@@ -909,7 +908,6 @@
     track.style.transform = 'translateX(0px)';
     void track.offsetWidth; 
 
-    // Плавный старт (0.22, 1, 0.36, 1) + ускоренный финиш (докат) в конце
     track.style.transition = 'transform 6s cubic-bezier(0.22, 1, 0.15, 1)';
     track.style.transform = `translateX(-${targetOffset}px)`;
 
@@ -1327,6 +1325,12 @@
     document.getElementById('selStatus').value = 'watchlist'; 
     document.getElementById('configForm').classList.remove('hidden'); 
     document.getElementById('txtComment').value = '';
+    
+    document.getElementById('sliBoy').value = 5;
+    document.getElementById('valBoy').textContent = '5';
+    document.getElementById('sliGirl').value = 5;
+    document.getElementById('valGirl').textContent = '5';
+    
     onStatusChange();
   }
 
@@ -1339,6 +1343,10 @@
     if (!pending || !hasToken()) return; const btn = document.getElementById('btnSave'); btn.disabled = true;
     const status = document.getElementById('selStatus').value; 
     const cat = status === 'watched' ? 'joint' : 'watchlist';
+    
+    const bScore = parseFloat(document.getElementById('sliBoy').value);
+    const gScore = parseFloat(document.getElementById('sliGirl').value);
+
     apiSave({
       id: pending.id, title: pending.title, overview: pending.overview ?? 'Описания нет.',
       poster: pending._poster || (pending.poster_path ? `https://image.tmdb.org/t/p/w185${pending.poster_path}` : 'https://placehold.co/125x175'),
@@ -1346,8 +1354,8 @@
       genre: pending._genre || pending.genre || '',
       runtime: pending._runtime || 0,
       status, category: cat,
-      scoreBoy: status === 'watched' ? 5 : null,
-      scoreGirl: status === 'watched' ? 5 : null,
+      scoreBoy: status === 'watched' ? bScore : null,
+      scoreGirl: status === 'watched' ? gScore : null,
       comment: status === 'watched' ? document.getElementById('txtComment').value.trim() : ''
     });
     document.getElementById('configForm').classList.add('hidden'); document.getElementById('searchInput').value = ''; pending = null; btn.disabled = false;
@@ -1358,15 +1366,13 @@
     const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt, _runtime: m.runtime };
     document.getElementById('configTitle').textContent = `Изменить: "${m.title}"`; document.getElementById('selStatus').value = m.status; 
     
-    if(m.status === 'watched') {
-      const bScore = m.scoreBoy ?? 5;
-      const gScore = m.scoreGirl ?? 5;
-      document.getElementById('sliBoy').value = bScore;
-      document.getElementById('valBoy').textContent = bScore;
-      document.getElementById('sliGirl').value = gScore;
-      document.getElementById('valGirl').textContent = gScore;
-      document.getElementById('txtComment').value = m.comment || '';
-    }
+    const bScore = m.scoreBoy ?? 5;
+    const gScore = m.scoreGirl ?? 5;
+    document.getElementById('sliBoy').value = bScore;
+    document.getElementById('valBoy').textContent = bScore;
+    document.getElementById('sliGirl').value = gScore;
+    document.getElementById('valGirl').textContent = gScore;
+    document.getElementById('txtComment').value = m.comment || '';
 
     const form = document.getElementById('configForm');
     form.classList.remove('hidden'); 
@@ -1382,7 +1388,15 @@
   function markWatched(id) { 
     if (!hasToken()) return;
     const m = db.find(x => x.id === id); if (!m) return; pending = { id: m.id, title: m.title, overview: m.overview, _poster: m.poster, year: m.year, _genre: m.genre, addedAt: m.addedAt, _runtime: m.runtime }; document.getElementById('selStatus').value = 'watched'; 
+    
+    const bScore = m.scoreBoy ?? 5;
+    const gScore = m.scoreGirl ?? 5;
+    document.getElementById('sliBoy').value = bScore;
+    document.getElementById('valBoy').textContent = bScore;
+    document.getElementById('sliGirl').value = gScore;
+    document.getElementById('valGirl').textContent = gScore;
     document.getElementById('txtComment').value = m.comment || '';
+
     const form = document.getElementById('configForm');
     form.classList.remove('hidden'); 
     onStatusChange();
@@ -1571,7 +1585,7 @@
       if (m.status === 'watched') {
         const avg = getAvgScore(m);
         const avgTag = avg > 0 ? `<span class="tag tag-avg">⭐ ${avg.toFixed(1)}/10</span>` : '';
-        tags = `${avgTag}${m.scoreBoy ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
+        tags = `${avgTag}${m.scoreBoy != null ? `<span class="tag tag-score">👨 ${m.scoreBoy}</span>`:''}${m.scoreGirl != null ? `<span class="tag tag-score">👩 ${m.scoreGirl}</span>`:''}`;
       }
 
       const isWatchlist = m.status === 'watchlist';
