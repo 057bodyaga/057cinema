@@ -1503,22 +1503,28 @@
     const watchedList = db.filter(x => x.status === 'watched');
     const watchlistList = db.filter(x => x.status === 'watchlist');
     
-    let totalScore = 0;
-    let scoredCount = 0;
+    let totalBoyScore = 0;
+    let boyCount = 0;
+    let totalGirlScore = 0;
+    let girlCount = 0;
     let totalMinutes = 0;
 
     watchedList.forEach(m => {
-      const avg = getAvgScore(m);
-      if (avg > 0) {
-        totalScore += avg;
-        scoredCount++;
+      if (m.scoreBoy != null) {
+        totalBoyScore += m.scoreBoy;
+        boyCount++;
+      }
+      if (m.scoreGirl != null) {
+        totalGirlScore += m.scoreGirl;
+        girlCount++;
       }
       if (m.runtime) {
         totalMinutes += m.runtime;
       }
     });
 
-    const overallAvg = scoredCount > 0 ? (totalScore / scoredCount).toFixed(1) : '—';
+    const avgBoy = boyCount > 0 ? (totalBoyScore / boyCount).toFixed(1) : '—';
+    const avgGirl = girlCount > 0 ? (totalGirlScore / girlCount).toFixed(1) : '—';
     const totalHours = Math.floor(totalMinutes / 60);
     const remMinutes = totalMinutes % 60;
     const timeString = totalMinutes > 0 ? `${totalHours} ч ${remMinutes} мин` : '0 ч 0 мин';
@@ -1541,8 +1547,12 @@
             <div class="stat-label">В списке «Нужно посмотреть»</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">⭐ ${overallAvg}</div>
-            <div class="stat-label">Средняя оценка всей коллекции</div>
+            <div class="stat-value">⭐ ${avgBoy}</div>
+            <div class="stat-label">Средняя оценка Боди</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">⭐ ${avgGirl}</div>
+            <div class="stat-label">Средняя оценка Каракумику</div>
           </div>
         </div>
       </div>
